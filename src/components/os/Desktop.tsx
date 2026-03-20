@@ -6,6 +6,7 @@ import Window from "./Window";
 import Taskbar from "./Taskbar";
 import KROSLogo from "./KROSLogo";
 import DesktopBg from "./DesktopBg";
+import MouseTrail from "./MouseTrail";
 import AboutApp from "@/components/apps/AboutApp";
 import SkillsApp from "@/components/apps/SkillsApp";
 import ProjectsApp from "@/components/apps/ProjectsApp";
@@ -284,6 +285,9 @@ export default function Desktop() {
         onIconClick={openWindow}
         onTaskbarClick={handleTaskbarClick}
       />
+
+      {/* Pixelated mouse trail — floats above everything */}
+      <MouseTrail />
     </div>
   );
 }
