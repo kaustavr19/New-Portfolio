@@ -44,7 +44,7 @@ export default function ProjectsApp() {
         style={{ width: 200, borderRight: "1px solid #a4c63922" }}
       >
         <div
-          style={{ padding: "20px 24px", background: "#141408", borderBottom: "1px solid #a4c63922" }}
+          style={{ padding: "24px 24px 20px", background: "#141408", borderBottom: "1px solid #a4c63922", flexShrink: 0 }}
         >
           <div style={{ fontFamily: BEBAS, fontSize: 11, color: "#a4c63977", letterSpacing: "0.4em", marginBottom: 2 }}>
             ACTIVE MISSIONS
@@ -58,15 +58,16 @@ export default function ProjectsApp() {
           <button
             key={p.id}
             onClick={() => setSelected(p.id)}
-            className="w-full text-left py-4 transition-all"
+            className="w-full text-left transition-all"
             style={{
               paddingLeft: 24, paddingRight: 16,
+              paddingTop: 18, paddingBottom: 18,
               background: selected === p.id ? "#1a1e0a" : "transparent",
               borderLeft: selected === p.id ? "3px solid #a4c639" : "3px solid transparent",
               borderBottom: "1px solid #a4c63911",
             }}
           >
-            <div style={{ fontFamily: BEBAS, fontSize: 16, color: selected === p.id ? "#a4c639" : "#7a7a5a", letterSpacing: "0.06em", marginBottom: 4 }}>
+            <div style={{ fontFamily: BEBAS, fontSize: 16, color: selected === p.id ? "#a4c639" : "#7a7a5a", letterSpacing: "0.06em", marginBottom: 6 }}>
               {p.name}
             </div>
             <div className="flex items-center gap-2">
@@ -88,36 +89,38 @@ export default function ProjectsApp() {
       </div>
 
       {/* Right — mission brief */}
-      <div className="flex-1 flex flex-col overflow-auto" style={{ padding: "36px 40px 36px 36px" }}>
-        {/* Mission header */}
+      <div className="flex-1 flex flex-col overflow-auto" style={{ padding: "40px 40px 40px 36px" }}>
+        {/* Mission header card */}
         <div
-          className="mb-6 p-5 relative"
+          className="relative"
           style={{
             background: "#141408",
             border: "1px solid #a4c63922",
             boxShadow: "0 0 40px rgba(164,198,57,0.04)",
+            padding: "28px 28px 24px",
+            marginBottom: 40,
           }}
         >
-          <div className="absolute top-3 right-4" style={{ fontFamily: MONO, fontSize: 9, color: "#a4c63922", letterSpacing: "0.3em" }}>
+          <div className="absolute top-4 right-5" style={{ fontFamily: MONO, fontSize: 9, color: "#a4c63922", letterSpacing: "0.3em" }}>
             KR//OS MISSIONS
           </div>
-          <div className="flex items-start gap-4">
+          <div className="flex items-start gap-5">
             <div
               style={{
-                width: 64, height: 64, flexShrink: 0,
+                width: 72, height: 72, flexShrink: 0,
                 background: "#0b0b05",
                 border: "1px solid #a4c63944",
                 display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 32,
+                fontSize: 36,
               }}
             >
               📁
             </div>
             <div className="flex-1">
-              <div style={{ fontFamily: BEBAS, fontSize: 28, color: "#a4c639", letterSpacing: "0.08em", lineHeight: 1, marginBottom: 4 }}>
+              <div style={{ fontFamily: BEBAS, fontSize: 32, color: "#a4c639", letterSpacing: "0.08em", lineHeight: 1, marginBottom: 6 }}>
                 {project.name}
               </div>
-              <div style={{ fontFamily: MONO, fontSize: 12, color: "#c8b89a", marginBottom: 8, letterSpacing: "0.04em" }}>
+              <div style={{ fontFamily: MONO, fontSize: 12, color: "#c8b89a", marginBottom: 12, letterSpacing: "0.04em" }}>
                 {project.tagline}
               </div>
               <div className="flex items-center gap-3">
@@ -140,18 +143,18 @@ export default function ProjectsApp() {
         </div>
 
         {/* Brief */}
-        <div className="mb-6">
-          <div style={{ fontFamily: BEBAS, fontSize: 14, color: "#a4c63966", letterSpacing: "0.4em", borderBottom: "1px solid #a4c63922", paddingBottom: 5, marginBottom: 10 }}>
+        <div style={{ marginBottom: 40 }}>
+          <div style={{ fontFamily: BEBAS, fontSize: 14, color: "#a4c63966", letterSpacing: "0.4em", borderBottom: "1px solid #a4c63922", paddingBottom: 8, marginBottom: 14 }}>
             MISSION BRIEF
           </div>
-          <p style={{ fontFamily: MONO, fontSize: 13, color: "#b0a880", lineHeight: 1.9 }}>
+          <p style={{ fontFamily: MONO, fontSize: 13, color: "#b0a880", lineHeight: 2 }}>
             {project.description}
           </p>
         </div>
 
         {/* Tags */}
-        <div className="mb-6">
-          <div style={{ fontFamily: BEBAS, fontSize: 14, color: "#a4c63966", letterSpacing: "0.4em", borderBottom: "1px solid #a4c63922", paddingBottom: 5, marginBottom: 10 }}>
+        <div style={{ marginBottom: 0 }}>
+          <div style={{ fontFamily: BEBAS, fontSize: 14, color: "#a4c63966", letterSpacing: "0.4em", borderBottom: "1px solid #a4c63922", paddingBottom: 8, marginBottom: 14 }}>
             INTEL TAGS
           </div>
           <div className="flex flex-wrap gap-2">
@@ -159,7 +162,7 @@ export default function ProjectsApp() {
               <span
                 key={tag}
                 style={{
-                  fontFamily: MONO, fontSize: 10, padding: "4px 10px",
+                  fontFamily: MONO, fontSize: 10, padding: "5px 12px",
                   background: "#141408",
                   border: "1px solid #a4c63933",
                   color: "#a4c639",
@@ -172,28 +175,32 @@ export default function ProjectsApp() {
           </div>
         </div>
 
-        {/* Connected missions */}
-        <div className="mt-auto p-4" style={{ background: "#0b0b05", border: "1px solid #a4c63922" }}>
-          <div style={{ fontFamily: BEBAS, fontSize: 13, color: "#a4c63966", letterSpacing: "0.3em", marginBottom: 6 }}>
-            CONNECTED MISSIONS
-          </div>
-          <div className="flex gap-2 flex-wrap">
-            {projects.filter((p) => p.id !== selected).slice(0, 3).map((p) => (
-              <button
-                key={p.id}
-                onClick={() => setSelected(p.id)}
-                style={{
-                  fontFamily: BEBAS, fontSize: 14, padding: "3px 10px",
-                  border: "1px solid #a4c63933",
-                  color: "#a4c63988",
-                  background: "transparent",
-                  cursor: "pointer",
-                  letterSpacing: "0.06em",
-                }}
-              >
-                {p.name}
-              </button>
-            ))}
+        {/* Connected missions — pinned to bottom */}
+        <div className="mt-auto" style={{ paddingTop: 40 }}>
+          <div
+            style={{ background: "#0b0b05", border: "1px solid #a4c63922", padding: "20px 24px" }}
+          >
+            <div style={{ fontFamily: BEBAS, fontSize: 13, color: "#a4c63966", letterSpacing: "0.3em", marginBottom: 12 }}>
+              CONNECTED MISSIONS
+            </div>
+            <div className="flex gap-2 flex-wrap">
+              {projects.filter((p) => p.id !== selected).slice(0, 3).map((p) => (
+                <button
+                  key={p.id}
+                  onClick={() => setSelected(p.id)}
+                  style={{
+                    fontFamily: BEBAS, fontSize: 14, padding: "5px 14px",
+                    border: "1px solid #a4c63933",
+                    color: "#a4c63988",
+                    background: "transparent",
+                    cursor: "pointer",
+                    letterSpacing: "0.06em",
+                  }}
+                >
+                  {p.name}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>

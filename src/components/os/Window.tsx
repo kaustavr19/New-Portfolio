@@ -12,6 +12,7 @@ export interface WindowProps {
   zIndex: number;
   defaultPosition?: { x: number; y: number };
   defaultSize?: { width: number; height: number };
+  defaultMaximized?: boolean;
   onClose: (id: string) => void;
   onMinimize: (id: string) => void;
   onFocus: (id: string) => void;
@@ -66,6 +67,7 @@ export default function Window({
   zIndex,
   defaultPosition = { x: 80, y: 60 },
   defaultSize = { width: 760, height: 520 },
+  defaultMaximized = true,
   onClose,
   onMinimize,
   onFocus,
@@ -73,7 +75,7 @@ export default function Window({
 }: WindowProps) {
   const [pos, setPos] = useState(defaultPosition);
   const [size] = useState(defaultSize);
-  const [isMaximized, setIsMaximized] = useState(true);
+  const [isMaximized, setIsMaximized] = useState(defaultMaximized);
   const [titleHovered, setTitleHovered] = useState(false);
   const [isDraggingActive, setIsDraggingActive] = useState(false);
   const dragOffset = useRef({ x: 0, y: 0 });

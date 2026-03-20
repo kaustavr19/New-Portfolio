@@ -5,6 +5,7 @@ import { desktopIcons } from "@/data/content";
 import Window from "./Window";
 import Taskbar from "./Taskbar";
 import KROSLogo from "./KROSLogo";
+import DesktopBg from "./DesktopBg";
 import AboutApp from "@/components/apps/AboutApp";
 import SkillsApp from "@/components/apps/SkillsApp";
 import ProjectsApp from "@/components/apps/ProjectsApp";
@@ -50,7 +51,7 @@ const DEFAULT_SIZES: Record<string, { width: number; height: number }> = {
   skills: { width: 640, height: 460 },
   projects: { width: 700, height: 480 },
   experience: { width: 720, height: 500 },
-  contact: { width: 540, height: 520 },
+  contact: { width: 620, height: 540 },
   terminal: { width: 600, height: 420 },
 };
 
@@ -134,17 +135,20 @@ export default function Desktop() {
       }}
       onClick={() => setContextMenu(null)}
     >
+      {/* Pixel animation background */}
+      <DesktopBg />
+
       {/* Centered logo wallpaper */}
       <div
         className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none gap-5"
         style={{ bottom: 48 }}
       >
-        <KROSLogo size={300} opacity={0.055} />
+        <KROSLogo size={340} opacity={0.55} />
         <div
           style={{
             fontFamily: "'Share Tech Mono', monospace",
             fontSize: 10,
-            color: "rgba(255,255,255,0.045)",
+            color: "rgba(79,195,247,0.3)",
             letterSpacing: "0.5em",
             userSelect: "none",
             textTransform: "uppercase",
@@ -156,8 +160,8 @@ export default function Desktop() {
 
       {/* Desktop icons — constrained above taskbar */}
       <div
-        className="absolute top-6 left-6 flex flex-col gap-4 overflow-y-auto"
-        style={{ maxHeight: "calc(100vh - 72px)", paddingBottom: 8 }}
+        className="absolute top-6 left-6 flex flex-col gap-4"
+        style={{ paddingTop: 8, paddingBottom: 8 }}
       >
         {desktopIcons.map((icon) => {
           const accent = themeAccent[icon.theme] ?? "#e0e0e8";
@@ -264,6 +268,7 @@ export default function Desktop() {
             zIndex={state.zIndex}
             defaultPosition={DEFAULT_POSITIONS[icon.id]}
             defaultSize={DEFAULT_SIZES[icon.id]}
+            defaultMaximized={icon.id !== "contact"}
             onClose={closeWindow}
             onMinimize={minimizeWindow}
             onFocus={focusWindow}
