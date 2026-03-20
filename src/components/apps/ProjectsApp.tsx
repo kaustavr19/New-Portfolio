@@ -40,7 +40,7 @@ export default function ProjectsApp() {
     >
       {/* Left — mission list */}
       <div
-        className="flex-shrink-0 flex flex-col"
+        className="flex-shrink-0 flex flex-col overflow-auto"
         style={{ width: 200, borderRight: "1px solid #a4c63922" }}
       >
         <div
@@ -54,41 +54,38 @@ export default function ProjectsApp() {
           </div>
         </div>
 
-        {/* Items fill remaining height evenly */}
-        <div className="flex flex-col flex-1">
-          {projects.map((p) => (
-            <button
-              key={p.id}
-              onClick={() => setSelected(p.id)}
-              className="w-full text-left flex-1 flex flex-col justify-center transition-all"
-              style={{
-                paddingLeft: 24, paddingRight: 16,
-                paddingTop: 20, paddingBottom: 20,
-                background: selected === p.id ? "#1a1e0a" : "transparent",
-                borderLeft: selected === p.id ? "3px solid #a4c639" : "3px solid transparent",
-                borderBottom: "1px solid #a4c63911",
-              }}
-            >
-              <div style={{ fontFamily: BEBAS, fontSize: 16, color: selected === p.id ? "#a4c639" : "#7a7a5a", letterSpacing: "0.06em", marginBottom: 6 }}>
-                {p.name}
+        {projects.map((p) => (
+          <button
+            key={p.id}
+            onClick={() => setSelected(p.id)}
+            className="w-full text-left transition-all"
+            style={{
+              paddingLeft: 24, paddingRight: 16,
+              paddingTop: 18, paddingBottom: 18,
+              background: selected === p.id ? "#1a1e0a" : "transparent",
+              borderLeft: selected === p.id ? "3px solid #a4c639" : "3px solid transparent",
+              borderBottom: "1px solid #a4c63911",
+            }}
+          >
+            <div style={{ fontFamily: BEBAS, fontSize: 16, color: selected === p.id ? "#a4c639" : "#7a7a5a", letterSpacing: "0.06em", marginBottom: 6 }}>
+              {p.name}
+            </div>
+            <div className="flex items-center gap-2">
+              <div
+                style={{
+                  fontFamily: MONO, fontSize: 8,
+                  padding: "1px 5px",
+                  background: `${STATUS_COLOR[p.status] ?? "#666"}1a`,
+                  color: STATUS_COLOR[p.status] ?? "#888",
+                  border: `1px solid ${STATUS_COLOR[p.status] ?? "#666"}44`,
+                  letterSpacing: "0.15em",
+                }}
+              >
+                {p.status}
               </div>
-              <div className="flex items-center gap-2">
-                <div
-                  style={{
-                    fontFamily: MONO, fontSize: 8,
-                    padding: "1px 5px",
-                    background: `${STATUS_COLOR[p.status] ?? "#666"}1a`,
-                    color: STATUS_COLOR[p.status] ?? "#888",
-                    border: `1px solid ${STATUS_COLOR[p.status] ?? "#666"}44`,
-                    letterSpacing: "0.15em",
-                  }}
-                >
-                  {p.status}
-                </div>
-              </div>
-            </button>
-          ))}
-        </div>
+            </div>
+          </button>
+        ))}
       </div>
 
       {/* Right — mission brief */}
