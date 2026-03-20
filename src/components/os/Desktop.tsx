@@ -156,8 +156,8 @@ export default function Desktop() {
 
       {/* Desktop icons — constrained above taskbar */}
       <div
-        className="absolute top-6 left-6 flex flex-col gap-4 overflow-y-auto"
-        style={{ maxHeight: "calc(100vh - 72px)", paddingBottom: 8 }}
+        className="absolute top-6 left-6 flex flex-col gap-4"
+        style={{ paddingTop: 8, paddingBottom: 8 }}
       >
         {desktopIcons.map((icon) => {
           const accent = themeAccent[icon.theme] ?? "#e0e0e8";
