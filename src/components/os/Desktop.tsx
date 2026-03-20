@@ -5,6 +5,7 @@ import { desktopIcons } from "@/data/content";
 import Window from "./Window";
 import Taskbar from "./Taskbar";
 import KROSLogo from "./KROSLogo";
+import DesktopBg from "./DesktopBg";
 import AboutApp from "@/components/apps/AboutApp";
 import SkillsApp from "@/components/apps/SkillsApp";
 import ProjectsApp from "@/components/apps/ProjectsApp";
@@ -134,17 +135,20 @@ export default function Desktop() {
       }}
       onClick={() => setContextMenu(null)}
     >
+      {/* Pixel animation background */}
+      <DesktopBg />
+
       {/* Centered logo wallpaper */}
       <div
         className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none gap-5"
         style={{ bottom: 48 }}
       >
-        <KROSLogo size={300} opacity={0.055} />
+        <KROSLogo size={340} opacity={0.55} />
         <div
           style={{
             fontFamily: "'Share Tech Mono', monospace",
             fontSize: 10,
-            color: "rgba(255,255,255,0.045)",
+            color: "rgba(79,195,247,0.3)",
             letterSpacing: "0.5em",
             userSelect: "none",
             textTransform: "uppercase",
