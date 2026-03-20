@@ -50,7 +50,7 @@ const DEFAULT_SIZES: Record<string, { width: number; height: number }> = {
   skills: { width: 640, height: 460 },
   projects: { width: 700, height: 480 },
   experience: { width: 720, height: 500 },
-  contact: { width: 540, height: 520 },
+  contact: { width: 620, height: 540 },
   terminal: { width: 600, height: 420 },
 };
 
