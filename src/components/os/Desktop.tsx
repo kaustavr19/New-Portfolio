@@ -264,6 +264,7 @@ export default function Desktop() {
             zIndex={state.zIndex}
             defaultPosition={DEFAULT_POSITIONS[icon.id]}
             defaultSize={DEFAULT_SIZES[icon.id]}
+            defaultMaximized={icon.id !== "contact"}
             onClose={closeWindow}
             onMinimize={minimizeWindow}
             onFocus={focusWindow}
