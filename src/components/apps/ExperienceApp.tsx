@@ -89,24 +89,24 @@ export default function ExperienceApp() {
             </div>
           </div>
 
-          {/* Period + location */}
-          <div className="flex items-start gap-8" style={{ borderBottom: "1px dashed #c8a96e66", paddingBottom: 28, marginBottom: 36 }}>
-            <div>
-              <div style={{ fontFamily: MONO, fontSize: 9, color: "#8b6020", letterSpacing: "0.25em", marginBottom: 4 }}>PERIOD</div>
-              <div style={{ fontFamily: CINZEL, fontSize: 12, color: "#2a1a0e" }}>{job.period}</div>
+          {/* ── Group 1: Period/Territory + Description ── */}
+          <div style={{ marginBottom: 40, paddingBottom: 36, borderBottom: "1px dashed #c8a96e66" }}>
+            <div className="flex items-start gap-8" style={{ marginBottom: 24 }}>
+              <div>
+                <div style={{ fontFamily: MONO, fontSize: 9, color: "#8b6020", letterSpacing: "0.25em", marginBottom: 4 }}>PERIOD</div>
+                <div style={{ fontFamily: CINZEL, fontSize: 12, color: "#2a1a0e" }}>{job.period}</div>
+              </div>
+              <div>
+                <div style={{ fontFamily: MONO, fontSize: 9, color: "#8b6020", letterSpacing: "0.25em", marginBottom: 4 }}>TERRITORY</div>
+                <div style={{ fontFamily: CINZEL, fontSize: 12, color: "#2a1a0e" }}>{job.location}</div>
+              </div>
             </div>
-            <div>
-              <div style={{ fontFamily: MONO, fontSize: 9, color: "#8b6020", letterSpacing: "0.25em", marginBottom: 4 }}>TERRITORY</div>
-              <div style={{ fontFamily: CINZEL, fontSize: 12, color: "#2a1a0e" }}>{job.location}</div>
-            </div>
+            <p style={{ fontFamily: CINZEL, fontSize: 13, color: "#3a2a10", lineHeight: 2.1, margin: 0 }}>
+              {job.description}
+            </p>
           </div>
 
-          {/* Description */}
-          <p style={{ fontFamily: CINZEL, fontSize: 13, color: "#3a2a10", lineHeight: 2.1, marginBottom: 36 }}>
-            {job.description}
-          </p>
-
-          {/* Tags */}
+          {/* ── Group 2: Tags ── */}
           <div className="flex flex-wrap gap-2">
             {job.tags.map((tag) => (
               <span
