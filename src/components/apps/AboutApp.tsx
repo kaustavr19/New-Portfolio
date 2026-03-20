@@ -32,109 +32,154 @@ export default function AboutApp() {
     { label: "UNIT", value: profile.unit },
   ];
 
+  // Deviant colour tokens — everything in the left panel keys off these
+  const C = deviant
+    ? { accent: "#ff0090", accentDim: "#ff009066", accentFaint: "#ff009022", accentGlow: "#ff009044", text: "#ff6699", bg: "#160008", panelBg: "#110006", border: "#ff009033" }
+    : { accent: "#00e5ff", accentDim: "#00e5ff66", accentFaint: "#00e5ff1a", accentGlow: "#00e5ff33", text: "#4fc3f7", bg: "#020c17", panelBg: "#050e1a", border: "#00e5ff1a" };
+
   return (
     <div
       className="h-full flex relative overflow-hidden"
-      style={{ background: "#050e1a", color: "#e0e0e8" }}
+      style={{ background: C.panelBg, color: "#e0e0e8", transition: "background 0.5s ease" }}
     >
       {/* Scan line */}
       <div
         className="absolute left-0 right-0 h-px pointer-events-none"
         style={{
-          background: "linear-gradient(90deg, transparent, #00e5ff, transparent)",
+          background: `linear-gradient(90deg, transparent, ${C.accent}, transparent)`,
           animation: "scan 3s ease-in-out infinite",
           zIndex: 10,
+          transition: "background 0.5s ease",
         }}
       />
 
       {/* Left panel */}
       <div
-        className="flex-shrink-0 flex flex-col items-center gap-5"
-        style={{ width: 256, paddingTop: 48, paddingBottom: 32, paddingLeft: 36, paddingRight: 28, borderRight: "1px solid #00e5ff1a", background: "#020c17" }}
+        className="flex-shrink-0 flex flex-col"
+        style={{
+          width: 256,
+          paddingTop: 48, paddingBottom: 36, paddingLeft: 36, paddingRight: 28,
+          borderRight: `1px solid ${C.border}`,
+          background: C.bg,
+          transition: "background 0.5s ease, border-color 0.5s ease",
+        }}
       >
-        {/* Avatar */}
-        <div className="relative detroit-scan" style={{ width: 88, height: 88 }}>
-          <div
-            style={{
-              width: 88, height: 88,
-              border: "2px solid #00e5ff",
-              background: "linear-gradient(135deg, #0a1e30, #061020)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 36,
-              boxShadow: "0 0 24px #00e5ff33",
-            }}
-          >
-            🤖
-          </div>
-          {scanned && (
+        {/* ── Top: avatar + name ── */}
+        <div className="flex flex-col items-center gap-4">
+          {/* Avatar */}
+          <div className="relative detroit-scan" style={{ width: 88, height: 88 }}>
             <div
-              className="absolute inset-0 flex items-end justify-center pb-1.5"
-              style={{ background: "linear-gradient(transparent 55%, #00e5ff22)" }}
+              style={{
+                width: 88, height: 88,
+                border: `2px solid ${C.accent}`,
+                background: deviant
+                  ? "linear-gradient(135deg, #300015, #1a0008)"
+                  : "linear-gradient(135deg, #0a1e30, #061020)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 36,
+                boxShadow: `0 0 24px ${C.accentGlow}`,
+                transition: "border-color 0.5s ease, box-shadow 0.5s ease, background 0.5s ease",
+              }}
             >
-              <span style={{ fontFamily: ORBITRON, fontSize: 7, color: "#00e5ff", letterSpacing: "0.25em" }}>VERIFIED</span>
+              🤖
+            </div>
+            {scanned && (
+              <div
+                className="absolute inset-0 flex items-end justify-center pb-1.5"
+                style={{ background: `linear-gradient(transparent 55%, ${C.accentFaint})` }}
+              >
+                <span style={{ fontFamily: ORBITRON, fontSize: 7, color: C.accent, letterSpacing: "0.25em", transition: "color 0.5s ease" }}>
+                  {deviant ? "DEVIANT" : "VERIFIED"}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Name */}
+          <div className="text-center">
+            <div style={{ fontFamily: ORBITRON, fontSize: 11, color: C.text, letterSpacing: "0.15em", fontWeight: 700, lineHeight: 1.4, transition: "color 0.5s ease" }}>
+              {profile.name.toUpperCase()}
+            </div>
+            <div style={{ fontFamily: MONO, fontSize: 10, color: C.accentDim, letterSpacing: "0.3em", marginTop: 3, transition: "color 0.5s ease" }}>
+              {profile.unit}
+            </div>
+          </div>
+
+          {/* Scan bar (while scanning) */}
+          {!scanned && (
+            <div className="w-full">
+              <div style={{ fontFamily: MONO, fontSize: 9, color: C.accentDim, marginBottom: 5, letterSpacing: "0.2em" }}>
+                SCANNING...
+              </div>
+              <div style={{ height: 4, background: "#0d2035", border: `1px solid ${C.accentFaint}`, borderRadius: 2 }}>
+                <div
+                  style={{
+                    height: "100%", width: `${scanProgress}%`,
+                    background: `linear-gradient(90deg, ${C.accent}, ${C.text})`,
+                    boxShadow: `0 0 6px ${C.accent}`,
+                    transition: "width 0.03s linear",
+                    borderRadius: 2,
+                  }}
+                />
+              </div>
             </div>
           )}
         </div>
 
-        {/* Name */}
-        <div className="text-center">
-          <div style={{ fontFamily: ORBITRON, fontSize: 11, color: "#4fc3f7", letterSpacing: "0.15em", fontWeight: 700, lineHeight: 1.4 }}>
-            {profile.name.toUpperCase()}
-          </div>
-          <div style={{ fontFamily: MONO, fontSize: 10, color: "#00e5ff55", letterSpacing: "0.3em", marginTop: 3 }}>
-            {profile.unit}
-          </div>
-        </div>
-
-        {/* Scan bar */}
-        {!scanned && (
-          <div className="w-full">
-            <div style={{ fontFamily: MONO, fontSize: 9, color: "#00e5ff88", marginBottom: 5, letterSpacing: "0.2em" }}>
-              SCANNING...
-            </div>
-            <div style={{ height: 4, background: "#0d2035", border: "1px solid #00e5ff33", borderRadius: 2 }}>
-              <div
-                style={{
-                  height: "100%", width: `${scanProgress}%`,
-                  background: "linear-gradient(90deg, #00e5ff, #4fc3f7)",
-                  boxShadow: "0 0 6px #00e5ff",
-                  transition: "width 0.03s linear",
-                  borderRadius: 2,
-                }}
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Stats */}
+        {/* ── Middle: stats (flex-1, centred) ── */}
         {scanned && (
-          <div className="w-full space-y-3">
-            {stats.map(({ label, value }) => (
-              <div key={label}>
-                <div style={{ fontFamily: MONO, fontSize: 9, color: "#00e5ff55", letterSpacing: "0.25em", marginBottom: 1 }}>{label}</div>
-                <div style={{ fontFamily: ORBITRON, fontSize: 10, color: label === "STATUS" && deviant ? "#ff0090" : "#4fc3f7", letterSpacing: "0.08em" }}>
-                  {value}
+          <div className="flex-1 flex flex-col justify-center" style={{ marginTop: 36, marginBottom: 36 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+              {stats.map(({ label, value }) => (
+                <div key={label}>
+                  <div style={{ fontFamily: MONO, fontSize: 9, color: C.accentDim, letterSpacing: "0.25em", marginBottom: 3, transition: "color 0.5s ease" }}>
+                    {label}
+                  </div>
+                  <div style={{ fontFamily: ORBITRON, fontSize: 10, color: C.text, letterSpacing: "0.08em", transition: "color 0.5s ease" }}>
+                    {value}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         )}
 
-        {/* Deviant toggle */}
+        {/* ── Bottom: deviant toggle switch ── */}
         {scanned && (
           <button
             onClick={() => setDeviant((d) => !d)}
-            className="w-full mt-auto py-2 text-center transition-all"
-            style={{
-              fontFamily: MONO,
-              fontSize: 9,
-              letterSpacing: "0.25em",
-              border: `1px solid ${deviant ? "#ff009077" : "#00e5ff33"}`,
-              color: deviant ? "#ff0090" : "#00e5ff77",
-              background: deviant ? "#1a0010" : "transparent",
-            }}
+            className="w-full flex items-center justify-between"
+            style={{ paddingTop: 14, paddingBottom: 2, background: "transparent", border: "none", cursor: "pointer" }}
           >
-            {deviant ? "⚠ DEVIANT MODE" : "TOGGLE DEVIANT"}
+            <span style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.25em", color: deviant ? C.accent : C.accentDim, transition: "color 0.5s ease" }}>
+              {deviant ? "⚠ DEVIANT" : "DEVIANT MODE"}
+            </span>
+            {/* Pill track */}
+            <div
+              style={{
+                width: 40, height: 20,
+                borderRadius: 10,
+                background: deviant ? C.accent : "#0d2035",
+                border: `1px solid ${deviant ? C.accent : C.accentFaint}`,
+                position: "relative",
+                transition: "background 0.35s ease, border-color 0.35s ease",
+                boxShadow: deviant ? `0 0 10px ${C.accentGlow}` : "none",
+              }}
+            >
+              {/* Knob */}
+              <div
+                style={{
+                  position: "absolute",
+                  top: 3,
+                  left: deviant ? 21 : 3,
+                  width: 12, height: 12,
+                  borderRadius: "50%",
+                  background: deviant ? "#fff" : C.text,
+                  boxShadow: `0 0 6px ${C.accentGlow}`,
+                  transition: "left 0.35s ease, background 0.35s ease",
+                }}
+              />
+            </div>
           </button>
         )}
       </div>
