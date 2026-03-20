@@ -140,23 +140,23 @@ export default function AboutApp() {
       </div>
 
       {/* Right panel */}
-      <div className="flex-1 overflow-auto space-y-7" style={{ padding: "36px 40px 36px 36px" }}>
+      <div className="flex-1 overflow-auto flex flex-col" style={{ padding: "40px 40px 40px 36px" }}>
         {/* Bio */}
-        <div>
-          <div style={{ fontFamily: ORBITRON, fontSize: 10, color: "#00e5ff77", letterSpacing: "0.4em", marginBottom: 10, borderBottom: "1px solid #00e5ff1a", paddingBottom: 6 }}>
+        <div style={{ marginBottom: 48 }}>
+          <div style={{ fontFamily: ORBITRON, fontSize: 10, color: "#00e5ff77", letterSpacing: "0.4em", marginBottom: 12, borderBottom: "1px solid #00e5ff1a", paddingBottom: 8 }}>
             BIOGRAPHICAL DATA
           </div>
-          <p style={{ fontFamily: MONO, fontSize: 13, color: "#b0bec5", lineHeight: 1.9, letterSpacing: "0.02em" }}>
+          <p style={{ fontFamily: MONO, fontSize: 13, color: "#b0bec5", lineHeight: 2, letterSpacing: "0.02em" }}>
             {profile.bio}
           </p>
         </div>
 
         {/* Capability bars */}
-        <div>
-          <div style={{ fontFamily: ORBITRON, fontSize: 10, color: "#00e5ff77", letterSpacing: "0.4em", marginBottom: 10, borderBottom: "1px solid #00e5ff1a", paddingBottom: 6 }}>
+        <div style={{ marginBottom: 48 }}>
+          <div style={{ fontFamily: ORBITRON, fontSize: 10, color: "#00e5ff77", letterSpacing: "0.4em", marginBottom: 16, borderBottom: "1px solid #00e5ff1a", paddingBottom: 8 }}>
             CAPABILITY MATRIX
           </div>
-          <div className="space-y-3">
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             {[
               { label: "Product Design", value: 95 },
               { label: "AI / UX Strategy", value: 88 },
@@ -164,7 +164,7 @@ export default function AboutApp() {
               { label: "Design Systems", value: 87 },
             ].map(({ label, value }) => (
               <div key={label}>
-                <div className="flex justify-between mb-1.5">
+                <div className="flex justify-between" style={{ marginBottom: 6 }}>
                   <span style={{ fontFamily: MONO, fontSize: 12, color: "#4fc3f7" }}>{label}</span>
                   <span style={{ fontFamily: ORBITRON, fontSize: 11, color: "#00e5ff" }}>{value}%</span>
                 </div>
@@ -185,25 +185,25 @@ export default function AboutApp() {
         </div>
 
         {/* Awards */}
-        <div>
-          <div style={{ fontFamily: ORBITRON, fontSize: 10, color: "#00e5ff77", letterSpacing: "0.4em", marginBottom: 10, borderBottom: "1px solid #00e5ff1a", paddingBottom: 6 }}>
+        <div style={{ marginBottom: 0 }}>
+          <div style={{ fontFamily: ORBITRON, fontSize: 10, color: "#00e5ff77", letterSpacing: "0.4em", marginBottom: 16, borderBottom: "1px solid #00e5ff1a", paddingBottom: 8 }}>
             COMMENDATIONS
           </div>
-          <div className="space-y-3">
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             {awards.map((award) => (
               <div key={award.title} className="flex items-start gap-3">
                 <span style={{ color: "#00e5ff", fontSize: 12, marginTop: 1 }}>▸</span>
                 <div>
                   <div style={{ fontFamily: MONO, fontSize: 12, color: "#4fc3f7" }}>{award.title}</div>
-                  <div style={{ fontFamily: MONO, fontSize: 10, color: "#00e5ff55", marginTop: 1 }}>{award.org} · {award.year}</div>
+                  <div style={{ fontFamily: MONO, fontSize: 10, color: "#00e5ff55", marginTop: 3 }}>{award.org} · {award.year}</div>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Links */}
-        <div className="flex gap-3 pt-1">
+        {/* Links — pushed to bottom */}
+        <div className="flex gap-3 mt-auto" style={{ paddingTop: 40 }}>
           <a
             href={profile.social.linkedin}
             target="_blank"
