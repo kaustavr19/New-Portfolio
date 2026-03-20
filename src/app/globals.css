@@ -1,26 +1,189 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --os-bg: #1e1e24;
+  --os-surface: #2a2a32;
+  --os-border: #3a3a45;
+  --os-text: #e0e0e8;
+  --os-muted: #6b6b7e;
+
+  /* Detroit */
+  --detroit-blue: #4fc3f7;
+  --detroit-cyan: #00e5ff;
+  --detroit-dark: #0a1628;
+  --detroit-chrome: #b0bec5;
+
+  /* Cyberpunk */
+  --cyber-yellow: #f5e642;
+  --cyber-cyan: #00ffff;
+  --cyber-pink: #ff0090;
+  --cyber-dark: #0d0d1a;
+
+  /* GTA */
+  --gta-green: #a4c639;
+  --gta-orange: #ff6b35;
+  --gta-tan: #c8b89a;
+  --gta-paper: #d4c9a8;
+
+  /* RDR2 */
+  --rdr-sepia: #c8a96e;
+  --rdr-brown: #6b4423;
+  --rdr-paper: #f0e6c8;
+  --rdr-ink: #2a1a0e;
+
+  /* TLOU */
+  --tlou-green: #7ab648;
+  --tlou-rust: #8b4513;
+  --tlou-paper: #d4c5a9;
+  --tlou-dark: #1a1a10;
+
+  /* Minecraft */
+  --mc-green: #5aaf26;
+  --mc-dirt: #8b6914;
+  --mc-stone: #7a7a7a;
+  --mc-bg: #1e1e1e;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+html,
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: var(--os-bg);
+  color: var(--os-text);
 }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--os-border); border-radius: 3px; }
+
+/* Scanline overlay */
+.scanlines::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.03) 2px,
+    rgba(0,0,0,0.03) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Glitch keyframes */
+@keyframes glitch {
+  0%   { clip-path: inset(40% 0 61% 0); transform: translate(-2px, 0); }
+  20%  { clip-path: inset(92% 0 1% 0);  transform: translate(2px, 0); }
+  40%  { clip-path: inset(43% 0 1% 0);  transform: translate(-1px, 0); }
+  60%  { clip-path: inset(25% 0 58% 0); transform: translate(1px, 0); }
+  80%  { clip-path: inset(54% 0 7% 0);  transform: translate(-2px, 0); }
+  100% { clip-path: inset(58% 0 43% 0); transform: translate(0); }
+}
+
+.glitch { position: relative; }
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+}
+.glitch::before {
+  color: var(--cyber-cyan);
+  animation: glitch 0.4s infinite;
+  opacity: 0.7;
+}
+.glitch::after {
+  color: var(--cyber-pink);
+  animation: glitch 0.4s infinite reverse;
+  opacity: 0.7;
+}
+
+/* Detroit scan animation */
+@keyframes scan {
+  0%   { top: -4px; opacity: 0.8; }
+  100% { top: 100%; opacity: 0; }
+}
+.detroit-scan {
+  position: relative;
+  overflow: hidden;
+}
+.detroit-scan::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--detroit-cyan), transparent);
+  animation: scan 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Neon glow utilities */
+.neon-yellow {
+  text-shadow: 0 0 8px var(--cyber-yellow), 0 0 20px var(--cyber-yellow);
+  color: var(--cyber-yellow);
+}
+.neon-cyan {
+  text-shadow: 0 0 8px var(--cyber-cyan), 0 0 20px var(--cyber-cyan);
+  color: var(--cyber-cyan);
+}
+
+/* Minecraft border */
+.mc-border {
+  border: 3px solid #555;
+  box-shadow: inset -2px -4px 0 rgba(0,0,0,0.4), inset 2px 2px 0 rgba(255,255,255,0.15);
+}
+
+/* RDR2 paper */
+.rdr-paper {
+  background-color: var(--rdr-paper);
+  color: var(--rdr-ink);
+  background-image:
+    repeating-linear-gradient(90deg, transparent, transparent 48px, rgba(139,100,20,0.06) 48px, rgba(139,100,20,0.06) 50px),
+    repeating-linear-gradient(0deg,  transparent, transparent 28px, rgba(139,100,20,0.06) 28px, rgba(139,100,20,0.06) 30px);
+}
+
+/* TLOU paper */
+.tlou-paper {
+  background-color: var(--tlou-paper);
+  color: #2a1f10;
+}
+
+/* Typewriter */
+@keyframes typewriter { from { width: 0; } to { width: 100%; } }
+@keyframes blink { 50% { border-color: transparent; } }
+.typewriter {
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 2px solid currentColor;
+  animation: typewriter 2s steps(40) forwards, blink 0.7s step-end infinite;
+}
+
+/* OS desktop grid */
+.os-grid-bg {
+  background-color: var(--os-bg);
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* Pixel font */
+.font-pixel { font-family: "Press Start 2P", monospace; }
+.font-mono  { font-family: "Share Tech Mono", "Courier New", monospace; }
+
+/* Window chrome animations */
+@keyframes windowOpen {
+  from { opacity: 0; transform: scale(0.9); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.window-open { animation: windowOpen 0.15s ease-out forwards; }
