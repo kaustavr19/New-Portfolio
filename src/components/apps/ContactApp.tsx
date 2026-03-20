@@ -19,8 +19,7 @@ export default function ContactApp() {
   return (
     <div
       className="h-full flex flex-col items-center justify-start overflow-auto"
-      style={{ padding: "36px 40px" }}
-      style={{ background: "#141410" }}
+      style={{ padding: "36px 40px", background: "#141410" }}
     >
       {/* Radio header */}
       <div

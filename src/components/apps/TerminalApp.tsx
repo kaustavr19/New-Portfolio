@@ -171,8 +171,7 @@ export default function TerminalApp() {
       {/* Input row */}
       <div
         className="flex items-center py-3"
-        style={{ paddingLeft: 36, paddingRight: 36 }}
-        style={{ borderTop: "2px solid #333", background: "#0a0a0a" }}
+        style={{ paddingLeft: 36, paddingRight: 36, borderTop: "2px solid #333", background: "#0a0a0a" }}
       >
         <span style={{ fontSize: 9, color: "#5aaf26", marginRight: 8 }}>
           kaustav@kr-os ~$
