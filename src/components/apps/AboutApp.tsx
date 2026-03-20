@@ -49,8 +49,8 @@ export default function AboutApp() {
 
       {/* Left panel */}
       <div
-        className="flex-shrink-0 flex flex-col items-center pt-14 pb-8 gap-5"
-        style={{ width: 256, paddingLeft: 36, paddingRight: 28, borderRight: "1px solid #00e5ff1a", background: "#020c17" }}
+        className="flex-shrink-0 flex flex-col items-center gap-5"
+        style={{ width: 256, paddingTop: 48, paddingBottom: 32, paddingLeft: 36, paddingRight: 28, borderRight: "1px solid #00e5ff1a", background: "#020c17" }}
       >
         {/* Avatar */}
         <div className="relative detroit-scan" style={{ width: 88, height: 88 }}>
