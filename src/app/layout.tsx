@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "@hackernoon/pixel-icon-library/fonts/iconfont.css";
 
 export const metadata: Metadata = {
   title: "Kaustav Roy — KR//OS",

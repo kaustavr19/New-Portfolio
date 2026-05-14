@@ -88,7 +88,7 @@ export default function Taskbar({ openWindows, onIconClick, onTaskbarClick }: Ta
                 }}
                 onClick={() => { onIconClick(icon.id); setStartOpen(false); }}
               >
-                <span style={{ fontSize: 16 }}>{icon.icon}</span>
+                <i className={`hn hn-${icon.icon}`} style={{ fontSize: 16 }} />
                 <span>{icon.label}</span>
               </button>
             ))}
@@ -125,7 +125,7 @@ export default function Taskbar({ openWindows, onIconClick, onTaskbarClick }: Ta
                   opacity: isMinimized ? 0.6 : 1,
                 }}
               >
-                <span style={{ fontSize: 14 }}>{icon.icon}</span>
+                <i className={`hn hn-${icon.icon}`} style={{ fontSize: 14 }} />
                 <span className="hidden md:inline">{icon.label}</span>
               </button>
             );

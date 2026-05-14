@@ -81,7 +81,7 @@ export default function AboutApp() {
                 transition: "border-color 0.5s ease, box-shadow 0.5s ease, background 0.5s ease",
               }}
             >
-              🤖
+              <i className="hn hn-robot" style={{ fontSize: 36 }} />
             </div>
             {scanned && (
               <div
@@ -152,7 +152,7 @@ export default function AboutApp() {
             style={{ paddingTop: 14, paddingBottom: 2, background: "transparent", border: "none", cursor: "pointer" }}
           >
             <span style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.25em", color: deviant ? C.accent : C.accentDim, transition: "color 0.5s ease" }}>
-              {deviant ? "⚠ DEVIANT" : "DEVIANT MODE"}
+              {deviant ? <><i className="hn hn-exclamation-triangle" /> DEVIANT</> : "DEVIANT MODE"}
             </span>
             {/* Pill track */}
             <div
@@ -237,7 +237,7 @@ export default function AboutApp() {
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             {awards.map((award) => (
               <div key={award.title} className="flex items-start gap-3">
-                <span style={{ color: "#00e5ff", fontSize: 12, marginTop: 1 }}>▸</span>
+                <i className="hn hn-angle-right" style={{ color: "#00e5ff", fontSize: 12, marginTop: 1, flexShrink: 0 }} />
                 <div>
                   <div style={{ fontFamily: MONO, fontSize: 12, color: "#4fc3f7" }}>{award.title}</div>
                   <div style={{ fontFamily: MONO, fontSize: 10, color: "#00e5ff55", marginTop: 3 }}>{award.org} · {award.year}</div>

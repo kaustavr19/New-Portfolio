@@ -162,37 +162,37 @@ export const desktopIcons = [
   {
     id: "about",
     label: "About.exe",
-    icon: "🤖",
+    icon: "robot",
     theme: "detroit",
   },
   {
     id: "projects",
     label: "Projects/",
-    icon: "📁",
+    icon: "folder",
     theme: "gta",
   },
   {
     id: "skills",
     label: "Skills.tree",
-    icon: "⚡",
+    icon: "bolt",
     theme: "cyberpunk",
   },
   {
     id: "experience",
     label: "Experience.log",
-    icon: "📖",
+    icon: "book",
     theme: "rdr2",
   },
   {
     id: "contact",
     label: "Contact.wav",
-    icon: "📻",
+    icon: "phone-ringing-high",
     theme: "tlou",
   },
   {
     id: "terminal",
     label: "Terminal",
-    icon: "⬛",
+    icon: "code-block",
     theme: "minecraft",
   },
 ];

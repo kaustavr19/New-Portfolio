@@ -192,7 +192,7 @@ export default function Window({
                     lineHeight: 1, userSelect: "none",
                   }}
                 >
-                  ✕
+                  <i className="hn hn-times" />
                 </span>
               </button>
 
@@ -216,7 +216,7 @@ export default function Window({
                     marginTop: -1,
                   }}
                 >
-                  −
+                  <i className="hn hn-minus" />
                 </span>
               </button>
 
@@ -240,7 +240,7 @@ export default function Window({
                     lineHeight: 1, userSelect: "none",
                   }}
                 >
-                  {isMaximized ? "⊖" : "⊕"}
+                  <i className={isMaximized ? "hn hn-window-restore" : "hn hn-expand"} />
                 </span>
               </button>
             </div>

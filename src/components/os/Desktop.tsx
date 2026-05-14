@@ -185,7 +185,7 @@ export default function Desktop() {
                   boxShadow: isOpen ? `0 0 16px ${accent}44, 0 4px 12px rgba(0,0,0,0.4)` : "0 2px 8px rgba(0,0,0,0.3)",
                 }}
               >
-                {icon.icon}
+                <i className={`hn hn-${icon.icon}`} style={{ fontSize: 26 }} />
               </div>
               <span
                 style={{
@@ -247,7 +247,7 @@ export default function Desktop() {
               }}
               onClick={() => { openWindow(icon.id); setContextMenu(null); }}
             >
-              <span>{icon.icon}</span>
+              <i className={`hn hn-${icon.icon}`} />
               <span>Open {icon.label}</span>
             </button>
           ))}

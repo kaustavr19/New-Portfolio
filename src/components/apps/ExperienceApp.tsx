@@ -138,7 +138,7 @@ export default function ExperienceApp() {
                     cursor: "pointer", letterSpacing: "0.1em",
                   }}
                 >
-                  ← Newer
+                  <i className="hn hn-arrow-left" /> Newer
                 </button>
               )}
               {selected < experience.length - 1 && (
@@ -151,7 +151,7 @@ export default function ExperienceApp() {
                     cursor: "pointer", letterSpacing: "0.1em",
                   }}
                 >
-                  Older →
+                  Older <i className="hn hn-arrow-right" />
                 </button>
               )}
             </div>

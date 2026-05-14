@@ -11,9 +11,9 @@ const BG     = "#030d03";
 const PANEL  = "#060f06";
 
 function Portrait({
-  emoji, label, sub, side,
+  icon, label, sub, side,
 }: {
-  emoji: string; label: string; sub: string; side: "left" | "right";
+  icon: string; label: string; sub: string; side: "left" | "right";
 }) {
   return (
     <div
@@ -42,7 +42,7 @@ function Portrait({
             fontSize: 34,
           }}
         >
-          {emoji}
+          <i className={`hn hn-${icon}`} style={{ fontSize: 34 }} />
         </div>
         {/* Corner brackets */}
         {[
@@ -115,7 +115,7 @@ export default function ContactApp() {
           gap: 12,
         }}
       >
-        <span style={{ fontFamily: MONO, fontSize: 10, color: DIM, letterSpacing: "0.35em" }}>◄ CODEC ►</span>
+        <span style={{ fontFamily: MONO, fontSize: 10, color: DIM, letterSpacing: "0.35em" }}><i className="hn hn-angle-left" /> CODEC <i className="hn hn-angle-right" /></span>
         <div style={{ flex: 1, height: 1, background: `${GREEN}18` }} />
         <span style={{ fontFamily: MONO, fontSize: 13, color: AMBER, letterSpacing: "0.08em" }}>
           FREQ: 140.85 MHz
@@ -133,7 +133,7 @@ export default function ContactApp() {
       {/* ── MAIN: Portraits + Form ── */}
       <div className="flex flex-1 overflow-hidden">
         {/* Left portrait — KR-19 */}
-        <Portrait emoji="🤖" label="KR·19" sub="RECV" side="left" />
+        <Portrait icon="robot" label="KR·19" sub="RECV" side="left" />
 
         {/* Center form */}
         <div
@@ -208,7 +208,7 @@ export default function ContactApp() {
                   flexShrink: 0,
                 }}
               >
-                {message.trim() ? "▶  TRANSMIT" : "▷  AWAITING INPUT..."}
+                {message.trim() ? <><i className="hn hn-play" />{"  TRANSMIT"}</> : <><i className="hn hn-play" style={{ opacity: 0.4 }} />{"  AWAITING INPUT..."}</>}
               </button>
             </>
           ) : (
@@ -245,7 +245,7 @@ export default function ContactApp() {
 
         {/* Right portrait — Caller */}
         <Portrait
-          emoji={sent ? "📡" : "👤"}
+          icon={sent ? "share-alt" : "user"}
           label={callerLabel}
           sub="SEND"
           side="right"
@@ -283,7 +283,7 @@ export default function ContactApp() {
             href={`mailto:${profile.social.email}`}
             style={{ fontFamily: MONO, fontSize: 9, color: DIM, letterSpacing: "0.1em", textDecoration: "none" }}
           >
-            ✉ {profile.social.email}
+            <i className="hn hn-envelope" /> {profile.social.email}
           </a>
           <span style={{ color: `${GREEN}22` }}>│</span>
           <a
@@ -292,7 +292,7 @@ export default function ContactApp() {
             rel="noopener noreferrer"
             style={{ fontFamily: MONO, fontSize: 9, color: DIM, letterSpacing: "0.1em", textDecoration: "none" }}
           >
-            ↗ LINKEDIN
+            <i className="hn hn-external-link" /> LINKEDIN
           </a>
         </div>
       </div>

@@ -9,10 +9,10 @@ const MONO = "'Share Tech Mono', monospace";
 type Category = "intelligence" | "technical" | "cool" | "body";
 
 const categoryMeta: Record<Category, { label: string; stat: string; color: string; icon: string }> = {
-  intelligence: { label: "INTELLIGENCE", stat: "INT", color: "#00ffff", icon: "🧠" },
-  technical:    { label: "TECHNICAL",    stat: "TEC", color: "#f5e642", icon: "⚡" },
-  cool:         { label: "COOL",         stat: "COL", color: "#ff0090", icon: "😎" },
-  body:         { label: "BODY",         stat: "BOD", color: "#a855f7", icon: "💪" },
+  intelligence: { label: "INTELLIGENCE", stat: "INT", color: "#00ffff", icon: "lightbulb" },
+  technical:    { label: "TECHNICAL",    stat: "TEC", color: "#f5e642", icon: "bolt" },
+  cool:         { label: "COOL",         stat: "COL", color: "#ff0090", icon: "face-grin" },
+  body:         { label: "BODY",         stat: "BOD", color: "#a855f7", icon: "trophy" },
 };
 
 const CATEGORIES: Category[] = ["intelligence", "technical", "cool", "body"];
@@ -60,7 +60,7 @@ export default function SkillsApp() {
                 borderLeft: isActive ? `3px solid ${m.color}` : "3px solid transparent",
               }}
             >
-              <span style={{ fontSize: 18 }}>{m.icon}</span>
+              <i className={`hn hn-${m.icon}`} style={{ fontSize: 18, color: isActive ? m.color : "#4a4a5a" }} />
               <div>
                 <div style={{ fontFamily: RAJDHANI, fontSize: 18, fontWeight: 700, color: isActive ? m.color : "#4a4a5a", letterSpacing: "0.1em", lineHeight: 1 }}>
                   {m.stat}
@@ -70,7 +70,7 @@ export default function SkillsApp() {
                 </div>
               </div>
               {isActive && (
-                <div className="absolute right-3" style={{ color: m.color, fontSize: 10 }}>▶</div>
+                <i className="hn hn-angle-right absolute right-3" style={{ color: m.color, fontSize: 10 }} />
               )}
             </button>
           );
@@ -87,7 +87,7 @@ export default function SkillsApp() {
       <div className="flex-1 flex flex-col relative z-10 overflow-auto" style={{ padding: "40px 40px 40px 36px" }}>
         {/* Header */}
         <div className="flex items-center gap-4" style={{ marginBottom: 48 }}>
-          <span style={{ fontSize: 36 }}>{meta.icon}</span>
+          <i className={`hn hn-${meta.icon}`} style={{ fontSize: 36, color: meta.color }} />
           <div>
             <div style={{ fontFamily: RAJDHANI, fontSize: 30, fontWeight: 700, color: meta.color, letterSpacing: "0.15em", textShadow: `0 0 16px ${meta.color}88`, lineHeight: 1 }}>
               {meta.label}
