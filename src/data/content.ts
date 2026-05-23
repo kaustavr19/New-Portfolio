@@ -262,6 +262,7 @@ export const desktopIcons = [
   { id: "experience", label: "Experience.log",  deviantLabel: "CHRONICLE.log",     icon: "book",               theme: "rdr2"      },
   { id: "contact",    label: "Contact.wav",     deviantLabel: "TRANSMISSION.wav",  icon: "phone-ringing-high", theme: "tlou"      },
   { id: "terminal",   label: "Terminal",        deviantLabel: "DEBUG.exe",         icon: "code-block",         theme: "minecraft" },
+  { id: "settings",   label: "Settings.cfg",    deviantLabel: "PROTOCOLS.cfg",     icon: "cog",                theme: "detroit"   },
 ];
 
 /* OS chrome strings — taskbar, menus, system labels that get
