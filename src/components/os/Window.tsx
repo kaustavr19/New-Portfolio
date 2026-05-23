@@ -2,6 +2,7 @@
 
 import { useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useA11y } from "@/lib/a11y";
 
 export interface WindowProps {
   id: string;
@@ -73,6 +74,7 @@ export default function Window({
   onFocus,
   children,
 }: WindowProps) {
+  const { motionReduced } = useA11y();
   const [pos, setPos] = useState(defaultPosition);
   const [size] = useState(defaultSize);
   const [isMaximized, setIsMaximized] = useState(defaultMaximized);
@@ -157,10 +159,10 @@ export default function Window({
               ? "none"
               : "left 0.22s cubic-bezier(0.25,0,0.25,1), top 0.22s cubic-bezier(0.25,0,0.25,1), width 0.22s cubic-bezier(0.25,0,0.25,1), height 0.22s cubic-bezier(0.25,0,0.25,1), border-radius 0.22s ease",
           }}
-          initial={{ opacity: 0, scale: 0.97 }}
+          initial={motionReduced ? false : { opacity: 0, scale: 0.97 }}
           animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          transition={{ duration: 0.16, ease: "easeOut" }}
+          exit={motionReduced ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
+          transition={motionReduced ? { duration: 0 } : { duration: 0.16, ease: "easeOut" }}
           onMouseDown={() => onFocus(id)}
         >
           {/* Title bar */}

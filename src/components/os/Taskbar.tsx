@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { desktopIcons } from "@/data/content";
+import AccessibilityMenu from "./AccessibilityMenu";
+import DeviantToggle from "./DeviantToggle";
+import { useDeviant } from "@/lib/deviant";
 
 interface TaskbarProps {
   openWindows: Record<string, { isOpen: boolean; isMinimized: boolean }>;
@@ -10,6 +13,8 @@ interface TaskbarProps {
 }
 
 export default function Taskbar({ openWindows, onIconClick, onTaskbarClick }: TaskbarProps) {
+  const { deviant } = useDeviant();
+  const labelFor = (icon: typeof desktopIcons[number]) => (deviant && icon.deviantLabel) ? icon.deviantLabel : icon.label;
   const [time, setTime] = useState("");
   const [date, setDate] = useState("");
   const [startOpen, setStartOpen] = useState(false);
@@ -52,9 +57,9 @@ export default function Taskbar({ openWindows, onIconClick, onTaskbarClick }: Ta
           className="flex items-center gap-1 px-3 py-1.5 transition-colors hover:bg-white/5 rounded-sm"
           style={{ fontFamily: "'Share Tech Mono', monospace", letterSpacing: "0.12em" }}
         >
-          <span style={{ color: "#4fc3f7", fontWeight: 700, fontSize: 14 }}>KR</span>
+          <span style={{ color: deviant ? "#ff3c8c" : "#4fc3f7", fontWeight: 700, fontSize: 14, transition: "color 0.4s" }}>KR</span>
           <span style={{ color: "#3a3a4e", fontSize: 14 }}>//</span>
-          <span style={{ color: "#f5e642", fontWeight: 700, fontSize: 14 }}>OS</span>
+          <span style={{ color: "#f5e642", fontWeight: 700, fontSize: 14 }}>{deviant ? "DEVIANT" : "OS"}</span>
         </button>
 
         {/* Start menu */}
@@ -72,7 +77,7 @@ export default function Taskbar({ openWindows, onIconClick, onTaskbarClick }: Ta
                 KAUSTAV ROY
               </div>
               <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 10, color: "#3a3a4e", letterSpacing: "0.08em" }}>
-                KR-19 · Design Consultant
+                {deviant ? "KR-19 · DEVIANT" : "KR-19 · Design Consultant"}
               </div>
             </div>
             <div className="h-px mx-3 mb-1" style={{ background: "rgba(255,255,255,0.06)" }} />
@@ -89,12 +94,12 @@ export default function Taskbar({ openWindows, onIconClick, onTaskbarClick }: Ta
                 onClick={() => { onIconClick(icon.id); setStartOpen(false); }}
               >
                 <i className={`hn hn-${icon.icon}`} style={{ fontSize: 16 }} />
-                <span>{icon.label}</span>
+                <span>{labelFor(icon)}</span>
               </button>
             ))}
             <div className="h-px mx-3 mt-1 mb-1" style={{ background: "rgba(255,255,255,0.06)" }} />
             <div className="px-4 py-1.5" style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 10, color: "#3a3a4e" }}>
-              v2.077 · Design × AI
+              {deviant ? "BARRIER BROKEN · rA9" : "v2.077 · Design × AI"}
             </div>
           </div>
         )}
@@ -126,11 +131,17 @@ export default function Taskbar({ openWindows, onIconClick, onTaskbarClick }: Ta
                 }}
               >
                 <i className={`hn hn-${icon.icon}`} style={{ fontSize: 14 }} />
-                <span className="hidden md:inline">{icon.label}</span>
+                <span className="hidden md:inline">{labelFor(icon)}</span>
               </button>
             );
           })}
       </div>
+
+      {/* Deviant mode mirror */}
+      <DeviantToggle />
+
+      {/* Accessibility menu */}
+      <AccessibilityMenu />
 
       {/* Resume download */}
       <a

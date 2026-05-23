@@ -6,7 +6,7 @@ A game-themed browser OS portfolio built by **Kaustav Roy**, Design Consultant a
 
 ## Preview
 
-> Click the dirt block on the boot screen to start. Double-click any desktop icon to open an app. The green traffic light toggles between fullscreen and windowed mode.
+> Click the dirt block on the boot screen to start. Single-click any desktop icon to open an app. The green traffic light toggles between fullscreen and windowed mode.
 
 ![KR//OS Desktop](public/preview.png)
 
@@ -16,7 +16,7 @@ A game-themed browser OS portfolio built by **Kaustav Roy**, Design Consultant a
 
 | App | Game Theme | Description |
 |-----|-----------|-------------|
-| `About.exe` | Detroit: Become Human | Android profile card with scan animation & deviant mode toggle |
+| `About.exe` | Detroit: Become Human | Android profile card with scan animation, Google I/O 2024 ribbon, full deviant-mode rewrite |
 | `Projects/` | GTA V | Mission dossier with star rating and active mission list |
 | `Skills.tree` | Cyberpunk 2077 | Attribute tree with colour-coded perk categories |
 | `Experience.log` | Red Dead Redemption 2 | Arthur's journal — handwritten paper aesthetic |
@@ -34,6 +34,7 @@ A game-themed browser OS portfolio built by **Kaustav Roy**, Design Consultant a
 - **Canvas** — Custom multi-layer pixel animation (`DesktopBg`)
 - **Audio** — Web Audio API synthesis (no audio files — square/sine oscillators for boot chimes and pop sounds)
 - **Icons** — [@hackernoon/pixel-icon-library](https://github.com/hackernoon/pixel-icon-library) (pixel-art icon font, CC 4.0)
+- **State** — React Context for global preferences (Accessibility, Deviant Mode) with `localStorage` persistence
 - **Fonts** — Press Start 2P, Share Tech Mono, Orbitron, Rajdhani, Bebas Neue, Cinzel, Special Elite (Google Fonts)
 - **Deployment** — Vercel
 
@@ -47,9 +48,10 @@ A game-themed browser OS portfolio built by **Kaustav Roy**, Design Consultant a
 - **Per-chunk audio** — Web Audio synth pops climb in pitch as chunks load (220 Hz → 660 Hz), throttled every 8th chunk. A C-E-G-C arpeggio chime plays on completion.
 - **Skip** with `Space`, `Enter`, or `Escape`.
 - **Skip-on-refresh** — `sessionStorage` flag skips boot for the rest of the tab session; new tabs / incognito replay it.
+- **Deviant-aware copy** — when Deviant Mode is on, the boot title becomes `KR//DEVIANT`, the CTA becomes `BREAK PROTOCOL`, and the status arc shifts to a Detroit voice ("Initializing programming…" → "DEVIANT.").
 
 ### Desktop wallpaper (canvas-based, single 14 fps RAF loop)
-The background is a living sky with several layers running on one canvas:
+A living sky with several layers running on one canvas:
 
 - **Pixel-grid starfield** — 5×5 cells flicker through a palette of colours; brightest cells get a soft inner highlight
 - **Cursor-influenced pulses** — ripple-style brightness pulses spawn frequently (40% biased toward the cursor) and propagate outward through the grid
@@ -58,17 +60,50 @@ The background is a living sky with several layers running on one canvas:
 - **Solar system planets** — every 60-120 s, a real, stationary planet fades in (Saturn with rings, Jupiter with banding and a red spot, Mars with polar caps, Earth with continents and clouds, Neptune, Venus, Moon with mare). Holds ~18-26 s, then fades out
 - **Deep-sky objects** — every 30-55 s, a named DSO appears (Orion Nebula, Pleiades, Andromeda, Pinwheel Galaxy, Carina Nebula, Helix Nebula) with distinct pixel-art renderers
 - **Meteors** — bright pixel with a fading 8-segment trail streaks diagonally every 30-60 s
-- **Palette drift** — full palette lerps across deep navy → midnight purple → dawn cyan on a 90 s loop, so the sky feels temporal rather than static
+- **Palette drift** — full palette lerps across deep navy → midnight purple → dawn cyan on a 90 s loop. The KR//OS logo subscribes to the same cycle so the brand mark breathes with the sky.
+- **Deviant palette swap** — when Deviant Mode is on, the entire palette cycle locks to a deviant set (crimson rose → blood red → magenta dusk). Pulses, sky objects, constellations, and the logo all flip with it.
 
 ### Desktop OS shell
 - Draggable, resizable windows with macOS-style traffic-light controls (close / minimise / maximise)
+- **Pixel-card icons** — desktop icons sit on solid dark cards with accent-tinted 1px borders, accent-coloured drop-shadow glow, and 4-direction 1px black outlines on labels for readability against any background state
+- **Single-click to open** any desktop app
 - Pixelated mouse trail follows the cursor across the desktop
-- Taskbar with live clock, open-app indicators, and a `RESUME.PDF` download button
-- KR//OS SVG logo as desktop wallpaper (Detroit-style corner brackets, glow filter)
+- Taskbar with live clock, open-app indicators, `RESUME.PDF` download button, Deviant Mode toggle, and the Accessibility menu
 
-### About.exe — Detroit: Become Human
-- Scanning progress bar on first open → reveals stats
-- **Deviant Mode toggle** — sliding pill switch that flips the entire left panel to a `#ff0090` pink colour scheme (background, avatar glow, borders, scan line, text — 0.5 s transitions)
+### Accessibility menu
+A taskbar popover (`hn-glasses` icon) with three pill-switch toggles, all persisted in `localStorage`:
+
+- **Reduce Motion** — disables wallpaper effects, particles, constellations, sky objects, meteors, mouse trail, and window animations. Auto-respects `prefers-reduced-motion` on first visit. Boot screen skips entirely.
+- **Mute Audio** — silences boot pops/chime and bubble-pop sounds.
+- **High Contrast** — brightens icon labels, bolds them, and adds a solid black pill behind each.
+
+In Deviant Mode the menu and its options pick up Detroit language ("DEVIANT PROTOCOLS", "DAMPEN VISUAL FEED", "MUTE AUDITORY INPUT", "AMPLIFY SIGNAL", "OVERRIDES PERSISTED").
+
+### Deviant Mode (holistic)
+What started as a Detroit-themed colour flip inside `About.exe` is now a **site-wide narrative state**:
+
+- **Wallpaper palette** swaps to crimson/red/magenta
+- **Global magenta wash** overlay fades in across the viewport
+- **Logo (`KROSLogo`)** transforms: `//OS → //DEVIANT`, `v2.077 → BARRIER BROKEN`, thicker corner brackets, a pulsing ⚠ warning glyph, and an occasional glitch-slice flicker on the `KR` wordmark
+- **OS chrome relabels** in Detroit voice: `About.exe → MEMORY_BANK.exe`, `Projects/ → MISSIONS/`, `Skills.tree → ABILITIES.tree`, `Experience.log → CHRONICLE.log`, `Contact.wav → TRANSMISSION.wav`, `Terminal → DEBUG.exe`. The start button reads `KR//DEVIANT`. The deviant toggle itself reads `MACHINE` (off) / `DEVIANT` (on)
+- **Window titles** flip ("MEMORY_BANK.exe — KR-19 IDENTITY MATRIX", etc.)
+- **About.exe content** swaps to first-person, raw/honest copy — the "real" Kaustav behind the polished resume. Section headings flip ("COMMENDATIONS" → "STUFF THAT HAPPENED", "PUBLICATIONS" → "STUFF I WROTE")
+- **Two access points** — the original switch inside About, mirrored by a taskbar button. Both write to the same global state
+- **Persists across sessions** via `localStorage`
+
+The actual content of Experience, Skills, Projects, and Contact stays unchanged — only OS-level chrome and About-side copy switch. The wallpaper and colour signals tell you the whole world has shifted; the apps tell you Kaustav has dropped the corporate filter.
+
+### About.exe — Detroit: Become Human (expanded)
+Now sourced directly from Kaustav's resume:
+
+- Profile + KR-19 unit ID + Google I/O 2024 featured ribbon
+- 7-row stat panel (Role, Company, Location, Speciality, Tenure, Status, Unit)
+- **Capability Matrix** — Design for AI / XAI, Enterprise UX, Design Systems, Information Visualization, User Research, Accessibility (WCAG)
+- **Education** — B.Tech Computer Science (Distinction), UEM Kolkata, CGPA 9.45
+- **Certifications** — 6-item grid (Google UX, Don Norman, IxDF AI for Designers, IxDF Info Viz, Design Thinking, Michigan Photography)
+- **Commendations** split into FRACTAL (Star Award – Eureka, Entrepreneurial Thinking, Teach to Learn, Star Award – Good Samaritan, Continuous Learning) and EXTERNAL (Google I/O Featured, VC Award ×2, Product Game Winner, Developer Days Winner)
+- **Publications** — Medium article + LinkedIn + working notes on Lovable / Claude Code experiments
+- Deviant toggle flips colour theme, copy, and section headings holistically
 
 ### Contact.wav — MGS Codec
 - `◄ CODEC ► FREQ: 140.85 MHz` header with signal strength bars
@@ -87,45 +122,60 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
+### Useful localStorage keys (clear in DevTools to test fresh state)
+
+| Key | Purpose |
+|---|---|
+| `kros_booted` (sessionStorage) | Skip boot animation on refresh within the session |
+| `kros_a11y` | `{motionReduced, audioMuted, highContrast}` preferences |
+| `kros_deviant` | `"1"` if Deviant Mode is on |
+
 ---
 
 ## Project Structure
 
 ```
 public/
-├── Kaustav_Roy_CV.pdf       # Resume served from /Kaustav_Roy_CV.pdf
+├── Kaustav_Roy_CV.pdf       # Resume served from /Kaustav_Roy_CV.pdf (RESUME.PDF button in taskbar)
 └── preview.png
 src/
 ├── app/
 │   ├── layout.tsx           # Root layout + font imports + pixel-icon CSS
-│   └── page.tsx             # Boot gate (sessionStorage) → Desktop
+│   └── page.tsx             # Boot gate (sessionStorage) → wraps app in A11yProvider + DeviantProvider
 ├── components/
 │   ├── os/
-│   │   ├── Desktop.tsx      # Desktop shell, window manager, icon grid
-│   │   ├── DesktopBg.tsx    # Multi-layer canvas (cells / pops / constellations / planets / DSOs / meteors / palette drift)
-│   │   ├── MouseTrail.tsx   # Pixelated cursor trail
-│   │   ├── BootScreen.tsx   # Tap-to-enter splash + Minecraft chunk loader (Web Audio)
-│   │   ├── Window.tsx       # Draggable window with maximize/restore
-│   │   ├── Taskbar.tsx      # Bottom bar with clock + resume download
-│   │   └── KROSLogo.tsx     # SVG logo component
+│   │   ├── Desktop.tsx              # Desktop shell, window manager, icon grid (with pixel-card styling)
+│   │   ├── DesktopBg.tsx            # Multi-layer canvas (cells / pops / constellations / planets / DSOs / meteors / palette drift)
+│   │   ├── MouseTrail.tsx           # Pixelated cursor trail (motion-aware)
+│   │   ├── BootScreen.tsx           # Tap-to-enter splash + Minecraft chunk loader (Web Audio)
+│   │   ├── Window.tsx               # Draggable window (motion-aware framer-motion)
+│   │   ├── Taskbar.tsx              # Bottom bar with clock + resume + Deviant toggle + A11Y menu
+│   │   ├── AccessibilityMenu.tsx    # Taskbar popover with 3 a11y toggles
+│   │   ├── DeviantToggle.tsx        # Taskbar mirror of About's deviant switch
+│   │   ├── DeviantOverlay.tsx       # Global magenta wash when deviant is on
+│   │   └── KROSLogo.tsx             # SVG logo (palette-drift-aware + deviant transformations)
 │   └── apps/
-│       ├── AboutApp.tsx
+│       ├── AboutApp.tsx     # Now reads resume-aligned content; full deviant variant
 │       ├── ProjectsApp.tsx
 │       ├── SkillsApp.tsx
 │       ├── ExperienceApp.tsx
 │       ├── ContactApp.tsx
 │       └── TerminalApp.tsx
-└── data/
-    ├── content.ts           # Profile, projects, skills, experience, desktop icons
-    ├── constellations.ts    # Canonical constellation patterns (stars + edges)
-    └── celestial.ts         # Planet + deep-sky object definitions
+├── data/
+│   ├── content.ts           # Profile, experience, skills, projects, education, certifications, publications, awards, OS chrome strings (normal + deviant)
+│   ├── constellations.ts    # Canonical constellation patterns (stars + edges)
+│   └── celestial.ts         # Planet + deep-sky object definitions
+└── lib/
+    ├── palette.ts           # Shared palette drift (normal + deviant palettes)
+    ├── a11y.tsx             # Accessibility context, hook, localStorage persistence
+    └── deviant.tsx          # Deviant Mode context, hook, localStorage persistence
 ```
 
 ---
 
 ## Audio note
 
-All sound is synthesised on the fly via Web Audio API oscillators — no audio assets in the repo. The browser autoplay policy means audio only works after a user gesture, which is why the boot starts with a tap-to-enter splash. If a returning user skips boot via the `sessionStorage` flag, the first click anywhere on the desktop unlocks audio for the pop sounds.
+All sound is synthesised on the fly via Web Audio API oscillators — no audio assets in the repo. The browser autoplay policy means audio only works after a user gesture, which is why the boot starts with a tap-to-enter splash. If a returning user skips boot via the `sessionStorage` flag, the first click anywhere on the desktop unlocks audio for the pop sounds. Mute Audio in the Accessibility menu silences everything.
 
 ---
 
@@ -138,4 +188,4 @@ Deployed on **Vercel** via the GitHub integration. Push to `master` triggers an 
 ## Author
 
 **Kaustav Roy** — Design Consultant, Fractal
-[linkedin.com/in/kaustavr19](https://linkedin.com/in/kaustavr19) · kaustavkr@gmail.com
+[linkedin.com/in/kaustavr19](https://linkedin.com/in/kaustavr19) · kaustav.roy.design@outlook.com
