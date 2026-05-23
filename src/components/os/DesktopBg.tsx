@@ -677,7 +677,7 @@ export default function DesktopBg() {
       const palette = samplePalette(ts);
 
       /* Spawns */
-      if (Math.random() < 0.04) spawnPulse();
+      if (Math.random() < 0.065) spawnPulse(); // ~1.6× more frequent than baseline
       if (ts >= nextMeteorTime) {
         spawnMeteor();
         nextMeteorTime = ts + rand(STAR_MIN_INTERVAL_MS, STAR_MAX_INTERVAL_MS);
