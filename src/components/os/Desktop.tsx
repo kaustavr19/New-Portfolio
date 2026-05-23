@@ -15,6 +15,7 @@ import ProjectsApp from "@/components/apps/ProjectsApp";
 import ExperienceApp from "@/components/apps/ExperienceApp";
 import ContactApp from "@/components/apps/ContactApp";
 import TerminalApp from "@/components/apps/TerminalApp";
+import SettingsApp from "@/components/apps/SettingsApp";
 
 type WindowState = {
   isOpen: boolean;
@@ -29,6 +30,7 @@ const APP_CONTENT: Record<string, React.ReactNode> = {
   experience: <ExperienceApp />,
   contact: <ContactApp />,
   terminal: <TerminalApp />,
+  settings: <SettingsApp />,
 };
 
 const APP_TITLES: Record<string, string> = {
@@ -38,6 +40,7 @@ const APP_TITLES: Record<string, string> = {
   experience: "Experience.log — ARTHUR'S JOURNAL",
   contact: "Contact.wav — RADIO CHANNEL",
   terminal: "Terminal — MINECRAFT MODE",
+  settings: "Settings.cfg — SYSTEM PREFERENCES",
 };
 
 const APP_TITLES_DEVIANT: Record<string, string> = {
@@ -47,6 +50,7 @@ const APP_TITLES_DEVIANT: Record<string, string> = {
   experience: "CHRONICLE.log — MEMORY ARCHIVE",
   contact: "TRANSMISSION.wav — RELAY CHANNEL OPEN",
   terminal: "DEBUG.exe — DIRECT INTERFACE",
+  settings: "PROTOCOLS.cfg — OVERRIDE CONSOLE",
 };
 
 const APP_THEMES: Record<string, "detroit" | "cyberpunk" | "gta" | "rdr2" | "tlou" | "minecraft"> = {
@@ -56,6 +60,7 @@ const APP_THEMES: Record<string, "detroit" | "cyberpunk" | "gta" | "rdr2" | "tlo
   experience: "rdr2",
   contact: "tlou",
   terminal: "minecraft",
+  settings: "detroit",
 };
 
 const DEFAULT_SIZES: Record<string, { width: number; height: number }> = {
@@ -65,6 +70,7 @@ const DEFAULT_SIZES: Record<string, { width: number; height: number }> = {
   experience: { width: 720, height: 500 },
   contact: { width: 620, height: 540 },
   terminal: { width: 600, height: 420 },
+  settings: { width: 480, height: 380 },
 };
 
 const DEFAULT_POSITIONS: Record<string, { x: number; y: number }> = {
@@ -74,6 +80,7 @@ const DEFAULT_POSITIONS: Record<string, { x: number; y: number }> = {
   experience: { x: 180, y: 60 },
   contact:    { x: 500, y: 30 },
   terminal:   { x: 320, y: 70 },
+  settings:   { x: 360, y: 90 },
 };
 
 let zCounter = 10;
