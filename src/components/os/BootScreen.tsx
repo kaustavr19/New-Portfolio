@@ -2,6 +2,9 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useA11y } from "@/lib/a11y";
+import { useDeviant } from "@/lib/deviant";
+import { osChrome, osChromeDeviant } from "@/data/content";
 
 /* ──────────────────────────────────────────────────────────
    KR//OS Boot Screen
@@ -47,15 +50,7 @@ const CHUNK_COLORS = [
   "#c0c0c0",                                   // stone
 ];
 
-/* ── Loading status lines ── */
-const STATUS_LINES = [
-  { at: 0,   text: "Generating world..." },
-  { at: 15,  text: "Building terrain..." },
-  { at: 40,  text: "Spawning entities..." },
-  { at: 65,  text: "Loading KR-19..." },
-  { at: 88,  text: "Preparing spawn..." },
-  { at: 100, text: "Ready." },
-];
+/* Status lines come from osChrome / osChromeDeviant in /data/content */
 
 /* ── Grid config ── */
 const COLS = 24;
@@ -65,12 +60,24 @@ const TOTAL_CELLS = COLS * ROWS;
 const REVEAL_DURATION_MS = 2200;
 
 export default function BootScreen({ onComplete }: BootScreenProps) {
+  const a11y = useA11y();
+  const { deviant } = useDeviant();
+  const ch = deviant ? osChromeDeviant : osChrome;
+  const STATUS_LINES = ch.bootStatuses;
+  const a11yRef = useRef(a11y);
+  useEffect(() => { a11yRef.current = a11y; }, [a11y]);
+
   const [phase, setPhase] = useState<Phase>("tap");
   const [revealed, setRevealed] = useState(0);   // count of chunks revealed
   const audioCtxRef = useRef<AudioContext | null>(null);
   const orderRef = useRef<number[]>([]);
   const colorsRef = useRef<string[]>([]);
   const startTimeRef = useRef<number>(0);
+
+  // If Reduce Motion is on (incl. hydrated from localStorage), skip boot entirely
+  useEffect(() => {
+    if (a11y.motionReduced) onComplete();
+  }, [a11y.motionReduced, onComplete]);
 
   /* Precompute chunk reveal order (Manhattan distance from center + jitter) */
   if (orderRef.current.length === 0) {
@@ -95,6 +102,7 @@ export default function BootScreen({ onComplete }: BootScreenProps) {
 
   /* ── Audio synthesis (Web Audio API) ── */
   const playPop = useCallback((pitch: number) => {
+    if (a11yRef.current.audioMuted) return;
     const ctx = audioCtxRef.current;
     if (!ctx) return;
     const now = ctx.currentTime;
@@ -111,6 +119,7 @@ export default function BootScreen({ onComplete }: BootScreenProps) {
   }, []);
 
   const playChime = useCallback(() => {
+    if (a11yRef.current.audioMuted) return;
     const ctx = audioCtxRef.current;
     if (!ctx) return;
     const now = ctx.currentTime;
@@ -249,10 +258,10 @@ export default function BootScreen({ onComplete }: BootScreenProps) {
                   }}
                 />
                 <div style={{ color: "#fff", fontSize: 28, letterSpacing: "0.1em", textShadow: "3px 3px 0 #000", marginBottom: 12 }}>
-                  KR//OS
+                  {deviant ? "KR//DEVIANT" : "KR//OS"}
                 </div>
                 <div style={{ color: "#ddd", fontSize: 9, letterSpacing: "0.2em", textShadow: "2px 2px 0 #000", marginBottom: 36 }}>
-                  PORTFOLIO v2.077
+                  {ch.bootSubtitle}
                 </div>
 
                 {/* Pulsing CTA */}
@@ -261,19 +270,19 @@ export default function BootScreen({ onComplete }: BootScreenProps) {
                   transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
                   style={{
                     fontSize: 11,
-                    color: "#ffd24a",
+                    color: deviant ? "#ff5fa0" : "#ffd24a",
                     letterSpacing: "0.3em",
                     textShadow: "2px 2px 0 #000",
                     padding: "12px 24px",
-                    border: "2px solid #ffd24a",
+                    border: `2px solid ${deviant ? "#ff5fa0" : "#ffd24a"}`,
                     background: "rgba(0,0,0,0.35)",
                   }}
                 >
-                  CLICK TO BOOT
+                  {ch.bootCta}
                 </motion.div>
 
                 <div style={{ marginTop: 24, fontSize: 8, color: "#aaa", letterSpacing: "0.2em", textShadow: "1px 1px 0 #000" }}>
-                  (sound on)
+                  {ch.bootSoundNote}
                 </div>
               </motion.div>
             )}

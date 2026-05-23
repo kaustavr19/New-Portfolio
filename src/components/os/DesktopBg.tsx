@@ -3,6 +3,9 @@
 import { useEffect, useRef } from "react";
 import { CONSTELLATIONS } from "@/data/constellations";
 import { PLANETS, DSOS, PlanetName, DsoName, PlanetDef, DsoDef } from "@/data/celestial";
+import { samplePalette } from "@/lib/palette";
+import { useA11y } from "@/lib/a11y";
+import { useDeviant } from "@/lib/deviant";
 
 /* ──────────────────────────────────────────────────────────
    KR//OS Desktop Background
@@ -19,13 +22,7 @@ import { PLANETS, DSOS, PlanetName, DsoName, PlanetDef, DsoDef } from "@/data/ce
 const CELL = 5;
 const FPS  = 14;
 
-/* Palette drift */
-const PALETTES: number[][][] = [
-  [[8, 14, 28], [12, 30, 58],  [18, 60, 110], [30, 140, 200], [79, 195, 247]],   // navy
-  [[12, 8, 24], [28, 18, 52],  [60, 30, 100], [120, 60, 180], [200, 140, 240]],  // purple
-  [[8, 20, 28], [16, 46, 58],  [30, 90, 110], [60, 160, 200], [120, 220, 247]],  // dawn cyan
-];
-const PALETTE_CYCLE_MS = 90_000;
+/* Palette drift lives in @/lib/palette so the desktop logo can subscribe too */
 
 /* Pops */
 const POP_RADIUS = 28;
@@ -89,6 +86,14 @@ type SkyObject = {
 
 export default function DesktopBg() {
   const ref = useRef<HTMLCanvasElement>(null);
+  const a11y = useA11y();
+  const { deviant } = useDeviant();
+
+  // Ref mirrors so the canvas RAF loop sees live values without restarting
+  const a11yRef = useRef(a11y);
+  const deviantRef = useRef(deviant);
+  useEffect(() => { a11yRef.current = a11y; }, [a11y]);
+  useEffect(() => { deviantRef.current = deviant; }, [deviant]);
 
   useEffect(() => {
     const canvas = ref.current;
@@ -140,6 +145,7 @@ export default function DesktopBg() {
       if (audioCtx.state === "suspended") audioCtx.resume().catch(() => {});
     };
     const playPop = (intensity: number) => {
+      if (a11yRef.current.audioMuted) return;
       if (!audioCtx || audioCtx.state !== "running") return;
       const t = audioCtx.currentTime;
       const osc = audioCtx.createOscillator();
@@ -169,17 +175,6 @@ export default function DesktopBg() {
       }));
       constellations.length = 0;
       skyObjects.length = 0;
-    };
-
-    /* ── Palette ── */
-    const samplePalette = (ts: number): number[][] => {
-      const phase = (ts % PALETTE_CYCLE_MS) / PALETTE_CYCLE_MS;
-      const segPos = phase * PALETTES.length;
-      const segIdx = Math.floor(segPos);
-      const t = segPos - segIdx;
-      const a = PALETTES[segIdx];
-      const b = PALETTES[(segIdx + 1) % PALETTES.length];
-      return a.map((stop, i) => stop.map((c, ci) => Math.round(c + (b[i][ci] - c) * t)));
     };
 
     /* ── Label alpha helper (shared by constellations + sky objects) ── */
@@ -674,24 +669,33 @@ export default function DesktopBg() {
       if (ts - last < dt) return;
       last = ts;
 
-      const palette = samplePalette(ts);
+      const palette = samplePalette(ts, deviantRef.current);
 
-      /* Spawns */
-      if (Math.random() < 0.065) spawnPulse(); // ~1.6× more frequent than baseline
-      if (ts >= nextMeteorTime) {
-        spawnMeteor();
-        nextMeteorTime = ts + rand(STAR_MIN_INTERVAL_MS, STAR_MAX_INTERVAL_MS);
-      }
-      if (ts >= nextPlanetTime && skyObjects.filter(o => o.kind === "planet").length === 0) {
-        spawnPlanet();
-        nextPlanetTime = ts + rand(PLANET_MIN_INTERVAL_MS, PLANET_MAX_INTERVAL_MS);
-      }
-      if (ts >= nextDsoTime && skyObjects.filter(o => o.kind === "dso").length < 2) {
-        spawnDso();
-        nextDsoTime = ts + rand(DSO_MIN_INTERVAL_MS, DSO_MAX_INTERVAL_MS);
-      }
+      const motionOn = !a11yRef.current.motionReduced;
 
-      tryPop(ts);
+      /* Spawns — all motion-gated */
+      if (motionOn) {
+        if (Math.random() < 0.065) spawnPulse(); // ~1.6× more frequent than baseline
+        if (ts >= nextMeteorTime) {
+          spawnMeteor();
+          nextMeteorTime = ts + rand(STAR_MIN_INTERVAL_MS, STAR_MAX_INTERVAL_MS);
+        }
+        if (ts >= nextPlanetTime && skyObjects.filter(o => o.kind === "planet").length === 0) {
+          spawnPlanet();
+          nextPlanetTime = ts + rand(PLANET_MIN_INTERVAL_MS, PLANET_MAX_INTERVAL_MS);
+        }
+        if (ts >= nextDsoTime && skyObjects.filter(o => o.kind === "dso").length < 2) {
+          spawnDso();
+          nextDsoTime = ts + rand(DSO_MIN_INTERVAL_MS, DSO_MAX_INTERVAL_MS);
+        }
+        tryPop(ts);
+      } else {
+        // While motion-reduced: keep timers from accumulating a backlog of spawns
+        // that would all fire at once if the user turns motion back on
+        nextMeteorTime = Math.max(nextMeteorTime, ts + 1000);
+        nextPlanetTime = Math.max(nextPlanetTime, ts + 1000);
+        nextDsoTime    = Math.max(nextDsoTime,    ts + 1000);
+      }
 
       /* Pulses */
       for (let p = pulses.length - 1; p >= 0; p--) {
@@ -733,9 +737,9 @@ export default function DesktopBg() {
         if (o.ageMs >= o.lifetimeMs) skyObjects.splice(i, 1);
       }
 
-      /* Constellations update */
+      /* Constellations update — also motion-gated */
       const idleTime = ts - lastMouseMove;
-      const wantConstellations = idleTime > IDLE_THRESHOLD_MS;
+      const wantConstellations = motionOn && idleTime > IDLE_THRESHOLD_MS;
       if (wantConstellations && constellations.length === 0) spawnConstellations();
       for (let i = constellations.length - 1; i >= 0; i--) {
         const c = constellations[i];

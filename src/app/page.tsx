@@ -2,9 +2,12 @@
 
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
+import { A11yProvider } from "@/lib/a11y";
+import { DeviantProvider } from "@/lib/deviant";
 
 const BootScreen = dynamic(() => import("@/components/os/BootScreen"), { ssr: false });
 const Desktop = dynamic(() => import("@/components/os/Desktop"), { ssr: false });
+const DeviantOverlay = dynamic(() => import("@/components/os/DeviantOverlay"), { ssr: false });
 
 const BOOT_KEY = "kros_booted";
 
@@ -36,9 +39,14 @@ export default function Home() {
   if (!checked) return null;
 
   return (
-    <div className="fixed inset-0 overflow-hidden">
-      {!booted && <BootScreen onComplete={handleBootComplete} />}
-      {booted && <Desktop />}
-    </div>
+    <A11yProvider>
+      <DeviantProvider>
+        <div className="fixed inset-0 overflow-hidden">
+          {!booted && <BootScreen onComplete={handleBootComplete} />}
+          {booted && <Desktop />}
+          <DeviantOverlay />
+        </div>
+      </DeviantProvider>
+    </A11yProvider>
   );
 }

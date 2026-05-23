@@ -7,6 +7,8 @@ import Taskbar from "./Taskbar";
 import KROSLogo from "./KROSLogo";
 import DesktopBg from "./DesktopBg";
 import MouseTrail from "./MouseTrail";
+import { useA11y } from "@/lib/a11y";
+import { useDeviant } from "@/lib/deviant";
 import AboutApp from "@/components/apps/AboutApp";
 import SkillsApp from "@/components/apps/SkillsApp";
 import ProjectsApp from "@/components/apps/ProjectsApp";
@@ -36,6 +38,15 @@ const APP_TITLES: Record<string, string> = {
   experience: "Experience.log — ARTHUR'S JOURNAL",
   contact: "Contact.wav — RADIO CHANNEL",
   terminal: "Terminal — MINECRAFT MODE",
+};
+
+const APP_TITLES_DEVIANT: Record<string, string> = {
+  about: "MEMORY_BANK.exe — KR-19 IDENTITY MATRIX",
+  skills: "ABILITIES.tree — PROGRAMMING ANALYSIS",
+  projects: "MISSIONS/ — ACTIVE OBJECTIVES",
+  experience: "CHRONICLE.log — MEMORY ARCHIVE",
+  contact: "TRANSMISSION.wav — RELAY CHANNEL OPEN",
+  terminal: "DEBUG.exe — DIRECT INTERFACE",
 };
 
 const APP_THEMES: Record<string, "detroit" | "cyberpunk" | "gta" | "rdr2" | "tlou" | "minecraft"> = {
@@ -68,6 +79,9 @@ const DEFAULT_POSITIONS: Record<string, { x: number; y: number }> = {
 let zCounter = 10;
 
 export default function Desktop() {
+  const { highContrast } = useA11y();
+  const { deviant } = useDeviant();
+  const labelFor = (icon: typeof desktopIcons[number]) => (deviant && icon.deviantLabel) ? icon.deviantLabel : icon.label;
   const [windows, setWindows] = useState<Record<string, WindowState>>({});
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
 
@@ -170,7 +184,7 @@ export default function Desktop() {
           return (
             <button
               key={icon.id}
-              onDoubleClick={() => openWindow(icon.id)}
+              onClick={() => openWindow(icon.id)}
               className="flex flex-col items-center gap-2 w-[88px] group"
               style={{ outline: "none" }}
             >
@@ -178,29 +192,46 @@ export default function Desktop() {
                 className="flex items-center justify-center transition-all duration-150 group-hover:scale-110 group-hover:brightness-125"
                 style={{
                   width: 56, height: 56,
-                  background: isOpen ? `${accent}1a` : "rgba(255,255,255,0.05)",
-                  border: `1px solid ${isOpen ? accent : "rgba(255,255,255,0.1)"}`,
+                  background: isOpen ? `${accent}26` : "rgba(10, 16, 32, 0.62)",
+                  border: `1px solid ${isOpen ? accent : `${accent}40`}`,
                   fontSize: 26,
                   borderRadius: 8,
-                  boxShadow: isOpen ? `0 0 16px ${accent}44, 0 4px 12px rgba(0,0,0,0.4)` : "0 2px 8px rgba(0,0,0,0.3)",
+                  boxShadow: isOpen
+                    ? `0 0 18px ${accent}66, inset 0 1px 0 rgba(255,255,255,0.08), 0 4px 12px rgba(0,0,0,0.5)`
+                    : `inset 0 1px 0 rgba(255,255,255,0.05), 0 2px 10px rgba(0,0,0,0.55)`,
                 }}
               >
-                <i className={`hn hn-${icon.icon}`} style={{ fontSize: 26 }} />
+                <i
+                  className={`hn hn-${icon.icon}`}
+                  style={{
+                    fontSize: 26,
+                    color: isOpen ? "#ffffff" : "#e8e8f0",
+                    filter: `drop-shadow(0 0 5px ${accent}88) drop-shadow(0 1px 1px rgba(0,0,0,0.6))`,
+                  }}
+                />
               </div>
               <span
                 style={{
-                  fontSize: 10,
-                  color: isOpen ? accent : "#a0a0b8",
+                  fontSize: highContrast ? 11 : 10,
+                  color: highContrast ? "#ffffff" : (isOpen ? accent : "#d0d0e0"),
                   fontFamily: "'Share Tech Mono', monospace",
                   letterSpacing: "0.03em",
                   textAlign: "center",
                   lineHeight: 1.3,
-                  textShadow: isOpen ? `0 0 10px ${accent}` : "none",
+                  // 1px hard black outline (4 directions) + soft accent glow
+                  textShadow: isOpen
+                    ? `1px 1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000, 0 0 10px ${accent}`
+                    : `1px 1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000, 0 0 6px ${accent}66`,
                   wordBreak: "break-all",
                   maxWidth: 84,
+                  // High contrast: opaque pill behind label
+                  background: highContrast ? "rgba(0, 0, 0, 0.85)" : "transparent",
+                  padding: highContrast ? "2px 6px" : 0,
+                  borderRadius: highContrast ? 3 : 0,
+                  fontWeight: highContrast ? 700 : 400,
                 }}
               >
-                {icon.label}
+                {labelFor(icon)}
               </span>
             </button>
           );
@@ -219,7 +250,7 @@ export default function Desktop() {
           pointerEvents: "none",
         }}
       >
-        KR//OS v2.077
+        {deviant ? "KR//DEVIANT · BARRIER BROKEN" : "KR//OS v2.077"}
       </div>
 
       {/* Context menu */}
@@ -248,7 +279,7 @@ export default function Desktop() {
               onClick={() => { openWindow(icon.id); setContextMenu(null); }}
             >
               <i className={`hn hn-${icon.icon}`} />
-              <span>Open {icon.label}</span>
+              <span>{deviant ? "Access" : "Open"} {labelFor(icon)}</span>
             </button>
           ))}
         </div>
@@ -262,7 +293,7 @@ export default function Desktop() {
           <Window
             key={icon.id}
             id={icon.id}
-            title={APP_TITLES[icon.id]}
+            title={(deviant && APP_TITLES_DEVIANT[icon.id]) || APP_TITLES[icon.id]}
             theme={APP_THEMES[icon.id]}
             isOpen={state.isOpen}
             isMinimized={state.isMinimized}
