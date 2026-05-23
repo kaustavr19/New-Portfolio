@@ -132,6 +132,32 @@ export default function Taskbar({ openWindows, onIconClick, onTaskbarClick }: Ta
           })}
       </div>
 
+      {/* Resume download */}
+      <a
+        href="/Kaustav_Roy_CV.pdf"
+        target="_blank"
+        rel="noopener noreferrer"
+        download
+        className="flex items-center gap-2 px-3 py-1 transition-all hover:bg-white/5 flex-shrink-0 group"
+        style={{
+          fontFamily: "'Share Tech Mono', monospace",
+          fontSize: 11,
+          color: "#a0a0b8",
+          letterSpacing: "0.1em",
+          border: "1px solid rgba(255,255,255,0.08)",
+          borderRadius: 2,
+          textDecoration: "none",
+          marginRight: 12,
+        }}
+        title="Download Resume (PDF)"
+      >
+        <i className="hn hn-download" style={{ fontSize: 12, color: "#f5e642" }} />
+        <span className="hidden md:inline group-hover:text-white transition-colors">RESUME.PDF</span>
+      </a>
+
+      {/* Divider */}
+      <div className="w-px h-5 flex-shrink-0" style={{ background: "rgba(255,255,255,0.07)" }} />
+
       {/* Clock */}
       <div
         className="flex flex-col items-end text-right flex-shrink-0 ml-3"
