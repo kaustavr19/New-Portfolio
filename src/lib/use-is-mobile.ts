@@ -28,17 +28,8 @@ export function useIsMobile(breakpoint = MOBILE_BREAKPOINT_PX): boolean {
     const sync = () => setIsMobile(mql.matches);
 
     sync();
-
-    // Modern browsers: addEventListener; older Safari: addListener
-    if (mql.addEventListener) {
-      mql.addEventListener("change", sync);
-      return () => mql.removeEventListener("change", sync);
-    } else {
-      // @ts-expect-error legacy API
-      mql.addListener(sync);
-      // @ts-expect-error legacy API
-      return () => mql.removeListener(sync);
-    }
+    mql.addEventListener("change", sync);
+    return () => mql.removeEventListener("change", sync);
   }, [breakpoint]);
 
   return isMobile;
