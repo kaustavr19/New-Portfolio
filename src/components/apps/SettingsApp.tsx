@@ -6,6 +6,8 @@ import { osChrome, osChromeDeviant } from "@/data/content";
 
 const MONO = "'Share Tech Mono', monospace";
 const ORBITRON = "'Orbitron', monospace";
+// Body-text font — readable sans for hint/description text
+const BODY = "'Rajdhani', sans-serif";
 
 /* ──────────────────────────────────────────────────────────
    SettingsApp — Detroit-themed control panel.
@@ -228,12 +230,13 @@ function ToggleRow({
         </div>
         <div
           style={{
-            fontFamily: MONO,
-            fontSize: 9,
-            color: "#6a6a7a",
-            letterSpacing: "0.04em",
-            lineHeight: 1.5,
-            marginTop: 3,
+            fontFamily: BODY,
+            fontSize: 13,
+            fontWeight: 400,
+            color: "#8a8a9c",
+            letterSpacing: "0.01em",
+            lineHeight: 1.4,
+            marginTop: 4,
           }}
         >
           {hint}

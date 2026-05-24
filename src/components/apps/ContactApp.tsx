@@ -158,10 +158,10 @@ export default function ContactApp() {
                     border: `1px solid ${GREEN}33`,
                     color: GREEN,
                     fontFamily: MONO,
-                    fontSize: 12,
-                    padding: "7px 10px",
+                    fontSize: 14,
+                    padding: "9px 12px",
                     outline: "none",
-                    letterSpacing: "0.05em",
+                    letterSpacing: "0.04em",
                   }}
                 />
               </div>
@@ -182,12 +182,12 @@ export default function ContactApp() {
                     border: `1px solid ${GREEN}33`,
                     color: GREEN,
                     fontFamily: MONO,
-                    fontSize: 12,
-                    padding: "8px 10px",
+                    fontSize: 14,
+                    padding: "10px 12px",
                     outline: "none",
                     resize: "none",
-                    lineHeight: 1.75,
-                    letterSpacing: "0.03em",
+                    lineHeight: 1.7,
+                    letterSpacing: "0.02em",
                   }}
                 />
               </div>
@@ -217,7 +217,7 @@ export default function ContactApp() {
               <div style={{ fontFamily: MONO, fontSize: 10, color: AMBER, letterSpacing: "0.3em" }}>
                 ── TRANSMISSION COMPLETE ──
               </div>
-              <div style={{ fontFamily: MONO, fontSize: 11, color: GREEN, lineHeight: 1.9 }}>
+              <div style={{ fontFamily: MONO, fontSize: 13, color: GREEN, lineHeight: 1.8, letterSpacing: "0.02em" }}>
                 {name && <span style={{ color: AMBER }}>{name.toUpperCase()}</span>}
                 {name && <br />}
                 <span style={{ color: DIM }}>MESSAGE RECEIVED.</span><br />

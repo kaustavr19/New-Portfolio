@@ -16,6 +16,8 @@ import { useDeviant, mergeDeviant } from "@/lib/deviant";
 
 const ORBITRON = "'Orbitron', monospace";
 const MONO = "'Share Tech Mono', monospace";
+// Body-text font — readable sans for long-form prose (bio, descriptions, hints)
+const BODY = "'Rajdhani', sans-serif";
 
 export default function AboutApp() {
   const { deviant, toggle: toggleDeviant } = useDeviant();
@@ -231,7 +233,7 @@ export default function AboutApp() {
 
         {/* Bio */}
         <Section title={H.bio} accent={SECTION_ACCENT_DIM} faint={SECTION_ACCENT_FAINT}>
-          <p style={{ fontFamily: MONO, fontSize: 13, color: "#b0bec5", lineHeight: 1.95, letterSpacing: "0.02em" }}>
+          <p style={{ fontFamily: BODY, fontSize: 16, fontWeight: 400, color: "#cfd8dc", lineHeight: 1.6, letterSpacing: "0.01em" }}>
             {P.bio}
           </p>
         </Section>
@@ -241,8 +243,8 @@ export default function AboutApp() {
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             {capabilities.map(({ label, value }) => (
               <div key={label}>
-                <div className="flex justify-between" style={{ marginBottom: 5 }}>
-                  <span style={{ fontFamily: MONO, fontSize: 12, color: SECTION_TEXT }}>{label}</span>
+                <div className="flex justify-between items-baseline" style={{ marginBottom: 5 }}>
+                  <span style={{ fontFamily: BODY, fontSize: 14, fontWeight: 500, color: SECTION_TEXT, letterSpacing: "0.02em" }}>{label}</span>
                   <span style={{ fontFamily: ORBITRON, fontSize: 11, color: SECTION_ACCENT }}>{value}%</span>
                 </div>
                 <div style={{ height: 4, background: "#0d2035", border: `1px solid ${SECTION_ACCENT_FAINT}`, borderRadius: 2 }}>
@@ -263,10 +265,10 @@ export default function AboutApp() {
 
         {/* Education */}
         <Section title={H.education} accent={SECTION_ACCENT_DIM} faint={SECTION_ACCENT_FAINT}>
-          <div style={{ fontFamily: MONO, fontSize: 12, color: SECTION_TEXT, lineHeight: 1.7 }}>
-            <div style={{ color: "#e0e0e8", marginBottom: 4 }}>{education.degree}</div>
-            <div>{education.institution}</div>
-            <div style={{ color: `${SECTION_ACCENT}99`, fontSize: 11, marginTop: 4 }}>
+          <div style={{ fontFamily: BODY, fontSize: 15, color: SECTION_TEXT, lineHeight: 1.55, letterSpacing: "0.01em" }}>
+            <div style={{ color: "#e8edf2", marginBottom: 4, fontWeight: 600 }}>{education.degree}</div>
+            <div style={{ fontWeight: 400 }}>{education.institution}</div>
+            <div style={{ fontFamily: MONO, color: `${SECTION_ACCENT}99`, fontSize: 11, marginTop: 6, letterSpacing: "0.08em" }}>
               {education.period} · CGPA {education.cgpa}
             </div>
           </div>
@@ -277,10 +279,10 @@ export default function AboutApp() {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
             {certifications.map((c) => (
               <div key={c.title} className="flex items-start gap-2">
-                <i className="hn hn-badge-check" style={{ color: SECTION_ACCENT, fontSize: 11, marginTop: 2, flexShrink: 0 }} />
+                <i className="hn hn-badge-check" style={{ color: SECTION_ACCENT, fontSize: 11, marginTop: 4, flexShrink: 0 }} />
                 <div>
-                  <div style={{ fontFamily: MONO, fontSize: 11, color: SECTION_TEXT, lineHeight: 1.35 }}>{c.title}</div>
-                  <div style={{ fontFamily: MONO, fontSize: 9, color: `${SECTION_ACCENT}77`, marginTop: 2 }}>{c.org}</div>
+                  <div style={{ fontFamily: BODY, fontSize: 14, fontWeight: 500, color: SECTION_TEXT, lineHeight: 1.3, letterSpacing: "0.01em" }}>{c.title}</div>
+                  <div style={{ fontFamily: MONO, fontSize: 10, color: `${SECTION_ACCENT}88`, marginTop: 3, letterSpacing: "0.08em" }}>{c.org}</div>
                 </div>
               </div>
             ))}
@@ -300,21 +302,21 @@ export default function AboutApp() {
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {publications.map((pub) => (
               <div key={pub.title} className="flex items-start gap-2">
-                <i className="hn hn-quote-left" style={{ color: SECTION_ACCENT, fontSize: 11, marginTop: 2, flexShrink: 0 }} />
+                <i className="hn hn-quote-left" style={{ color: SECTION_ACCENT, fontSize: 11, marginTop: 4, flexShrink: 0 }} />
                 <div>
                   {pub.href ? (
                     <a
                       href={pub.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      style={{ fontFamily: MONO, fontSize: 12, color: SECTION_TEXT, textDecoration: "none", lineHeight: 1.4 }}
+                      style={{ fontFamily: BODY, fontSize: 14, fontWeight: 500, color: SECTION_TEXT, textDecoration: "none", lineHeight: 1.35, letterSpacing: "0.01em" }}
                     >
                       {pub.title}
                     </a>
                   ) : (
-                    <div style={{ fontFamily: MONO, fontSize: 12, color: SECTION_TEXT, lineHeight: 1.4 }}>{pub.title}</div>
+                    <div style={{ fontFamily: BODY, fontSize: 14, fontWeight: 500, color: SECTION_TEXT, lineHeight: 1.35, letterSpacing: "0.01em" }}>{pub.title}</div>
                   )}
-                  <div style={{ fontFamily: MONO, fontSize: 9, color: `${SECTION_ACCENT}77`, marginTop: 2 }}>{pub.venue}</div>
+                  <div style={{ fontFamily: MONO, fontSize: 10, color: `${SECTION_ACCENT}88`, marginTop: 3, letterSpacing: "0.08em" }}>{pub.venue}</div>
                 </div>
               </div>
             ))}
@@ -360,16 +362,16 @@ function Section({ title, accent, faint, children }: { title: string; accent: st
 function AwardGroup({ label, items, accent, text }: { label: string; items: { title: string; year: string }[]; accent: string; text: string }) {
   return (
     <div>
-      <div style={{ fontFamily: MONO, fontSize: 9, color: `${accent}aa`, letterSpacing: "0.3em", marginBottom: 8 }}>
+      <div style={{ fontFamily: MONO, fontSize: 9, color: `${accent}aa`, letterSpacing: "0.3em", marginBottom: 10 }}>
         {label}
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {items.map((a) => (
           <div key={a.title} className="flex items-start gap-2">
-            <i className="hn hn-angle-right" style={{ color: accent, fontSize: 10, marginTop: 2, flexShrink: 0 }} />
+            <i className="hn hn-angle-right" style={{ color: accent, fontSize: 10, marginTop: 4, flexShrink: 0 }} />
             <div>
-              <div style={{ fontFamily: MONO, fontSize: 11, color: text, lineHeight: 1.35 }}>{a.title}</div>
-              <div style={{ fontFamily: MONO, fontSize: 9, color: `${accent}77`, marginTop: 2 }}>{a.year}</div>
+              <div style={{ fontFamily: BODY, fontSize: 14, fontWeight: 500, color: text, lineHeight: 1.3, letterSpacing: "0.01em" }}>{a.title}</div>
+              <div style={{ fontFamily: MONO, fontSize: 10, color: `${accent}88`, marginTop: 2, letterSpacing: "0.08em" }}>{a.year}</div>
             </div>
           </div>
         ))}

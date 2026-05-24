@@ -6,6 +6,8 @@ import { useDeviant } from "@/lib/deviant";
 import { osChrome, osChromeDeviant } from "@/data/content";
 
 const MONO = "'Share Tech Mono', monospace";
+// Body-text font for hint/description copy in the popover
+const BODY = "'Rajdhani', sans-serif";
 
 type Toggle = {
   key: keyof A11yPrefs;
@@ -175,12 +177,13 @@ export default function AccessibilityMenu() {
                     </div>
                     <div
                       style={{
-                        fontFamily: MONO,
-                        fontSize: 9,
-                        color: "#6a6a7a",
-                        letterSpacing: "0.04em",
-                        lineHeight: 1.4,
-                        marginTop: 3,
+                        fontFamily: BODY,
+                        fontSize: 12,
+                        fontWeight: 400,
+                        color: "#8a8a9c",
+                        letterSpacing: "0.01em",
+                        lineHeight: 1.35,
+                        marginTop: 4,
                       }}
                     >
                       {t.hint}
