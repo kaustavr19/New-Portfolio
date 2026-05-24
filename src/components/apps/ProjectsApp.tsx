@@ -5,6 +5,8 @@ import { projects } from "@/data/content";
 
 const BEBAS = "'Bebas Neue', cursive";
 const MONO = "'Share Tech Mono', monospace";
+// Body-text font — readable sans for long-form prose
+const BODY = "'Rajdhani', sans-serif";
 
 const STATUS_COLOR: Record<string, string> = {
   "IN PROGRESS": "#febc2e",
@@ -120,7 +122,7 @@ export default function ProjectsApp() {
               <div style={{ fontFamily: BEBAS, fontSize: 32, color: "#a4c639", letterSpacing: "0.08em", lineHeight: 1, marginBottom: 6 }}>
                 {project.name}
               </div>
-              <div style={{ fontFamily: MONO, fontSize: 12, color: "#c8b89a", marginBottom: 12, letterSpacing: "0.04em" }}>
+              <div style={{ fontFamily: BODY, fontSize: 15, fontWeight: 500, color: "#d8c8a8", marginBottom: 14, letterSpacing: "0.02em", lineHeight: 1.35 }}>
                 {project.tagline}
               </div>
               <div className="flex items-center gap-3">
@@ -147,7 +149,7 @@ export default function ProjectsApp() {
           <div style={{ fontFamily: BEBAS, fontSize: 14, color: "#a4c63966", letterSpacing: "0.4em", borderBottom: "1px solid #a4c63922", paddingBottom: 8, marginBottom: 14 }}>
             MISSION BRIEF
           </div>
-          <p style={{ fontFamily: MONO, fontSize: 13, color: "#b0a880", lineHeight: 2 }}>
+          <p style={{ fontFamily: BODY, fontSize: 16, fontWeight: 400, color: "#c8bd9a", lineHeight: 1.6, letterSpacing: "0.01em" }}>
             {project.description}
           </p>
         </div>
