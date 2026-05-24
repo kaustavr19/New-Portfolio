@@ -200,7 +200,7 @@ export default function DesktopBg() {
     /* ── Spawners ── */
     const spawnPulse = () => {
       let cx: number, cy: number;
-      if (mouseX >= 0 && Math.random() < 0.4) {
+      if (mouseX >= 0 && Math.random() < 0.25) {
         const mc = Math.floor(mouseX / CELL);
         const mr = Math.floor(mouseY / CELL);
         cx = Math.max(0, Math.min(cols - 1, mc + Math.floor((Math.random() - 0.5) * 10)));
@@ -675,7 +675,7 @@ export default function DesktopBg() {
 
       /* Spawns — all motion-gated */
       if (motionOn) {
-        if (Math.random() < 0.065) spawnPulse(); // ~1.6× more frequent than baseline
+        if (Math.random() < 0.02) spawnPulse(); // calm ambient cadence (~one per 3.5s at 14fps)
         if (ts >= nextMeteorTime) {
           spawnMeteor();
           nextMeteorTime = ts + rand(STAR_MIN_INTERVAL_MS, STAR_MAX_INTERVAL_MS);
@@ -699,7 +699,7 @@ export default function DesktopBg() {
 
       /* Pulses */
       for (let p = pulses.length - 1; p >= 0; p--) {
-        pulses[p].r += 0.9;
+        pulses[p].r += 0.7; // gentler bloom (was 0.9)
         if (pulses[p].r > pulses[p].max) { pulses.splice(p, 1); continue; }
         const { cx, cy, r } = pulses[p];
         const ir = Math.floor(r);
@@ -710,7 +710,7 @@ export default function DesktopBg() {
             const nx = cx + dx, ny = cy + dy;
             if (nx < 0 || ny < 0 || nx >= cols || ny >= rows) continue;
             const cell = grid[ny * cols + nx];
-            cell.target = Math.min(1, cell.target + 0.5);
+            cell.target = Math.min(1, cell.target + 0.35); // softer ripple (was 0.5)
             cell.ttl    = Math.max(cell.ttl, 8);
           }
         }
