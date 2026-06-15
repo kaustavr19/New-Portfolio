@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useA11y } from "@/lib/a11y";
+import { useIsTouch } from "@/lib/use-is-touch";
 
 const CELL     = 6;    // snap-to-grid size — matches DesktopBg pixel size
 const MAX_PX   = 120;  // cap so it never gets heavy
@@ -17,10 +18,16 @@ export default function MouseTrail() {
   const pixels     = useRef<Pixel[]>([]);
   const rafRef     = useRef(0);
   const a11y       = useA11y();
+  const isTouch    = useIsTouch();
   const motionRef  = useRef(a11y.motionReduced);
   useEffect(() => { motionRef.current = a11y.motionReduced; }, [a11y.motionReduced]);
 
   useEffect(() => {
+    // Touch devices fire synthetic mousemove after every tap — letting
+    // the trail run would emit awkward single-point bursts at tap
+    // location. Short-circuit instead.
+    if (isTouch) return;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -84,7 +91,7 @@ export default function MouseTrail() {
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("resize", resize);
     };
-  }, []);
+  }, [isTouch]);
 
   return (
     <canvas

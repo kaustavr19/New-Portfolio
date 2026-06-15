@@ -844,10 +844,37 @@ export default function DesktopBg() {
     };
     const onMouseLeave = () => { mouseX = -1; mouseY = -1; };
 
+    /* Touch handlers — translate finger position to the same mouseX/Y
+       the existing pop + cursor-pulse code reads. Skipped when the
+       mobile shell has a full-screen app open (body class set by
+       MobileOS) so scrolling inside an app doesn't trigger pops on the
+       hidden wallpaper behind it. */
+    const isAppOverlay = () =>
+      typeof document !== "undefined" &&
+      document.body.classList.contains("kros-app-open");
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (isAppOverlay() || e.touches.length === 0) return;
+      const t = e.touches[0];
+      mouseX = t.clientX; mouseY = t.clientY;
+      lastMouseMove = performance.now();
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      if (isAppOverlay() || e.touches.length === 0) return;
+      const t = e.touches[0];
+      mouseX = t.clientX; mouseY = t.clientY;
+      lastMouseMove = performance.now();
+    };
+    const onTouchEnd = () => { mouseX = -1; mouseY = -1; };
+
     resize();
     window.addEventListener("resize", resize);
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("mouseleave", onMouseLeave);
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchmove", onTouchMove, { passive: true });
+    window.addEventListener("touchend", onTouchEnd);
+    window.addEventListener("touchcancel", onTouchEnd);
     window.addEventListener("click", ensureAudio);
     window.addEventListener("keydown", ensureAudio);
     raf = requestAnimationFrame(tick);
@@ -857,6 +884,10 @@ export default function DesktopBg() {
       window.removeEventListener("resize", resize);
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mouseleave", onMouseLeave);
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("touchend", onTouchEnd);
+      window.removeEventListener("touchcancel", onTouchEnd);
       window.removeEventListener("click", ensureAudio);
       window.removeEventListener("keydown", ensureAudio);
       if (audioCtx) audioCtx.close().catch(() => {});
