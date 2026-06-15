@@ -43,6 +43,21 @@ export default function MobileOS() {
     }
   }, []);
 
+  /* Toggle a body class while a full-screen app is open. DesktopBg
+     reads this to suppress touch-driven wallpaper interactions
+     (bubble pops, cursor pulses) when the wallpaper is hidden behind
+     an app — otherwise scrolling inside an app would trigger phantom
+     pops on the cells behind it. */
+  useEffect(() => {
+    const cls = "kros-app-open";
+    if (view === "app") {
+      document.body.classList.add(cls);
+    } else {
+      document.body.classList.remove(cls);
+    }
+    return () => { document.body.classList.remove(cls); };
+  }, [view]);
+
   const handleUnlock = () => {
     try {
       sessionStorage.setItem(BOOT_KEY, "1");
