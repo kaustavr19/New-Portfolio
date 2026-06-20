@@ -13,6 +13,7 @@ import {
   publications,
 } from "@/data/content";
 import { useDeviant, mergeDeviant } from "@/lib/deviant";
+import { useIsMobile } from "@/lib/use-is-mobile";
 
 const ORBITRON = "'Orbitron', monospace";
 const MONO = "'Share Tech Mono', monospace";
@@ -21,6 +22,7 @@ const BODY = "'Rajdhani', sans-serif";
 
 export default function AboutApp() {
   const { deviant, toggle: toggleDeviant } = useDeviant();
+  const isMobile = useIsMobile();
   const [scanned, setScanned] = useState(false);
   const [scanProgress, setScanProgress] = useState(0);
 
@@ -61,6 +63,314 @@ export default function AboutApp() {
   const SECTION_ACCENT_DIM = deviant ? "#ff009077" : "#00e5ff77";
   const SECTION_ACCENT_FAINT = deviant ? "#ff009022" : "#00e5ff1a";
   const SECTION_TEXT       = deviant ? "#ff6699" : "#4fc3f7";
+
+  /* ──────────────────────────────────────────────────────────
+     Mobile layout — single scrollable view.
+     Hero card (avatar / stats / deviant toggle) on top,
+     all sections stacked vertically below.
+     ────────────────────────────────────────────────────────── */
+  if (isMobile) {
+    return (
+      <div
+        className="h-full overflow-auto relative"
+        style={{ background: C.panelBg, color: "#e0e0e8", transition: "background 0.5s ease" }}
+      >
+        {/* Scan line — covers full mobile viewport */}
+        <div
+          className="absolute left-0 right-0 h-px pointer-events-none"
+          style={{
+            background: `linear-gradient(90deg, transparent, ${C.accent}, transparent)`,
+            animation: "scan 3s ease-in-out infinite",
+            zIndex: 10,
+            transition: "background 0.5s ease",
+          }}
+        />
+
+        {/* ── Hero card ── */}
+        <div
+          style={{
+            padding: "24px 20px 22px",
+            background: C.bg,
+            borderBottom: `1px solid ${C.border}`,
+            transition: "background 0.5s ease, border-color 0.5s ease",
+          }}
+        >
+          {/* Avatar + name */}
+          <div className="flex flex-col items-center gap-3">
+            <div className="relative detroit-scan" style={{ width: 72, height: 72 }}>
+              <div
+                style={{
+                  width: 72, height: 72,
+                  border: `2px solid ${C.accent}`,
+                  background: deviant
+                    ? "linear-gradient(135deg, #300015, #1a0008)"
+                    : "linear-gradient(135deg, #0a1e30, #061020)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  boxShadow: `0 0 22px ${C.accentGlow}`,
+                  transition: "border-color 0.5s ease, box-shadow 0.5s ease, background 0.5s ease",
+                }}
+              >
+                <i className="hn hn-robot" style={{ fontSize: 30 }} />
+              </div>
+              {scanned && (
+                <div
+                  className="absolute inset-0 flex items-end justify-center pb-1"
+                  style={{ background: `linear-gradient(transparent 55%, ${C.accentFaint})` }}
+                >
+                  <span style={{ fontFamily: ORBITRON, fontSize: 6, color: C.accent, letterSpacing: "0.25em", transition: "color 0.5s ease" }}>
+                    {deviant ? "DEVIANT" : "VERIFIED"}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            <div className="text-center">
+              <div style={{ fontFamily: ORBITRON, fontSize: 12, color: C.text, letterSpacing: "0.15em", fontWeight: 700, lineHeight: 1.4, transition: "color 0.5s ease" }}>
+                {P.name.toUpperCase()}
+              </div>
+              <div style={{ fontFamily: MONO, fontSize: 10, color: C.accentDim, letterSpacing: "0.3em", marginTop: 4, transition: "color 0.5s ease" }}>
+                {P.unit}
+              </div>
+            </div>
+
+            {/* Featured badge */}
+            {scanned && (
+              <div
+                style={{
+                  padding: "5px 12px",
+                  border: `1px solid ${C.accent}66`,
+                  background: `${C.accent}10`,
+                  fontFamily: MONO,
+                  fontSize: 8,
+                  color: C.accent,
+                  letterSpacing: "0.18em",
+                  textAlign: "center",
+                  lineHeight: 1.3,
+                  transition: "all 0.5s ease",
+                }}
+              >
+                <i className="hn hn-star" style={{ marginRight: 5 }} />
+                {P.featured}
+              </div>
+            )}
+
+            {/* Scan bar while scanning */}
+            {!scanned && (
+              <div className="w-full" style={{ marginTop: 4 }}>
+                <div style={{ fontFamily: MONO, fontSize: 9, color: C.accentDim, marginBottom: 5, letterSpacing: "0.2em", textAlign: "center" }}>
+                  SCANNING...
+                </div>
+                <div style={{ height: 4, background: "#0d2035", border: `1px solid ${C.accentFaint}`, borderRadius: 2 }}>
+                  <div
+                    style={{
+                      height: "100%", width: `${scanProgress}%`,
+                      background: `linear-gradient(90deg, ${C.accent}, ${C.text})`,
+                      boxShadow: `0 0 6px ${C.accent}`,
+                      transition: "width 0.03s linear",
+                      borderRadius: 2,
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Stats — 2-column grid */}
+          {scanned && (
+            <div
+              style={{
+                marginTop: 20,
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                columnGap: 14,
+                rowGap: 12,
+              }}
+            >
+              {statRows.map(({ label, value }, idx) => {
+                // Make the last stat (UNIT) span both columns
+                const isLast = idx === statRows.length - 1;
+                return (
+                  <div key={label} style={{ gridColumn: isLast ? "1 / -1" : "auto", textAlign: isLast ? "center" : "left" }}>
+                    <div style={{ fontFamily: MONO, fontSize: 8, color: C.accentDim, letterSpacing: "0.25em", marginBottom: 3, transition: "color 0.5s ease" }}>
+                      {label}
+                    </div>
+                    <div style={{ fontFamily: ORBITRON, fontSize: 10, color: C.text, letterSpacing: "0.06em", lineHeight: 1.4, transition: "color 0.5s ease" }}>
+                      {value}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Deviant toggle */}
+          {scanned && (
+            <button
+              onClick={toggleDeviant}
+              className="w-full flex items-center justify-between"
+              style={{
+                marginTop: 20,
+                paddingTop: 14,
+                // Longhand only — mixing shorthand `border` with `borderTop`
+                // causes React style re-render warnings
+                borderTop: `1px solid ${C.accentFaint}`,
+                borderRight: "none",
+                borderBottom: "none",
+                borderLeft: "none",
+                background: "transparent",
+                cursor: "pointer",
+                width: "100%",
+              }}
+            >
+              <span style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.25em", color: deviant ? C.accent : C.accentDim, transition: "color 0.5s ease" }}>
+                {deviant ? <><i className="hn hn-exclamation-triangle" /> DEVIANT</> : "DEVIANT MODE"}
+              </span>
+              <div
+                style={{
+                  width: 40, height: 20,
+                  borderRadius: 10,
+                  background: deviant ? C.accent : "#0d2035",
+                  border: `1px solid ${deviant ? C.accent : C.accentFaint}`,
+                  position: "relative",
+                  transition: "background 0.35s ease, border-color 0.35s ease",
+                  boxShadow: deviant ? `0 0 10px ${C.accentGlow}` : "none",
+                  flexShrink: 0,
+                }}
+              >
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 3,
+                    left: deviant ? 21 : 3,
+                    width: 12, height: 12,
+                    borderRadius: "50%",
+                    background: deviant ? "#fff" : C.text,
+                    boxShadow: `0 0 6px ${C.accentGlow}`,
+                    transition: "left 0.35s ease, background 0.35s ease",
+                  }}
+                />
+              </div>
+            </button>
+          )}
+        </div>
+
+        {/* ── Sections ── */}
+        <div style={{ padding: "24px 20px 32px" }}>
+          {/* Bio */}
+          <Section title={H.bio} accent={SECTION_ACCENT_DIM} faint={SECTION_ACCENT_FAINT}>
+            <p style={{ fontFamily: BODY, fontSize: 16, fontWeight: 400, color: "#cfd8dc", lineHeight: 1.6, letterSpacing: "0.01em" }}>
+              {P.bio}
+            </p>
+          </Section>
+
+          {/* Capability bars */}
+          <Section title={H.capability} accent={SECTION_ACCENT_DIM} faint={SECTION_ACCENT_FAINT}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              {capabilities.map(({ label, value }) => (
+                <div key={label}>
+                  <div className="flex justify-between items-baseline" style={{ marginBottom: 5 }}>
+                    <span style={{ fontFamily: BODY, fontSize: 14, fontWeight: 500, color: SECTION_TEXT, letterSpacing: "0.02em" }}>{label}</span>
+                    <span style={{ fontFamily: ORBITRON, fontSize: 11, color: SECTION_ACCENT }}>{value}%</span>
+                  </div>
+                  <div style={{ height: 4, background: "#0d2035", border: `1px solid ${SECTION_ACCENT_FAINT}`, borderRadius: 2 }}>
+                    <div
+                      style={{
+                        height: "100%", width: `${scanned ? value : 0}%`,
+                        background: `linear-gradient(90deg, ${SECTION_ACCENT}88, ${SECTION_TEXT})`,
+                        transition: "width 1.2s ease, background 0.5s ease",
+                        boxShadow: `0 0 6px ${SECTION_ACCENT}88`,
+                        borderRadius: 2,
+                      }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Section>
+
+          {/* Education */}
+          <Section title={H.education} accent={SECTION_ACCENT_DIM} faint={SECTION_ACCENT_FAINT}>
+            <div style={{ fontFamily: BODY, fontSize: 15, color: SECTION_TEXT, lineHeight: 1.55, letterSpacing: "0.01em" }}>
+              <div style={{ color: "#e8edf2", marginBottom: 4, fontWeight: 600 }}>{education.degree}</div>
+              <div style={{ fontWeight: 400 }}>{education.institution}</div>
+              <div style={{ fontFamily: MONO, color: `${SECTION_ACCENT}99`, fontSize: 11, marginTop: 6, letterSpacing: "0.08em" }}>
+                {education.period} · CGPA {education.cgpa}
+              </div>
+            </div>
+          </Section>
+
+          {/* Certifications — single column on mobile */}
+          <Section title={H.certifications} accent={SECTION_ACCENT_DIM} faint={SECTION_ACCENT_FAINT}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {certifications.map((c) => (
+                <div key={c.title} className="flex items-start gap-2">
+                  <i className="hn hn-badge-check" style={{ color: SECTION_ACCENT, fontSize: 11, marginTop: 4, flexShrink: 0 }} />
+                  <div>
+                    <div style={{ fontFamily: BODY, fontSize: 14, fontWeight: 500, color: SECTION_TEXT, lineHeight: 1.3, letterSpacing: "0.01em" }}>{c.title}</div>
+                    <div style={{ fontFamily: MONO, fontSize: 10, color: `${SECTION_ACCENT}88`, marginTop: 3, letterSpacing: "0.08em" }}>{c.org}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Section>
+
+          {/* Commendations — stacked groups on mobile */}
+          <Section title={H.awards} accent={SECTION_ACCENT_DIM} faint={SECTION_ACCENT_FAINT}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+              <AwardGroup label={H.awardsFractal} items={awardsFractal} accent={SECTION_ACCENT} text={SECTION_TEXT} />
+              <AwardGroup label={H.awardsExternal} items={awardsExternal} accent={SECTION_ACCENT} text={SECTION_TEXT} />
+            </div>
+          </Section>
+
+          {/* Publications */}
+          <Section title={H.publications} accent={SECTION_ACCENT_DIM} faint={SECTION_ACCENT_FAINT}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {publications.map((pub) => (
+                <div key={pub.title} className="flex items-start gap-2">
+                  <i className="hn hn-quote-left" style={{ color: SECTION_ACCENT, fontSize: 11, marginTop: 4, flexShrink: 0 }} />
+                  <div>
+                    {pub.href ? (
+                      <a
+                        href={pub.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ fontFamily: BODY, fontSize: 14, fontWeight: 500, color: SECTION_TEXT, textDecoration: "none", lineHeight: 1.35, letterSpacing: "0.01em" }}
+                      >
+                        {pub.title}
+                      </a>
+                    ) : (
+                      <div style={{ fontFamily: BODY, fontSize: 14, fontWeight: 500, color: SECTION_TEXT, lineHeight: 1.35, letterSpacing: "0.01em" }}>{pub.title}</div>
+                    )}
+                    <div style={{ fontFamily: MONO, fontSize: 10, color: `${SECTION_ACCENT}88`, marginTop: 3, letterSpacing: "0.08em" }}>{pub.venue}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Section>
+
+          {/* Links — side-by-side, equal weight */}
+          <div className="grid grid-cols-2 gap-3" style={{ marginTop: 8 }}>
+            <a
+              href={P.social.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center px-4 py-3 transition-all active:opacity-70"
+              style={{ fontFamily: ORBITRON, fontSize: 10, border: `1px solid ${SECTION_ACCENT}66`, color: SECTION_ACCENT, letterSpacing: "0.18em", background: `${SECTION_ACCENT}0c`, textAlign: "center" }}
+            >
+              LINKEDIN ↗
+            </a>
+            <a
+              href={`mailto:${P.social.email}`}
+              className="flex items-center justify-center px-4 py-3 transition-all active:opacity-70"
+              style={{ fontFamily: ORBITRON, fontSize: 10, border: `1px solid ${SECTION_ACCENT}66`, color: SECTION_ACCENT, letterSpacing: "0.18em", background: `${SECTION_ACCENT}0c`, textAlign: "center" }}
+            >
+              EMAIL ↗
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
