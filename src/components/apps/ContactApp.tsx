@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { profile } from "@/data/content";
+import { useIsMobile } from "@/lib/use-is-mobile";
 
 const MONO = "'Share Tech Mono', monospace";
 const GREEN  = "#00dd00";
@@ -64,7 +65,41 @@ function Portrait({
   );
 }
 
+/* Smaller variant for the mobile portrait row — same CODEC framing
+   but compressed to fit two portraits side-by-side in a 375px viewport. */
+function MobilePortrait({ icon, label, sub }: { icon: string; label: string; sub: string }) {
+  return (
+    <div className="flex flex-col items-center" style={{ gap: 8, flexShrink: 0 }}>
+      <div style={{ position: "relative", width: 60, height: 60 }}>
+        <div
+          style={{
+            width: "100%", height: "100%",
+            border: `1px solid ${GREEN}44`,
+            background: "#020802",
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}
+        >
+          <i className={`hn hn-${icon}`} style={{ fontSize: 28 }} />
+        </div>
+        {[
+          { top: -1, left: -1, borderTop: `2px solid ${GREEN}`, borderLeft: `2px solid ${GREEN}` },
+          { top: -1, right: -1, borderTop: `2px solid ${GREEN}`, borderRight: `2px solid ${GREEN}` },
+          { bottom: -1, left: -1, borderBottom: `2px solid ${GREEN}`, borderLeft: `2px solid ${GREEN}` },
+          { bottom: -1, right: -1, borderBottom: `2px solid ${GREEN}`, borderRight: `2px solid ${GREEN}` },
+        ].map((s, i) => (
+          <div key={i} style={{ position: "absolute", width: 10, height: 10, ...s }} />
+        ))}
+      </div>
+      <div style={{ textAlign: "center" }}>
+        <div style={{ fontFamily: MONO, fontSize: 10, color: GREEN, letterSpacing: "0.12em", whiteSpace: "nowrap" }}>{label}</div>
+        <div style={{ fontFamily: MONO, fontSize: 8,  color: DIM,   letterSpacing: "0.1em",  marginTop: 3 }}>{sub}</div>
+      </div>
+    </div>
+  );
+}
+
 export default function ContactApp() {
+  const isMobile = useIsMobile();
   const [sent, setSent]       = useState(false);
   const [name, setName]       = useState("");
   const [message, setMessage] = useState("");
@@ -88,6 +123,232 @@ export default function ContactApp() {
   });
 
   const callerLabel = name ? name.toUpperCase().slice(0, 8) : "UNKNOWN";
+
+  /* ──────────────────────────────────────────────────────────
+     Mobile layout — stacked CODEC.
+     ────────────────────────────────────────────────────────── */
+  if (isMobile) {
+    return (
+      <div
+        className="h-full flex flex-col overflow-auto"
+        style={{ background: BG, color: GREEN, position: "relative" }}
+      >
+        {/* CRT scanlines */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage:
+              "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 4px)",
+            zIndex: 20,
+          }}
+        />
+
+        {/* ── CODEC header (compact) ── */}
+        <div
+          style={{
+            flexShrink: 0,
+            background: "#020902",
+            borderBottom: `1px solid ${GREEN}33`,
+            padding: "10px 14px",
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+          }}
+        >
+          <span style={{ fontFamily: MONO, fontSize: 10, color: DIM, letterSpacing: "0.3em" }}>
+            <i className="hn hn-angle-left" /> CODEC <i className="hn hn-angle-right" />
+          </span>
+          <div style={{ flex: 1, height: 1, background: `${GREEN}18` }} />
+          <span style={{ fontFamily: MONO, fontSize: 11, color: AMBER, letterSpacing: "0.06em" }}>
+            140.85
+          </span>
+          <div className="flex items-end gap-0.5" style={{ height: 12 }}>
+            {[3, 5, 8, 11].map((h, i) => (
+              <div key={i} style={{ width: 3, height: h, background: GREEN, opacity: 0.8 }} />
+            ))}
+          </div>
+        </div>
+
+        {/* ── Portraits row ── */}
+        <div
+          className="flex items-center"
+          style={{
+            flexShrink: 0,
+            padding: "14px 16px",
+            background: PANEL,
+            borderBottom: `1px solid ${GREEN}22`,
+            gap: 12,
+          }}
+        >
+          <MobilePortrait icon="robot" label="KR·19" sub="RECV" />
+          {/* Status link line */}
+          <div className="flex-1 flex flex-col items-center" style={{ gap: 4 }}>
+            <div className="w-full" style={{ height: 1, background: `${GREEN}33` }} />
+            <div style={{ fontFamily: MONO, fontSize: 8, color: DIM, letterSpacing: "0.3em" }}>
+              {sent ? "RELAYED" : "OPEN"}
+            </div>
+            <div className="w-full" style={{ height: 1, background: `${GREEN}33` }} />
+          </div>
+          <MobilePortrait
+            icon={sent ? "share-alt" : "user"}
+            label={callerLabel}
+            sub="SEND"
+          />
+        </div>
+
+        {/* ── Form / Sent state ── */}
+        <div className="flex flex-col" style={{ padding: "18px 16px 12px" }}>
+          {!sent ? (
+            <>
+              {/* Callsign */}
+              <div style={{ marginBottom: 14 }}>
+                <div style={{ fontFamily: MONO, fontSize: 8, color: DIM, letterSpacing: "0.35em", marginBottom: 6 }}>
+                  CALLSIGN
+                </div>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="ENTER CODENAME..."
+                  style={{
+                    width: "100%",
+                    background: "#020902",
+                    border: `1px solid ${GREEN}33`,
+                    color: GREEN,
+                    fontFamily: MONO,
+                    fontSize: 14,
+                    padding: "10px 12px",
+                    outline: "none",
+                    letterSpacing: "0.04em",
+                  }}
+                />
+              </div>
+
+              {/* Transmission */}
+              <div style={{ marginBottom: 14 }}>
+                <div style={{ fontFamily: MONO, fontSize: 8, color: DIM, letterSpacing: "0.35em", marginBottom: 6 }}>
+                  TRANSMISSION
+                </div>
+                <textarea
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder={"BEGIN TRANSMISSION...\n\n_"}
+                  rows={6}
+                  style={{
+                    width: "100%",
+                    background: "#020902",
+                    border: `1px solid ${GREEN}33`,
+                    color: GREEN,
+                    fontFamily: MONO,
+                    fontSize: 14,
+                    padding: "10px 12px",
+                    outline: "none",
+                    resize: "vertical",
+                    lineHeight: 1.65,
+                    letterSpacing: "0.02em",
+                    minHeight: 140,
+                  }}
+                />
+              </div>
+
+              {/* Transmit button */}
+              <button
+                onClick={handleSend}
+                style={{
+                  background: message.trim() ? `${GREEN}18` : "transparent",
+                  border: `1px solid ${message.trim() ? GREEN + "99" : DIM + "66"}`,
+                  color: message.trim() ? GREEN : DIM,
+                  fontFamily: MONO,
+                  fontSize: 12,
+                  padding: "12px 8px",
+                  cursor: message.trim() ? "pointer" : "not-allowed",
+                  letterSpacing: "0.25em",
+                  transition: "all 0.2s",
+                  flexShrink: 0,
+                }}
+              >
+                {message.trim() ? (
+                  <><i className="hn hn-play" />{"  TRANSMIT"}</>
+                ) : (
+                  <><i className="hn hn-play" style={{ opacity: 0.4 }} />{"  AWAITING INPUT..."}</>
+                )}
+              </button>
+            </>
+          ) : (
+            <div className="flex flex-col items-center justify-center" style={{ gap: 18, textAlign: "center", padding: "32px 0" }}>
+              <div style={{ fontFamily: MONO, fontSize: 10, color: AMBER, letterSpacing: "0.3em" }}>
+                ── TRANSMISSION COMPLETE ──
+              </div>
+              <div style={{ fontFamily: MONO, fontSize: 13, color: GREEN, lineHeight: 1.8, letterSpacing: "0.02em" }}>
+                {name && <span style={{ color: AMBER }}>{name.toUpperCase()}</span>}
+                {name && <br />}
+                <span style={{ color: DIM }}>MESSAGE RECEIVED.</span><br />
+                <span style={{ color: DIM }}>KR-19 WILL RESPOND.</span>
+              </div>
+              <button
+                onClick={() => { setSent(false); setName(""); setMessage(""); }}
+                style={{
+                  marginTop: 4,
+                  background: "transparent",
+                  border: `1px solid ${GREEN}44`,
+                  color: DIM,
+                  fontFamily: MONO,
+                  fontSize: 10,
+                  padding: "8px 20px",
+                  cursor: "pointer",
+                  letterSpacing: "0.2em",
+                }}
+              >
+                NEW TRANSMISSION
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* ── Waveform + direct links ── */}
+        <div className="mt-auto" style={{ flexShrink: 0, background: "#020902", borderTop: `1px solid ${GREEN}22` }}>
+          <div
+            className="flex items-center"
+            style={{ height: 28, padding: "0 10px", gap: "1px", overflow: "hidden" }}
+          >
+            {wave.map((h, i) => (
+              <div
+                key={i}
+                style={{
+                  flex: 1,
+                  height: `${h}%`,
+                  background: GREEN,
+                  opacity: 0.45,
+                  minWidth: 2,
+                  maxWidth: 6,
+                }}
+              />
+            ))}
+          </div>
+
+          <div
+            className="flex flex-col items-center"
+            style={{ padding: "10px 12px 14px", borderTop: `1px solid ${GREEN}18`, gap: 6 }}
+          >
+            <a
+              href={`mailto:${profile.social.email}`}
+              style={{ fontFamily: MONO, fontSize: 10, color: DIM, letterSpacing: "0.08em", textDecoration: "none" }}
+            >
+              <i className="hn hn-envelope" /> {profile.social.email}
+            </a>
+            <a
+              href={profile.social.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ fontFamily: MONO, fontSize: 10, color: DIM, letterSpacing: "0.08em", textDecoration: "none" }}
+            >
+              <i className="hn hn-external-link" /> LINKEDIN
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
