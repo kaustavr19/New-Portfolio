@@ -75,8 +75,11 @@ export default function AppView({ appId, onBack }: Props) {
       <div
         className="flex items-center flex-shrink-0"
         style={{
-          height: 44,
-          padding: "0 4px",
+          minHeight: 44,
+          // env(safe-area-inset-top) pushes the bar below the notch
+          paddingTop: "env(safe-area-inset-top, 0px)",
+          paddingLeft: "max(4px, env(safe-area-inset-left, 0px))",
+          paddingRight: "max(4px, env(safe-area-inset-right, 0px))",
           background: "rgba(8, 12, 22, 0.92)",
           borderBottom: `1px solid ${accent}33`,
           backdropFilter: "blur(10px)",

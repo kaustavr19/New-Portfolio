@@ -26,7 +26,11 @@ export default function HomeIndicator({
   return (
     <div
       className="flex justify-center items-center flex-shrink-0 select-none"
-      style={{ padding: "8px 0 10px" }}
+      style={{
+        paddingTop: 8,
+        // env(safe-area-inset-bottom) sits the pill above the iOS gesture area
+        paddingBottom: "max(10px, env(safe-area-inset-bottom, 0px))",
+      }}
     >
       <Tag
         onClick={onTap}
