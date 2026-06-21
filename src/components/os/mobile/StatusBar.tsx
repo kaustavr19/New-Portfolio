@@ -47,8 +47,13 @@ export default function StatusBar({
     <div
       className="flex items-center justify-between flex-shrink-0 select-none"
       style={{
-        height,
-        padding: "0 14px",
+        // env(safe-area-inset-top) adds room above the bar on notched
+        // phones; fall back to 0 on browsers / non-notched devices.
+        paddingTop: "env(safe-area-inset-top, 0px)",
+        paddingLeft: "max(14px, env(safe-area-inset-left, 0px))",
+        paddingRight: "max(14px, env(safe-area-inset-right, 0px))",
+        minHeight: height,
+        boxSizing: "content-box",
         fontFamily: MONO,
         fontSize: 11,
         color: textColor,

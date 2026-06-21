@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "@hackernoon/pixel-icon-library/fonts/iconfont.css";
 
@@ -11,6 +11,16 @@ export const metadata: Metadata = {
     description: "Design × AI × Enterprise UX. An interactive OS-themed portfolio.",
     type: "website",
   },
+};
+
+/* viewport-fit: cover is what makes env(safe-area-inset-*) actually
+   report non-zero values on iOS notched phones. Without it, the page
+   doesn't extend under the notch/home indicator, and the env() vars
+   resolve to 0. */
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
