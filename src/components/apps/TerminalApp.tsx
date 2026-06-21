@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useIsMobile } from "@/lib/use-is-mobile";
 
 type Line = { type: "input" | "output" | "error" | "system"; text: string };
 
@@ -74,6 +75,7 @@ const COMMANDS: Record<string, string[]> = {
 };
 
 export default function TerminalApp() {
+  const isMobile = useIsMobile();
   const [lines, setLines] = useState<Line[]>([
     { type: "system", text: "KR//OS Minecraft Terminal v1.0" },
     { type: "system", text: 'Type "help" for a list of commands.' },
@@ -84,6 +86,12 @@ export default function TerminalApp() {
   const [histIdx, setHistIdx] = useState(-1);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  /* Mobile-aware tuning — same JSX tree, different sizing */
+  const fontSize    = isMobile ? 10 : 9;
+  const outputPad   = isMobile ? "14px 14px"  : "28px 36px";
+  const inputPadX   = isMobile ? 14           : 36;
+  const promptLabel = isMobile ? "kr ~$"      : "kaustav@kr-os ~$";
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -151,12 +159,15 @@ export default function TerminalApp() {
       onClick={() => inputRef.current?.focus()}
     >
       {/* Output */}
-      <div className="flex-1 overflow-auto space-y-0.5" style={{ padding: "28px 36px" }}>
+      <div
+        className="flex-1 space-y-0.5"
+        style={{ padding: outputPad, overflowY: "auto", overflowX: "auto" }}
+      >
         {lines.map((line, i) => (
           <div
             key={i}
             style={{
-              fontSize: 9,
+              fontSize,
               lineHeight: 1.8,
               color: lineColor[line.type],
               whiteSpace: "pre",
@@ -171,21 +182,23 @@ export default function TerminalApp() {
       {/* Input row */}
       <div
         className="flex items-center py-3"
-        style={{ paddingLeft: 36, paddingRight: 36, borderTop: "2px solid #333", background: "#0a0a0a" }}
+        style={{ paddingLeft: inputPadX, paddingRight: inputPadX, borderTop: "2px solid #333", background: "#0a0a0a" }}
       >
-        <span style={{ fontSize: 9, color: "#5aaf26", marginRight: 8 }}>
-          kaustav@kr-os ~$
+        <span style={{ fontSize, color: "#5aaf26", marginRight: 8, flexShrink: 0 }}>
+          {promptLabel}
         </span>
         <input
           ref={inputRef}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={onKeyDown}
-          autoFocus
+          autoFocus={!isMobile}
           spellCheck={false}
-          className="flex-1 bg-transparent outline-none"
+          autoCapitalize="off"
+          autoCorrect="off"
+          className="flex-1 bg-transparent outline-none min-w-0"
           style={{
-            fontSize: 9,
+            fontSize,
             color: "#5aaf26",
             fontFamily: "'Press Start 2P', monospace",
             caretColor: "#5aaf26",
@@ -193,8 +206,9 @@ export default function TerminalApp() {
         />
         <span
           style={{
-            fontSize: 9, color: "#5aaf26",
+            fontSize, color: "#5aaf26",
             animation: "blink 0.7s step-end infinite",
+            flexShrink: 0,
           }}
         >
           █
