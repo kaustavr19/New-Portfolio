@@ -132,38 +132,160 @@ export const publications: { title: string; venue: string; href?: string }[] = [
 /* ──────────────────────────────────────────────────────────
    EXPERIENCE — resume-aligned role groupings.
    ────────────────────────────────────────────────────────── */
-export const experience = [
+/* ──────────────────────────────────────────────────────────
+   EXPERIENCE — RDR2-style chapter chart.
+   Two CHAPTERS (companies), each with MISSIONS (roles).
+   Each mission has objectives (LOG checklist) + weapons (skill
+   chips) + a status (complete = "Gold Awarded" / in_progress
+   = active mission badge).
+   ────────────────────────────────────────────────────────── */
+
+export type MissionStatus = "complete" | "in_progress";
+export type Objective = { text: string; done: boolean };
+export type Mission = {
+  id: string;
+  title: string;          // Display title — e.g. "INSURANCE PRODUCTS"
+  role: string;           // Full role title
+  period: string;
+  duration: string;
+  location: string;
+  status: MissionStatus;
+  objectives: Objective[];
+  weapons: string[];      // Skill / tool chips, drawn as "WEAPONS UNLOCKED"
+};
+export type Chapter = {
+  id: string;
+  number: number;
+  title: string;          // "FRACTAL" / "EUGENIE.AI"
+  period: string;
+  duration: string;
+  status: MissionStatus;
+  missions: Mission[];
+};
+
+export const chapters: Chapter[] = [
   {
-    company: "Fractal Analytics",
-    role: "Design Consultant — Insurance Products",
-    period: "Jan 2026 – Present",
-    location: "Bengaluru, India · Hybrid",
-    description:
-      "Designing an AI-powered underwriting platform at the intersection of AI, risk, and enterprise UX. End-to-end product design with deep emphasis on human-in-the-loop decisioning, explainable AI, and regulator-ready workflows. Architecting override mechanisms, traceability dashboards, and audit trails for enterprise governance; partnering closely with data science and underwriting domain experts.",
-    tags: ["AI/UX", "Underwriting", "XAI", "Enterprise Governance"],
-    bounty: "$$$",
-  },
-  {
-    company: "Fractal Analytics",
-    role: "Design Consultant — CPG & Cogentiq AI",
-    period: "Jul 2024 – Jan 2026",
-    location: "Bengaluru, India · Hybrid",
-    description:
-      "Two parallel tracks: Cogentiq CPG — established the foundational UX direction for an AI-driven CPG intelligence platform, turning complex market data into decision-ready experiences. Cogentiq AI for BI — designed the Design Language & System for Fractal's agentic AI platform, enhanced AggRAG platform UX/UI, and shipped dark-mode design for HDFC Bank's SmartSearch.",
-    tags: ["Design System", "Agentic AI", "BI", "CPG"],
-    bounty: "$$$",
-  },
-  {
-    company: "Eugenie.ai (Fractal subsidiary)",
-    role: "Member of Design Staff II → Design Intern",
+    id: "eugenie",
+    number: 1,
+    title: "EUGENIE.AI",
     period: "Jul 2022 – Jul 2024",
-    location: "Mumbai & Kolkata, India · Remote / On-site",
-    description:
-      "Featured at Google I/O 2024 for asset & process management dashboard design. Drove a 90-day MVP with Google, Jabil, Flextronics, Meta, and TATA — delivering 11% cost and carbon reduction. Conducted user research, factory visits, and stakeholder interviews. Established brand identity and design systems for AI-powered industrial tools. Delivered design-thinking workshops to engineering and exec audiences.",
-    tags: ["Google I/O 2024", "Sustainability", "Industrial UX", "Design Workshops"],
-    bounty: "$$$",
+    duration: "2 yrs 1 mo",
+    status: "complete",
+    missions: [
+      {
+        id: "intern",
+        title: "DESIGN INTERN",
+        role: "Design Intern",
+        period: "Jul 2022 – Aug 2023",
+        duration: "1 yr 2 mos",
+        location: "India · Internship",
+        status: "complete",
+        objectives: [
+          { text: "Designed data visualization interfaces & dashboards for AI-driven insights", done: true },
+          { text: "Made ML outputs comprehensible to non-technical stakeholders through intuitive UI patterns", done: true },
+          { text: "Conducted user research and usability testing with domain experts", done: true },
+          { text: "Earned multiple training certifications in AI, design, and problem-solving", done: true },
+        ],
+        weapons: ["Data Visualization", "User Research", "Figma", "Design Thinking"],
+      },
+      {
+        id: "designstaff",
+        title: "DESIGN STAFF II",
+        role: "Member of Design Staff — II",
+        period: "Aug 2023 – Jul 2024",
+        duration: "1 yr",
+        location: "Mumbai, India · Remote",
+        status: "complete",
+        objectives: [
+          { text: "Built predictive maintenance dashboard featured at Google I/O 2024", done: true },
+          { text: "Conducted research with 10+ industrial operators to shape info hierarchy & decision workflows", done: true },
+          { text: "Owned product design for Eugenie's sustainability platform across multidisciplinary teams", done: true },
+          { text: "Delivered 11% cost & carbon reduction within 90 days of deployment", done: true },
+          { text: "Collaborated with Google, Jabil, Flextronics, Meta, TATA on sustainability analysis", done: true },
+          { text: "Spread design-thinking methodology via workshops to engineering & exec audiences", done: true },
+        ],
+        weapons: ["Google I/O 2024", "Industrial UX", "Sustainability", "Workshops", "Brand Identity"],
+      },
+    ],
+  },
+  {
+    id: "fractal",
+    number: 2,
+    title: "FRACTAL",
+    period: "Jul 2024 – Present",
+    duration: "2 yrs",
+    status: "in_progress",
+    missions: [
+      {
+        id: "cogentiq",
+        title: "COGENTIQ AI / BI",
+        role: "Design Consultant — Cogentiq AI for BI",
+        period: "Jul 2024 – Nov 2025",
+        duration: "1 yr 5 mos",
+        location: "Bengaluru, India · On-site",
+        status: "complete",
+        objectives: [
+          { text: "Led design system architecture for Cogentiq, serving 50+ internal designers", done: true },
+          { text: "Owned design language, component library, design tokens & accessibility standards from ground zero", done: true },
+          { text: "Achieved 40% faster design-to-dev handoff and eliminated 6+ months of rework", done: true },
+          { text: "Established WCAG 2.2 compliance baseline across the platform", done: true },
+          { text: "Enhanced AggRAG platform UX/UI for AI-powered search & retrieval clarity", done: true },
+          { text: "Shipped dark-mode for HDFC Bank SmartSearch (WCAG AAA, ~15% nightly usage lift)", done: true },
+          { text: "Developed marketing collateral & visual narratives for Cogentiq product outreach", done: true },
+        ],
+        weapons: ["Design System", "Agentic AI", "WCAG AAA", "AggRAG", "HDFC SmartSearch"],
+      },
+      {
+        id: "cpg",
+        title: "CPG PRODUCTS",
+        role: "Design Consultant — CPG Products",
+        period: "Nov 2025 – Jan 2026",
+        duration: "3 mos",
+        location: "Bengaluru, India · Hybrid",
+        status: "complete",
+        objectives: [
+          { text: "Established foundational UX principles for IntentSpark (AI-driven CPG intelligence SaaS)", done: true },
+          { text: "Built core workflows & low-fi product direction for B2B users analyzing consumer intent data", done: true },
+          { text: "Designed explainability patterns for AI-driven recommendations, reducing cognitive load", done: true },
+          { text: "Led cross-functional collaboration (product, data science, design) for AI workflow simplification", done: true },
+        ],
+        weapons: ["CPG Intelligence", "Explainable AI", "B2B SaaS", "Cross-functional"],
+      },
+      {
+        id: "insurance",
+        title: "INSURANCE PRODUCTS",
+        role: "Design Consultant — Insurance Products",
+        period: "Jan 2026 – Present",
+        duration: "6 mos",
+        location: "Bengaluru, India · Hybrid",
+        status: "in_progress",
+        objectives: [
+          { text: "Lead UX for AI-powered underwriting platform serving 100+ daily users", done: true },
+          { text: "Reduced underwriter review time ~40% through better feedback loops & error states", done: true },
+          { text: "Established accessibility-first design system standards (WCAG 2.2)", done: true },
+          { text: "Ship traceability dashboards + audit trails for enterprise governance", done: false },
+          { text: "Establish regulator-ready governance workflows with data science partners", done: false },
+        ],
+        weapons: ["AI Underwriting", "Human-in-the-Loop", "XAI", "Enterprise Governance"],
+      },
+    ],
   },
 ];
+
+/* Backwards-compat: a flat list of missions, in chronological order.
+   Existing code that imports `experience` keeps working — it just sees
+   the new richer rows. */
+export const experience = chapters.flatMap((c) =>
+  c.missions.map((m) => ({
+    company: c.title,
+    role: m.role,
+    period: m.period,
+    location: m.location,
+    description: m.objectives.map((o) => `• ${o.text}`).join(" "),
+    tags: m.weapons,
+    bounty: m.status === "in_progress" ? "$$" : "$$$",
+  }))
+);
 
 /* ──────────────────────────────────────────────────────────
    PROJECTS — personal side work
