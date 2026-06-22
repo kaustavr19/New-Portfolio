@@ -6,7 +6,9 @@ A game-themed browser OS portfolio built by **Kaustav Roy**, Design Consultant a
 
 ## Preview
 
-> Click the dirt block on the boot screen to start. Single-click any desktop icon to open an app. The green traffic light toggles between fullscreen and windowed mode.
+> **Desktop (≥768px):** click the dirt block on the boot screen to start. Single-click any desktop icon to open an app. The green traffic light toggles between fullscreen and windowed mode.
+>
+> **Mobile (<768px):** the desktop windowing shell is replaced by a phone OS — lock screen → home grid → full-screen apps. Drag a finger across the wallpaper to pop pixel cells.
 
 ![KR//OS Desktop](public/preview.png)
 
@@ -111,6 +113,25 @@ Now sourced directly from Kaustav's resume:
 - Animated sine-wave waveform driven by a `useEffect` tick (80 ms interval)
 - CRT scanline overlay across the whole window
 
+### Mobile experience (< 768px)
+Below the 768px viewport breakpoint, the desktop windowing shell is replaced by a dedicated **phone-OS metaphor**. Same brand, same providers, same wallpaper — different shell and per-app layouts.
+
+- **Lock screen** — replaces the desktop boot. Live clock + date, KR//OS brand stack, pulsing `CLICK TO BOOT` CTA. One tap unlocks audio + reveals home.
+- **Home screen** — iOS-style status bar (live time, KR//OS mark, pixel signal/battery), 4×2 app icon grid with the same pixel-card treatment as desktop, frosted dock with `RESUME.PDF`, home indicator pill at the bottom.
+- **App view** — full-screen container with theme-accented top bar (back arrow + icon + title), tappable home indicator to return.
+- **Touch wallpaper** — `touchstart` / `touchmove` translate finger position into the same `mouseX/Y` the desktop pop logic reads; drag a finger across bright cells to pop them. Touches are suppressed while inside a full-screen app so phantom pops don't fire during scroll.
+- **Per-app mobile layouts** — every app gets a dedicated mobile branch via `useIsMobile()`:
+  - **About** stacks the hero card + sections vertically (replaces the 2-column desktop layout)
+  - **Skills** swaps the left sidebar for a horizontal attribute tab strip
+  - **Projects** becomes a collapsible accordion list
+  - **Experience** uses a horizontal job pill row + single journal page
+  - **Contact** stacks the CODEC vertically with both portraits side-by-side above the form
+  - **Terminal** keeps the same JSX with tuned padding, font size, and shorter `kr ~$` prompt
+- **Settings app** — new 8th app, single source of truth for accessibility + Deviant Mode prefs; works on both desktop and mobile.
+- **Safe-area insets** — `viewport-fit: cover` plus `env(safe-area-inset-*)` on StatusBar / HomeIndicator / AppView top bar / LockScreen so notched phones get chrome pushed clear of the notch + home gesture area.
+- **MouseTrail** short-circuits on touch devices to avoid awkward synthetic-mousemove blips at tap location.
+- **Shared state across modes** — resize from desktop to mobile mid-session and Deviant mode, A11y prefs, and the "already booted" flag all persist.
+
 ---
 
 ## Local Development
@@ -140,27 +161,35 @@ public/
 └── preview.png
 src/
 ├── app/
-│   ├── layout.tsx           # Root layout + font imports + pixel-icon CSS
-│   └── page.tsx             # Boot gate (sessionStorage) → wraps app in A11yProvider + DeviantProvider
+│   ├── layout.tsx           # Root layout + font imports + pixel-icon CSS + viewport-fit:cover
+│   └── page.tsx             # useIsMobile branch → MobileOS (mobile) or BootScreen → Desktop
 ├── components/
 │   ├── os/
 │   │   ├── Desktop.tsx              # Desktop shell, window manager, icon grid (with pixel-card styling)
-│   │   ├── DesktopBg.tsx            # Multi-layer canvas (cells / pops / constellations / planets / DSOs / meteors / palette drift)
-│   │   ├── MouseTrail.tsx           # Pixelated cursor trail (motion-aware)
-│   │   ├── BootScreen.tsx           # Tap-to-enter splash + Minecraft chunk loader (Web Audio)
+│   │   ├── DesktopBg.tsx            # Multi-layer canvas (cells / pops / constellations / planets / DSOs / meteors / palette drift) + touch handlers
+│   │   ├── MouseTrail.tsx           # Pixelated cursor trail (motion-aware, disabled on touch)
+│   │   ├── BootScreen.tsx           # Tap-to-enter splash + Minecraft chunk loader (Web Audio) — desktop only
 │   │   ├── Window.tsx               # Draggable window (motion-aware framer-motion)
 │   │   ├── Taskbar.tsx              # Bottom bar with clock + resume + Deviant toggle + A11Y menu
 │   │   ├── AccessibilityMenu.tsx    # Taskbar popover with 3 a11y toggles
 │   │   ├── DeviantToggle.tsx        # Taskbar mirror of About's deviant switch
 │   │   ├── DeviantOverlay.tsx       # Global magenta wash when deviant is on
-│   │   └── KROSLogo.tsx             # SVG logo (palette-drift-aware + deviant transformations)
+│   │   ├── KROSLogo.tsx             # SVG logo (palette-drift-aware + deviant transformations)
+│   │   ├── MobileOS.tsx             # Phone shell state machine (lock → home → app)
+│   │   └── mobile/
+│   │       ├── LockScreen.tsx       # Mobile boot replacement (clock + brand + tap-to-enter)
+│   │       ├── HomeScreen.tsx       # Mobile home — status bar + 4×2 app grid + dock + indicator
+│   │       ├── AppView.tsx          # Full-screen app container with back arrow + theme-accented top bar
+│   │       ├── StatusBar.tsx        # iOS-style top bar (time / KR//OS / signal+battery) + safe-area
+│   │       └── HomeIndicator.tsx    # Bottom pill (tap = back to home) + safe-area-inset-bottom
 │   └── apps/
-│       ├── AboutApp.tsx     # Now reads resume-aligned content; full deviant variant
-│       ├── ProjectsApp.tsx
-│       ├── SkillsApp.tsx
-│       ├── ExperienceApp.tsx
-│       ├── ContactApp.tsx
-│       └── TerminalApp.tsx
+│       ├── AboutApp.tsx       # Resume-aligned; desktop 2-col + mobile stacked branches
+│       ├── ProjectsApp.tsx    # Desktop dossier + mobile accordion list
+│       ├── SkillsApp.tsx      # Desktop sidebar + mobile horizontal tab strip
+│       ├── ExperienceApp.tsx  # Desktop journal + mobile pill-row selector
+│       ├── ContactApp.tsx     # Desktop CODEC + mobile stacked CODEC
+│       ├── TerminalApp.tsx    # Tuned padding/font/prompt on mobile
+│       └── SettingsApp.tsx    # A11y + Deviant prefs (desktop window + mobile app)
 ├── data/
 │   ├── content.ts           # Profile, experience, skills, projects, education, certifications, publications, awards, OS chrome strings (normal + deviant)
 │   ├── constellations.ts    # Canonical constellation patterns (stars + edges)
@@ -168,7 +197,9 @@ src/
 └── lib/
     ├── palette.ts           # Shared palette drift (normal + deviant palettes)
     ├── a11y.tsx             # Accessibility context, hook, localStorage persistence
-    └── deviant.tsx          # Deviant Mode context, hook, localStorage persistence
+    ├── deviant.tsx          # Deviant Mode context, hook, localStorage persistence
+    ├── use-is-mobile.ts     # Viewport-based mobile detection (768px breakpoint, matchMedia)
+    └── use-is-touch.ts      # Touch device detection (pointer:fine + ontouchstart)
 ```
 
 ---
