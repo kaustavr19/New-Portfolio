@@ -43,8 +43,9 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
         {/* GTA V — bold block */}
         <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet" />
-        {/* Red Dead Redemption 2 — western serif */}
+        {/* Red Dead Redemption 2 — western serif (display) + journal serif (body) */}
         <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet" />
         {/* The Last of Us — typewriter worn */}
         <link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet" />
       </head>

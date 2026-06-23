@@ -4,9 +4,12 @@ import { useState } from "react";
 import { chapters, Mission } from "@/data/content";
 import { useIsMobile } from "@/lib/use-is-mobile";
 
-const CINZEL = "'Cinzel', serif";
+/* Serif swap: Cinzel had thin strokes that got spindly at body sizes;
+   EB Garamond is the closer match to the actual RDR2 in-game journal
+   typeface and far more readable at heading + body sizes. */
+const SERIF = "'EB Garamond', 'Cinzel', serif";
 const MONO = "'Share Tech Mono', monospace";
-const BODY = "'Rajdhani', sans-serif";
+const BODY = "'EB Garamond', 'Cinzel', serif";
 
 /* ──────────────────────────────────────────────────────────
    ExperienceApp — RDR2 chapter chart treatment.
@@ -24,13 +27,15 @@ const BODY = "'Rajdhani', sans-serif";
    ────────────────────────────────────────────────────────── */
 
 // Paper / RDR2 palette
-const PAPER       = "#e8dcbe";
-const PAPER_DEEP  = "#dcceab";
-const INK         = "#1a1410";
-const INK_SOFT    = "#5a4533";
-const ACCENT      = "#8b2c1c";   // RDR2 red (current-mission, important)
-const GOLD        = "#c89a3a";   // gold key / awarded
-const LINE        = "#8b6a3a";   // arrows + dividers (warm brown)
+const PAPER         = "#e8dcbe";
+const PAPER_DEEP    = "#dcceab";
+const INK           = "#1a1410";
+const INK_SOFT      = "#5a4533";
+const ACCENT        = "#9a2410";   // deeper saturated red for use on cream paper
+const ACCENT_BRIGHT = "#f08056";   // bright coral for use on dark (black) backgrounds
+const ACCENT_FILL   = "#a8230f";   // solid badge fill — IN PROGRESS award badge gets white text on this
+const GOLD          = "#c89a3a";   // gold key / awarded
+const LINE          = "#8b6a3a";   // arrows + dividers (warm brown)
 
 // All missions flattened for the "find by id" lookup
 const ALL_MISSIONS: Mission[] = chapters.flatMap((c) => c.missions);
@@ -77,10 +82,10 @@ function DesktopLayout({
 
       {/* Header */}
       <div style={{ padding: "28px 36px 8px" }}>
-        <div style={{ fontFamily: MONO, fontSize: 10, color: INK_SOFT, letterSpacing: "0.35em" }}>
+        <div style={{ fontFamily: MONO, fontSize: 12, color: INK_SOFT, letterSpacing: "0.35em" }}>
           ARTHUR&apos;S JOURNAL
         </div>
-        <div style={{ fontFamily: CINZEL, fontSize: 26, color: INK, fontWeight: 700, letterSpacing: "0.02em", marginTop: 2 }}>
+        <div style={{ fontFamily: SERIF, fontSize: 32, color: INK, fontWeight: 700, letterSpacing: "0.01em", marginTop: 4, lineHeight: 1.1 }}>
           Career Progression
         </div>
       </div>
@@ -149,10 +154,10 @@ function MobileLayout({
 
       {/* Header */}
       <div style={{ padding: "18px 18px 6px" }}>
-        <div style={{ fontFamily: MONO, fontSize: 9, color: INK_SOFT, letterSpacing: "0.3em" }}>
+        <div style={{ fontFamily: MONO, fontSize: 11, color: INK_SOFT, letterSpacing: "0.3em" }}>
           ARTHUR&apos;S JOURNAL
         </div>
-        <div style={{ fontFamily: CINZEL, fontSize: 20, color: INK, fontWeight: 700, letterSpacing: "0.02em", marginTop: 2 }}>
+        <div style={{ fontFamily: SERIF, fontSize: 26, color: INK, fontWeight: 700, letterSpacing: "0.01em", marginTop: 4, lineHeight: 1.1 }}>
           Career Progression
         </div>
       </div>
@@ -202,14 +207,19 @@ function MobileLayout({
 
 function ChapterHeader({ chapter, mobile = false }: { chapter: typeof chapters[number]; mobile?: boolean }) {
   return (
-    <div className="flex items-baseline gap-3" style={{ borderBottom: `1px solid ${LINE}44`, paddingBottom: 6 }}>
-      <div style={{ fontFamily: MONO, fontSize: mobile ? 8 : 9, color: INK_SOFT, letterSpacing: "0.4em" }}>
-        CHAPTER {chapter.number}
+    <div
+      className={mobile ? "flex flex-col gap-1" : "flex items-baseline gap-3"}
+      style={{ borderBottom: `1px solid ${LINE}55`, paddingBottom: 8 }}
+    >
+      <div className="flex items-baseline gap-3" style={{ flex: mobile ? undefined : 1 }}>
+        <div style={{ fontFamily: MONO, fontSize: mobile ? 10 : 12, color: INK_SOFT, letterSpacing: "0.4em" }}>
+          CHAPTER {chapter.number}
+        </div>
+        <div style={{ fontFamily: SERIF, fontSize: mobile ? 20 : 24, color: INK, fontWeight: 700, letterSpacing: "0.04em", flex: 1, lineHeight: 1.1 }}>
+          {chapter.title}
+        </div>
       </div>
-      <div style={{ fontFamily: CINZEL, fontSize: mobile ? 15 : 18, color: INK, fontWeight: 700, letterSpacing: "0.06em", flex: 1, lineHeight: 1.1 }}>
-        {chapter.title}
-      </div>
-      <div style={{ fontFamily: MONO, fontSize: mobile ? 8 : 9, color: INK_SOFT, letterSpacing: "0.18em", flexShrink: 0 }}>
+      <div style={{ fontFamily: MONO, fontSize: mobile ? 10 : 11, color: INK_SOFT, letterSpacing: "0.16em", flexShrink: 0 }}>
         {chapter.period} · {chapter.duration}
       </div>
     </div>
@@ -228,20 +238,28 @@ function MissionBox({
 
   return (
     <div className="relative flex flex-col items-stretch" style={{ minWidth: mobile ? "100%" : 184 }}>
-      {/* CURRENT badge sits above the active mission box */}
+      {/* CURRENT badge sits above the active mission box.
+          Solid red fill + white text — RDR2 wanted-poster style.
+          (Much higher contrast than the previous dark-red-on-cream.) */}
       {isCurrent && (
         <div
           className="absolute"
           style={{
-            top: -16,
-            left: 0,
-            right: 0,
+            top: -14,
+            left: "50%",
+            transform: "translateX(-50%)",
             textAlign: "center",
             fontFamily: MONO,
-            fontSize: 8,
-            color: ACCENT,
-            letterSpacing: "0.35em",
+            fontSize: 10,
+            color: "#fff5e6",
+            background: ACCENT_FILL,
+            letterSpacing: "0.32em",
             fontWeight: 700,
+            padding: "3px 10px",
+            border: `1px solid ${INK}`,
+            boxShadow: `2px 2px 0 ${INK}88`,
+            whiteSpace: "nowrap",
+            zIndex: 5,
           }}
         >
           ★ CURRENT
@@ -252,35 +270,35 @@ function MissionBox({
         onClick={onSelect}
         className="text-left transition-all active:opacity-70"
         style={{
-          padding: mobile ? "12px 14px" : "12px 14px",
+          padding: mobile ? "14px 16px" : "14px 16px",
           background: INK,
           color: "#f0e8d4",
           border: selected ? `3px solid ${GOLD}` : `3px solid transparent`,
           cursor: "pointer",
           outline: "none",
-          minHeight: mobile ? "auto" : 76,
+          minHeight: mobile ? "auto" : 86,
           width: "100%",
           boxShadow: selected ? `0 0 0 1px ${INK}, 4px 4px 0 ${LINE}66` : `4px 4px 0 ${LINE}33`,
           transition: "border-color 0.15s, box-shadow 0.15s",
         }}
       >
-        <div style={{ fontFamily: CINZEL, fontSize: 13, fontWeight: 700, letterSpacing: "0.06em", color: "#f0e8d4", lineHeight: 1.2 }}>
+        <div style={{ fontFamily: SERIF, fontSize: 16, fontWeight: 700, letterSpacing: "0.04em", color: "#f0e8d4", lineHeight: 1.15 }}>
           {mission.title}
         </div>
-        <div style={{ fontFamily: MONO, fontSize: 8, color: "#c9b890", letterSpacing: "0.18em", marginTop: 6 }}>
+        <div style={{ fontFamily: MONO, fontSize: 10, color: "#d4c3a0", letterSpacing: "0.18em", marginTop: 8 }}>
           {mission.duration.toUpperCase()}
         </div>
         {/* Status pill */}
         <div className="flex items-center gap-1" style={{ marginTop: 8 }}>
           {mission.status === "complete" ? (
             <>
-              <i className="hn hn-badge-check" style={{ color: GOLD, fontSize: 10 }} />
-              <span style={{ fontFamily: MONO, fontSize: 8, color: GOLD, letterSpacing: "0.2em" }}>GOLD</span>
+              <i className="hn hn-badge-check" style={{ color: GOLD, fontSize: 12 }} />
+              <span style={{ fontFamily: MONO, fontSize: 10, color: GOLD, letterSpacing: "0.22em", fontWeight: 700 }}>GOLD</span>
             </>
           ) : (
             <>
-              <i className="hn hn-spinner" style={{ color: ACCENT, fontSize: 10 }} />
-              <span style={{ fontFamily: MONO, fontSize: 8, color: ACCENT, letterSpacing: "0.2em" }}>IN PROGRESS</span>
+              <i className="hn hn-spinner" style={{ color: ACCENT_BRIGHT, fontSize: 12 }} />
+              <span style={{ fontFamily: MONO, fontSize: 10, color: ACCENT_BRIGHT, letterSpacing: "0.22em", fontWeight: 700 }}>IN PROGRESS</span>
             </>
           )}
         </div>
@@ -336,58 +354,57 @@ function LogPanel({ mission, mobile = false }: { mission: Mission; mobile?: bool
         position: "relative",
       }}
     >
-      {/* Corner ornaments — small */}
-      <div className="absolute" style={{ top: 6, left: 6, fontFamily: CINZEL, fontSize: 12, color: INK_SOFT }}>❦</div>
-      <div className="absolute" style={{ top: 6, right: 6, fontFamily: CINZEL, fontSize: 12, color: INK_SOFT, transform: "scaleX(-1)" }}>❦</div>
+      {/* Corner ornaments */}
+      <div className="absolute" style={{ top: 6, left: 8, fontFamily: SERIF, fontSize: 16, color: INK_SOFT }}>❦</div>
+      <div className="absolute" style={{ top: 6, right: 8, fontFamily: SERIF, fontSize: 16, color: INK_SOFT, transform: "scaleX(-1)" }}>❦</div>
 
       {/* LOG header */}
-      <div style={{ fontFamily: MONO, fontSize: 9, color: INK_SOFT, letterSpacing: "0.4em", marginBottom: 10, textAlign: "center" }}>
+      <div style={{ fontFamily: MONO, fontSize: 11, color: INK_SOFT, letterSpacing: "0.4em", marginBottom: 12, textAlign: "center" }}>
         ── LOG ──
       </div>
 
       {/* Mission title + meta */}
-      <div style={{ borderBottom: `1px solid ${LINE}55`, paddingBottom: 12, marginBottom: 14 }}>
-        <div style={{ fontFamily: CINZEL, fontSize: mobile ? 18 : 22, color: INK, fontWeight: 700, fontStyle: "italic", lineHeight: 1.25 }}>
+      <div style={{ borderBottom: `1px solid ${LINE}55`, paddingBottom: 14, marginBottom: 16 }}>
+        <div style={{ fontFamily: SERIF, fontSize: mobile ? 22 : 28, color: INK, fontWeight: 700, fontStyle: "italic", lineHeight: 1.2 }}>
           {mission.role}
         </div>
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1" style={{ marginTop: 6 }}>
-          <span style={{ fontFamily: MONO, fontSize: 10, color: INK_SOFT, letterSpacing: "0.15em" }}>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1" style={{ marginTop: 8 }}>
+          <span style={{ fontFamily: MONO, fontSize: 12, color: INK_SOFT, letterSpacing: "0.14em" }}>
             {mission.period}
           </span>
-          <span style={{ fontFamily: MONO, fontSize: 9, color: `${INK_SOFT}aa` }}>·</span>
-          <span style={{ fontFamily: MONO, fontSize: 10, color: INK_SOFT, letterSpacing: "0.1em" }}>
+          <span style={{ fontFamily: MONO, fontSize: 11, color: `${INK_SOFT}aa` }}>·</span>
+          <span style={{ fontFamily: MONO, fontSize: 12, color: INK_SOFT, letterSpacing: "0.1em" }}>
             {mission.location}
           </span>
         </div>
       </div>
 
       {/* Objectives checklist */}
-      <div style={{ marginBottom: 18 }}>
-        <div style={{ fontFamily: MONO, fontSize: 9, color: INK_SOFT, letterSpacing: "0.35em", marginBottom: 10 }}>
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ fontFamily: MONO, fontSize: 11, color: INK_SOFT, letterSpacing: "0.35em", marginBottom: 12 }}>
           CHECKLIST
         </div>
-        <div className="flex flex-col" style={{ gap: 9 }}>
+        <div className="flex flex-col" style={{ gap: 11 }}>
           {mission.objectives.map((o, i) => (
             <div key={i} className="flex items-start gap-3">
               <div
                 style={{
-                  width: 16, height: 16, flexShrink: 0, marginTop: 2,
+                  width: 18, height: 18, flexShrink: 0, marginTop: 3,
                   border: `2px solid ${o.done ? GOLD : INK_SOFT}`,
                   background: o.done ? `${GOLD}33` : "transparent",
                   display: "flex", alignItems: "center", justifyContent: "center",
                 }}
               >
-                {o.done && <i className="hn hn-check" style={{ color: GOLD, fontSize: 10 }} />}
+                {o.done && <i className="hn hn-check" style={{ color: GOLD, fontSize: 12 }} />}
               </div>
               <div
                 style={{
                   fontFamily: BODY,
-                  fontSize: mobile ? 14 : 15,
-                  fontWeight: 500,
-                  color: o.done ? INK : INK_SOFT,
-                  lineHeight: 1.5,
-                  letterSpacing: "0.01em",
-                  textDecoration: o.done ? "none" : "none",
+                  fontSize: mobile ? 16 : 17,
+                  fontWeight: 400,
+                  color: o.done ? INK : `${INK_SOFT}cc`,
+                  lineHeight: 1.4,
+                  letterSpacing: "0.005em",
                 }}
               >
                 {o.text}
@@ -399,8 +416,8 @@ function LogPanel({ mission, mobile = false }: { mission: Mission; mobile?: bool
 
       {/* Weapons unlocked */}
       {mission.weapons.length > 0 && (
-        <div style={{ marginBottom: 18 }}>
-          <div style={{ fontFamily: MONO, fontSize: 9, color: INK_SOFT, letterSpacing: "0.35em", marginBottom: 10 }}>
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ fontFamily: MONO, fontSize: 11, color: INK_SOFT, letterSpacing: "0.35em", marginBottom: 12 }}>
             WEAPONS UNLOCKED
           </div>
           <div className="flex flex-wrap gap-2">
@@ -409,15 +426,16 @@ function LogPanel({ mission, mobile = false }: { mission: Mission; mobile?: bool
                 key={w}
                 style={{
                   fontFamily: MONO,
-                  fontSize: 10,
-                  padding: "4px 10px",
+                  fontSize: 12,
+                  padding: "5px 12px",
                   border: `1px solid ${ACCENT}`,
                   background: `${ACCENT}11`,
                   color: ACCENT,
                   letterSpacing: "0.08em",
+                  fontWeight: 600,
                 }}
               >
-                <i className="hn hn-star" style={{ fontSize: 9, marginRight: 5 }} />
+                <i className="hn hn-star" style={{ fontSize: 11, marginRight: 6 }} />
                 {w}
               </span>
             ))}
@@ -427,31 +445,37 @@ function LogPanel({ mission, mobile = false }: { mission: Mission; mobile?: bool
 
       {/* Award row */}
       <div
-        className="flex items-center gap-3"
+        className="flex items-center gap-4"
         style={{
           borderTop: `1px dashed ${LINE}66`,
-          paddingTop: 14,
+          paddingTop: 16,
           marginTop: 6,
         }}
       >
         {isCurrent ? (
           <>
+            {/* Wanted-poster style: solid red panel + white text. Much
+                higher contrast than the previous dark-red on cream. */}
             <div
-              className="flex items-center justify-center"
+              className="flex flex-col items-center justify-center"
               style={{
-                width: 44, height: 44, borderRadius: "50%",
-                border: `2px solid ${ACCENT}`,
-                background: `${ACCENT}1a`,
+                padding: "8px 14px",
+                background: ACCENT_FILL,
+                border: `2px solid ${INK}`,
+                color: "#fff5e6",
                 flexShrink: 0,
+                boxShadow: `3px 3px 0 ${INK}77`,
+                minWidth: 88,
               }}
             >
-              <i className="hn hn-spinner" style={{ color: ACCENT, fontSize: 20 }} />
+              <i className="hn hn-spinner" style={{ color: "#fff5e6", fontSize: 18 }} />
+              <div style={{ fontFamily: MONO, fontSize: 9, color: "#fff5e6", letterSpacing: "0.25em", marginTop: 3, fontWeight: 700 }}>ACTIVE</div>
             </div>
-            <div>
-              <div style={{ fontFamily: CINZEL, fontSize: 14, color: ACCENT, fontWeight: 700, letterSpacing: "0.18em" }}>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontFamily: SERIF, fontSize: 20, color: ACCENT, fontWeight: 700, letterSpacing: "0.06em", lineHeight: 1.1 }}>
                 IN PROGRESS
               </div>
-              <div style={{ fontFamily: MONO, fontSize: 10, color: INK_SOFT, letterSpacing: "0.1em", marginTop: 2 }}>
+              <div style={{ fontFamily: MONO, fontSize: 12, color: INK_SOFT, letterSpacing: "0.08em", marginTop: 4 }}>
                 {doneCount} of {total} objectives complete
               </div>
             </div>
@@ -461,19 +485,19 @@ function LogPanel({ mission, mobile = false }: { mission: Mission; mobile?: bool
             <div
               className="flex items-center justify-center"
               style={{
-                width: 44, height: 44, borderRadius: "50%",
+                width: 52, height: 52, borderRadius: "50%",
                 border: `2px solid ${GOLD}`,
-                background: `${GOLD}22`,
+                background: `${GOLD}26`,
                 flexShrink: 0,
               }}
             >
-              <i className="hn hn-trophy" style={{ color: GOLD, fontSize: 20 }} />
+              <i className="hn hn-trophy" style={{ color: GOLD, fontSize: 24 }} />
             </div>
-            <div>
-              <div style={{ fontFamily: CINZEL, fontSize: 14, color: GOLD, fontWeight: 700, letterSpacing: "0.18em" }}>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontFamily: SERIF, fontSize: 20, color: GOLD, fontWeight: 700, letterSpacing: "0.06em", lineHeight: 1.1 }}>
                 GOLD AWARDED
               </div>
-              <div style={{ fontFamily: MONO, fontSize: 10, color: INK_SOFT, letterSpacing: "0.1em", marginTop: 2 }}>
+              <div style={{ fontFamily: MONO, fontSize: 12, color: INK_SOFT, letterSpacing: "0.08em", marginTop: 4 }}>
                 {doneCount} of {total} objectives complete
               </div>
             </div>
