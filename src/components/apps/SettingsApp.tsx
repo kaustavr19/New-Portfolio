@@ -30,9 +30,9 @@ export default function SettingsApp() {
   // the rest hold the slot for upcoming phases.
   const experimentToggles: { key: keyof Experiments; label: string; hint: string }[] = [
     { key: "crtShader",      label: "CRT MONITOR",      hint: "Scanlines, vignette & phosphor glow over the whole OS." },
+    { key: "bootWebgl",      label: "BOOT SEQUENCE FX",  hint: "Synthwave WebGL backdrop on the next cold boot." },
+    { key: "starfieldWebgl", label: "GPU STARFIELD",     hint: "Replace the desktop sky with a GPU starfield." },
     { key: "skills3d",       label: "SKILLS · 3D GRAPH", hint: "Orbit your skills as a 3D node network. · SOON" },
-    { key: "bootWebgl",      label: "BOOT SEQUENCE FX",  hint: "WebGL intro on the next cold boot. · SOON" },
-    { key: "starfieldWebgl", label: "GPU STARFIELD",     hint: "Rebuild the desktop sky on the GPU. · SOON" },
   ];
 
   // Deviant-aware color tokens — matches About panel + AccessibilityMenu
