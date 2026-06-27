@@ -2,6 +2,7 @@
 
 import { useA11y } from "@/lib/a11y";
 import { useDeviant } from "@/lib/deviant";
+import { useExperiments, type Experiments } from "@/lib/experiments";
 import { osChrome, osChromeDeviant } from "@/data/content";
 
 const MONO = "'Share Tech Mono', monospace";
@@ -22,7 +23,17 @@ const BODY = "'Rajdhani', sans-serif";
 export default function SettingsApp() {
   const a11y = useA11y();
   const { deviant, toggle: toggleDeviant } = useDeviant();
+  const fx = useExperiments();
   const ch = deviant ? osChromeDeviant : osChrome;
+
+  // LABS // experimental WebGL flags. Only CRT is wired up so far;
+  // the rest hold the slot for upcoming phases.
+  const experimentToggles: { key: keyof Experiments; label: string; hint: string }[] = [
+    { key: "crtShader",      label: "CRT MONITOR",      hint: "Scanlines, vignette & phosphor glow over the whole OS." },
+    { key: "skills3d",       label: "SKILLS · 3D GRAPH", hint: "Orbit your skills as a 3D node network. · SOON" },
+    { key: "bootWebgl",      label: "BOOT SEQUENCE FX",  hint: "WebGL intro on the next cold boot. · SOON" },
+    { key: "starfieldWebgl", label: "GPU STARFIELD",     hint: "Rebuild the desktop sky on the GPU. · SOON" },
+  ];
 
   // Deviant-aware color tokens — matches About panel + AccessibilityMenu
   const C = deviant
@@ -124,6 +135,23 @@ export default function SettingsApp() {
           knobOff={C.knobOff}
           faint={C.accentFaint}
         />
+      </Group>
+
+      {/* ── Group: LABS / experiments ── */}
+      <Group title="LABS // EXPERIMENTAL" accent={C.accentDim}>
+        {experimentToggles.map((t) => (
+          <ToggleRow
+            key={t.key}
+            label={t.label}
+            hint={t.hint}
+            value={fx[t.key]}
+            onToggle={() => fx.toggle(t.key)}
+            accent={C.accent}
+            text={C.text}
+            knobOff={C.knobOff}
+            faint={C.accentFaint}
+          />
+        ))}
       </Group>
 
       {/* ── Footer ── */}
