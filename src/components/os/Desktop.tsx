@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import dynamic from "next/dynamic";
 import { desktopIcons } from "@/data/content";
 import Window from "./Window";
 import Taskbar from "./Taskbar";
@@ -9,6 +10,10 @@ import DesktopBg from "./DesktopBg";
 import MouseTrail from "./MouseTrail";
 import { useA11y } from "@/lib/a11y";
 import { useDeviant } from "@/lib/deviant";
+import { useExperiments } from "@/lib/experiments";
+
+// Lazy — only downloads when the starfieldWebgl experiment is on.
+const StarfieldWebgl = dynamic(() => import("@/components/experiments/StarfieldWebgl"), { ssr: false });
 import AboutApp from "@/components/apps/AboutApp";
 import SkillsApp from "@/components/apps/SkillsApp";
 import ProjectsApp from "@/components/apps/ProjectsApp";
@@ -88,6 +93,7 @@ let zCounter = 10;
 export default function Desktop() {
   const { highContrast } = useA11y();
   const { deviant } = useDeviant();
+  const { starfieldWebgl } = useExperiments();
   const labelFor = (icon: typeof desktopIcons[number]) => (deviant && icon.deviantLabel) ? icon.deviantLabel : icon.label;
   const [windows, setWindows] = useState<Record<string, WindowState>>({});
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
@@ -159,6 +165,9 @@ export default function Desktop() {
     >
       {/* Pixel animation background */}
       <DesktopBg />
+
+      {/* Experiment: GPU starfield — covers the 2D sky, sits below icons */}
+      {starfieldWebgl && <StarfieldWebgl />}
 
       {/* Centered logo wallpaper */}
       <div
