@@ -166,9 +166,78 @@ export const experience = [
 ];
 
 /* ──────────────────────────────────────────────────────────
-   PROJECTS — personal side work
+   PROJECTS — GTA V mission board.
+   `type` splits the pause-menu tabs:
+     "main" = work projects (story missions)
+     "side" = personal projects (side missions / strangers & freaks)
+   `completion` (0–100) + `medal` drive the MISSION PASSED card.
+   `stars` doubles as the GTA "wanted level" / difficulty.
+
+   NOTE: main missions are placeholders — swap in real work later.
    ────────────────────────────────────────────────────────── */
-export const projects = [
+export type ProjectType = "main" | "side";
+export type Medal = "gold" | "silver" | "bronze";
+
+export type Project = {
+  id: string;
+  name: string;
+  tagline: string;
+  description: string;
+  status: string;
+  stars: number;
+  tags: string[];
+  year: string;
+  type: ProjectType;
+  completion: number;
+  medal?: Medal;
+};
+
+export const projects: Project[] = [
+  /* ── MAIN MISSIONS — work (placeholders, fill in later) ── */
+  {
+    id: "underwriting",
+    name: "Operation Underwriting",
+    tagline: "Real money, real stakes",
+    description:
+      "[PLACEHOLDER] Enterprise AI for insurance underwriting at Fractal. Dragged the screens out of the Windows-98 era and made human-in-the-loop decisions legible. Swap in the real brief later.",
+    status: "IN PROGRESS",
+    stars: 5,
+    tags: ["Enterprise UX", "Design for AI", "Human-in-the-Loop"],
+    year: "2023–Present",
+    type: "main",
+    completion: 80,
+    medal: "gold",
+  },
+  {
+    id: "classified-a",
+    name: "Mission: [Classified]",
+    tagline: "Intel pending declassification",
+    description:
+      "[PLACEHOLDER] A flagship work project — details under wraps. Replace this entry with the real mission brief, objectives, and outcome.",
+    status: "SHIPPED",
+    stars: 4,
+    tags: ["Design for AI", "Research", "Strategy"],
+    year: "2022",
+    type: "main",
+    completion: 100,
+    medal: "gold",
+  },
+  {
+    id: "classified-b",
+    name: "Mission: [Redacted]",
+    tagline: "Awaiting clearance",
+    description:
+      "[PLACEHOLDER] Another work mission. Add the name, brief, and results when you're ready to declassify.",
+    status: "SHIPPED",
+    stars: 3,
+    tags: ["Enterprise UX", "Design Systems"],
+    year: "2021",
+    type: "main",
+    completion: 100,
+    medal: "silver",
+  },
+
+  /* ── SIDE MISSIONS — personal projects ── */
   {
     id: "flInq",
     name: "FlinQ",
@@ -179,6 +248,9 @@ export const projects = [
     stars: 4,
     tags: ["Product Design", "Community", "Next.js"],
     year: "2024–Present",
+    type: "side",
+    completion: 60,
+    medal: "silver",
   },
   {
     id: "devcom",
@@ -190,6 +262,9 @@ export const projects = [
     stars: 4,
     tags: ["Web App", "Developer Tools", "Community"],
     year: "2024–Present",
+    type: "side",
+    completion: 100,
+    medal: "gold",
   },
   {
     id: "stayput",
@@ -201,6 +276,9 @@ export const projects = [
     stars: 3,
     tags: ["Productivity", "Next.js", "Vibe Coded"],
     year: "2025",
+    type: "side",
+    completion: 100,
+    medal: "silver",
   },
   {
     id: "shikshalay",
@@ -212,6 +290,9 @@ export const projects = [
     stars: 3,
     tags: ["UX Research", "Education", "Prototype"],
     year: "2021",
+    type: "side",
+    completion: 100,
+    medal: "bronze",
   },
 ];
 
