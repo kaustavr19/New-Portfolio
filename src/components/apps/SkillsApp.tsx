@@ -1,8 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { skills } from "@/data/content";
 import { useIsMobile } from "@/lib/use-is-mobile";
+import { useExperiments } from "@/lib/experiments";
+
+// Lazy — only downloads when the skills3d experiment is on.
+const SkillsGraph3D = dynamic(() => import("@/components/experiments/SkillsGraph3D"), { ssr: false });
 
 const RAJDHANI = "'Rajdhani', sans-serif";
 const MONO = "'Share Tech Mono', monospace";
@@ -20,10 +25,14 @@ const CATEGORIES: Category[] = ["intelligence", "technical", "cool", "body"];
 
 export default function SkillsApp() {
   const isMobile = useIsMobile();
+  const fx = useExperiments();
   const [active, setActive] = useState<Category>("intelligence");
 
   const activeSkills = skills[active];
   const meta = categoryMeta[active];
+
+  // 3D node-graph experiment — desktop only.
+  const use3d = fx.skills3d && !isMobile;
 
   /* ──────────────────────────────────────────────────────────
      Mobile layout — horizontal tab strip + full-width tree.
@@ -243,53 +252,65 @@ export default function SkillsApp() {
           </div>
         </div>
 
-        {/* Skill nodes */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
-          {activeSkills.map((skill, i) => (
-            <div key={skill.name} className="flex items-center gap-4">
-              <div
-                style={{
-                  width: 40, height: 40, borderRadius: 4,
-                  border: `1px solid ${meta.color}66`,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontFamily: RAJDHANI, fontSize: 15, fontWeight: 700, color: meta.color,
-                  background: `${meta.color}0e`,
-                  flexShrink: 0,
-                }}
-              >
-                {String(i + 1).padStart(2, "0")}
-              </div>
-              <div className="flex-1">
-                <div className="flex justify-between items-center" style={{ marginBottom: 8 }}>
-                  <span style={{ fontFamily: RAJDHANI, fontSize: 17, fontWeight: 600, color: "#e0e0e8", letterSpacing: "0.06em" }}>
-                    {skill.name}
-                  </span>
-                  <span style={{ fontFamily: RAJDHANI, fontSize: 16, fontWeight: 700, color: meta.color }}>
-                    {skill.level}<span style={{ color: `${meta.color}55`, fontSize: 12 }}>/100</span>
-                  </span>
-                </div>
+        {/* Skill nodes — DOM list, or the 3D node graph when skills3d is on */}
+        {use3d ? (
+          <div className="relative" style={{ flex: 1, minHeight: 280 }}>
+            <SkillsGraph3D active={active} />
+            <div
+              className="absolute left-0 bottom-0 pointer-events-none"
+              style={{ fontFamily: MONO, fontSize: 9, color: `${meta.color}66`, letterSpacing: "0.25em" }}
+            >
+              DRAG TO ORBIT · SCROLL TO ZOOM · NODE SIZE = LEVEL
+            </div>
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
+            {activeSkills.map((skill, i) => (
+              <div key={skill.name} className="flex items-center gap-4">
                 <div
                   style={{
-                    height: 6, background: "#141428",
-                    border: `1px solid ${meta.color}22`,
-                    borderRadius: 3, overflow: "hidden", position: "relative",
+                    width: 40, height: 40, borderRadius: 4,
+                    border: `1px solid ${meta.color}66`,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontFamily: RAJDHANI, fontSize: 15, fontWeight: 700, color: meta.color,
+                    background: `${meta.color}0e`,
+                    flexShrink: 0,
                   }}
                 >
+                  {String(i + 1).padStart(2, "0")}
+                </div>
+                <div className="flex-1">
+                  <div className="flex justify-between items-center" style={{ marginBottom: 8 }}>
+                    <span style={{ fontFamily: RAJDHANI, fontSize: 17, fontWeight: 600, color: "#e0e0e8", letterSpacing: "0.06em" }}>
+                      {skill.name}
+                    </span>
+                    <span style={{ fontFamily: RAJDHANI, fontSize: 16, fontWeight: 700, color: meta.color }}>
+                      {skill.level}<span style={{ color: `${meta.color}55`, fontSize: 12 }}>/100</span>
+                    </span>
+                  </div>
                   <div
                     style={{
-                      height: "100%", width: `${skill.level}%`,
-                      background: `linear-gradient(90deg, ${meta.color}66, ${meta.color})`,
-                      boxShadow: `0 0 10px ${meta.color}66`,
+                      height: 6, background: "#141428",
+                      border: `1px solid ${meta.color}22`,
+                      borderRadius: 3, overflow: "hidden", position: "relative",
                     }}
-                  />
-                  {[20, 40, 60, 80].map((pct) => (
-                    <div key={pct} className="absolute top-0 bottom-0 w-px" style={{ left: `${pct}%`, background: "#0a0a14" }} />
-                  ))}
+                  >
+                    <div
+                      style={{
+                        height: "100%", width: `${skill.level}%`,
+                        background: `linear-gradient(90deg, ${meta.color}66, ${meta.color})`,
+                        boxShadow: `0 0 10px ${meta.color}66`,
+                      }}
+                    />
+                    {[20, 40, 60, 80].map((pct) => (
+                      <div key={pct} className="absolute top-0 bottom-0 w-px" style={{ left: `${pct}%`, background: "#0a0a14" }} />
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         <div className="mt-auto" style={{ borderTop: "1px solid #f5e64222", paddingTop: 24, marginTop: 48 }}>
           <div style={{ fontFamily: RAJDHANI, fontSize: 14, fontStyle: "italic", color: "#f5e64255", letterSpacing: "0.1em" }}>
