@@ -58,7 +58,7 @@ export default function Taskbar({ openWindows, onIconClick, onTaskbarClick }: Ta
           className="flex items-center gap-1 px-3 py-1.5 transition-colors hover:bg-white/5 rounded-sm"
           style={{ fontFamily: "'Share Tech Mono', monospace", letterSpacing: "0.12em" }}
         >
-          <KRMark height={13} color={deviant ? "#ff3c8c" : "#4fc3f7"} />
+          <KRMark height={16} color={deviant ? "#ff3c8c" : "#4fc3f7"} />
           <span style={{ color: "#3a3a4e", fontSize: 14 }}>//</span>
           <span style={{ color: "#f5e642", fontWeight: 700, fontSize: 14 }}>{deviant ? "DEVIANT" : "OS"}</span>
         </button>

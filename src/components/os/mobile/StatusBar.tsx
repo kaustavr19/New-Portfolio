@@ -66,7 +66,7 @@ export default function StatusBar({
 
       {/* Center: brand mark */}
       <div className="flex items-center gap-1" style={{ fontSize: 10, letterSpacing: "0.18em" }}>
-        <KRMark height={9} color={markColor} />
+        <KRMark height={11} color={markColor} />
         <span style={{ color: "rgba(255,255,255,0.35)" }}>//</span>
         <span style={{ color: "#f5e642", fontWeight: 700 }}>{deviant ? "DEVIANT" : "OS"}</span>
       </div>
