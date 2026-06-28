@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useDeviant } from "@/lib/deviant";
+import KRMark from "../KRMark";
 
 const MONO = "'Share Tech Mono', monospace";
 
@@ -65,7 +66,7 @@ export default function StatusBar({
 
       {/* Center: brand mark */}
       <div className="flex items-center gap-1" style={{ fontSize: 10, letterSpacing: "0.18em" }}>
-        <span style={{ color: markColor, fontWeight: 700 }}>KR</span>
+        <KRMark height={9} color={markColor} />
         <span style={{ color: "rgba(255,255,255,0.35)" }}>//</span>
         <span style={{ color: "#f5e642", fontWeight: 700 }}>{deviant ? "DEVIANT" : "OS"}</span>
       </div>

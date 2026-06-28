@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { desktopIcons } from "@/data/content";
 import AccessibilityMenu from "./AccessibilityMenu";
 import DeviantToggle from "./DeviantToggle";
+import KRMark from "./KRMark";
 import { useDeviant } from "@/lib/deviant";
 
 interface TaskbarProps {
@@ -57,7 +58,7 @@ export default function Taskbar({ openWindows, onIconClick, onTaskbarClick }: Ta
           className="flex items-center gap-1 px-3 py-1.5 transition-colors hover:bg-white/5 rounded-sm"
           style={{ fontFamily: "'Share Tech Mono', monospace", letterSpacing: "0.12em" }}
         >
-          <span style={{ color: deviant ? "#ff3c8c" : "#4fc3f7", fontWeight: 700, fontSize: 14, transition: "color 0.4s" }}>KR</span>
+          <KRMark height={13} color={deviant ? "#ff3c8c" : "#4fc3f7"} />
           <span style={{ color: "#3a3a4e", fontSize: 14 }}>//</span>
           <span style={{ color: "#f5e642", fontWeight: 700, fontSize: 14 }}>{deviant ? "DEVIANT" : "OS"}</span>
         </button>

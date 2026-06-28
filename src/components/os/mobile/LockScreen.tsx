@@ -6,6 +6,7 @@ import { useDeviant } from "@/lib/deviant";
 import { useA11y } from "@/lib/a11y";
 import { osChrome, osChromeDeviant } from "@/data/content";
 import StatusBar from "./StatusBar";
+import KRMark from "../KRMark";
 
 const PIXEL = "'Press Start 2P', monospace";
 const MONO  = "'Share Tech Mono', monospace";
@@ -141,7 +142,9 @@ export default function LockScreen({ onUnlock }: Props) {
               }}
             />
             <div
+              className="flex items-center"
               style={{
+                gap: 5,
                 fontFamily: PIXEL,
                 fontSize: 18,
                 letterSpacing: "0.1em",
@@ -150,7 +153,8 @@ export default function LockScreen({ onUnlock }: Props) {
                 transition: "text-shadow 0.5s ease",
               }}
             >
-              {deviant ? "KR//DEVIANT" : "KR//OS"}
+              <KRMark height={18} color="#fff" style={{ filter: `drop-shadow(0 0 10px ${accent}66)` }} />
+              <span>{deviant ? "//DEVIANT" : "//OS"}</span>
             </div>
             <div
               style={{
