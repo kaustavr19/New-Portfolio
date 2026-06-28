@@ -15,15 +15,14 @@ import { createContext, useContext, useEffect, useState, ReactNode, useCallback 
    so an OFF flag means that effect's code is never downloaded.
 
    Toggle surfaces:
-     · URL    →  ?fx=crt,skills3d   (aliases below)
+     · URL    →  ?fx=crt,starfield  (aliases below)
      · In-app →  SettingsApp "LABS" section
    ────────────────────────────────────────────────────────── */
 
 export type Experiments = {
-  crtShader: boolean;       // Phase 1 — full-screen CRT post layer
-  skills3d: boolean;        // Phase 2 — Skills as a 3D node graph (WIP)
-  bootWebgl: boolean;       // Phase 3 — WebGL boot moment (WIP)
-  starfieldWebgl: boolean;  // Phase 4 — GPU desktop starfield (WIP)
+  crtShader: boolean;       // full-screen CRT post layer
+  bootWebgl: boolean;       // synthwave WebGL boot backdrop
+  starfieldWebgl: boolean;  // cosmic GPU desktop wallpaper
 };
 
 type ExperimentsCtx = Experiments & {
@@ -34,14 +33,12 @@ type ExperimentsCtx = Experiments & {
 const DEFAULTS: Experiments = {
   crtShader: true,        // shipped on — part of the default OS look
   bootWebgl: true,        // shipped on — synthwave cold-boot backdrop
-  skills3d: false,
   starfieldWebgl: false,  // opt-in wallpaper — toggled via the desktop switcher
 };
 
-/* Short URL aliases → flag keys. `?fx=crt,skills3d` */
+/* Short URL aliases → flag keys. `?fx=crt,starfield` */
 const FX_ALIASES: Record<string, keyof Experiments> = {
   crt: "crtShader",
-  skills3d: "skills3d",
   boot: "bootWebgl",
   starfield: "starfieldWebgl",
 };

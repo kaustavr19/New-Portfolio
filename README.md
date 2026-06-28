@@ -88,13 +88,14 @@ An opt-in WebGL layer, built so every effect is **flag-gated and lazy-loaded** �
 - Taskbar with live clock, open-app indicators, `RESUME.PDF` download button, Deviant Mode toggle, and the Accessibility menu
 
 ### Accessibility menu
-A taskbar popover (`hn-glasses` icon) with three pill-switch toggles, all persisted in `localStorage`:
+A taskbar popover (`hn-glasses` icon) with four pill-switch toggles, all persisted in `localStorage`:
 
 - **Reduce Motion** — disables wallpaper effects, particles, constellations, sky objects, meteors, mouse trail, and window animations. Auto-respects `prefers-reduced-motion` on first visit. Boot screen skips entirely.
-- **Mute Audio** — silences boot pops/chime and bubble-pop sounds.
+- **Sound Effects** — boot pops/chime, bubble-pop sounds, and UI blips (on by default). On the cosmic wallpaper the bubble-pops are suppressed entirely, since the pixel cells they react to are hidden.
+- **Galactic Ambience** — a very slight synthesized space hum behind both wallpapers (on by default). Built on the first user gesture; the toggle ramps its gain.
 - **High Contrast** — brightens icon labels, bolds them, and adds a solid black pill behind each.
 
-In Deviant Mode the menu and its options pick up Detroit language ("DEVIANT PROTOCOLS", "DAMPEN VISUAL FEED", "MUTE AUDITORY INPUT", "AMPLIFY SIGNAL", "OVERRIDES PERSISTED").
+In Deviant Mode the menu and its options pick up Detroit language ("DEVIANT PROTOCOLS", "DAMPEN VISUAL FEED", "ACOUSTIC OUTPUT", "AMBIENT SUBSPACE HUM", "AMPLIFY SIGNAL", "OVERRIDES PERSISTED").
 
 ### Deviant Mode (holistic)
 What started as a Detroit-themed colour flip inside `About.exe` is now a **site-wide narrative state**:
@@ -163,9 +164,9 @@ Open [http://localhost:3000](http://localhost:3000).
 | Key | Purpose |
 |---|---|
 | `kros_booted` (sessionStorage) | Skip boot animation on refresh within the session |
-| `kros_a11y` | `{motionReduced, audioMuted, highContrast}` preferences |
+| `kros_a11y` | `{motionReduced, soundEffects, ambience, highContrast}` preferences |
 | `kros_deviant` | `"1"` if Deviant Mode is on |
-| `kros_experiments` | `{crtShader, bootWebgl, skills3d, starfieldWebgl}` WebGL effect flags (also settable via `?fx=`) |
+| `kros_experiments` | `{crtShader, bootWebgl, starfieldWebgl}` WebGL effect flags (also settable via `?fx=`) |
 
 ---
 
@@ -184,6 +185,7 @@ src/
 │   │   ├── Desktop.tsx              # Desktop shell, window manager, icon grid (with pixel-card styling)
 │   │   ├── DesktopBg.tsx            # Multi-layer canvas (cells / pops / constellations / planets / DSOs / meteors / palette drift) + touch handlers
 │   │   ├── MouseTrail.tsx           # Pixelated cursor trail (motion-aware, disabled on touch)
+│   │   ├── AmbientAudio.tsx         # Synthesized galactic hum (gesture-gated, follows the ambience pref)
 │   │   ├── BootScreen.tsx           # Tap-to-enter splash + Minecraft chunk loader (Web Audio) — desktop only
 │   │   ├── Window.tsx               # Draggable window (motion-aware framer-motion)
 │   │   ├── Taskbar.tsx              # Bottom bar with clock + resume + Deviant toggle + A11Y menu
@@ -231,7 +233,7 @@ src/
 
 ## Audio note
 
-All sound is synthesised on the fly via Web Audio API oscillators — no audio assets in the repo. The browser autoplay policy means audio only works after a user gesture, which is why the boot starts with a tap-to-enter splash. If a returning user skips boot via the `sessionStorage` flag, the first click anywhere on the desktop unlocks audio for the pop sounds. Mute Audio in the Accessibility menu silences everything.
+All sound is synthesised on the fly via Web Audio API oscillators — no audio assets in the repo. This includes the **Galactic Ambience** drone (low detuned oscillators + filtered noise through a slow LFO). The browser autoplay policy means audio only works after a user gesture, which is why the boot starts with a tap-to-enter splash. If a returning user skips boot via the `sessionStorage` flag, the first click anywhere unlocks audio. **Sound Effects** and **Galactic Ambience** in the Accessibility menu (or Settings) toggle each independently.
 
 ---
 

@@ -5,11 +5,13 @@ import dynamic from "next/dynamic";
 import LockScreen from "./mobile/LockScreen";
 import HomeScreen from "./mobile/HomeScreen";
 import AppView from "./mobile/AppView";
+import { useExperiments } from "@/lib/experiments";
 
 /* DesktopBg and MouseTrail are dynamically imported, same pattern as
    Desktop.tsx — keeps SSR happy (both touch window/canvas). */
 const DesktopBg = dynamic(() => import("./DesktopBg"), { ssr: false });
 const MouseTrail = dynamic(() => import("./MouseTrail"), { ssr: false });
+const StarfieldWebgl = dynamic(() => import("@/components/experiments/StarfieldWebgl"), { ssr: false });
 
 type View = "lock" | "home" | "app";
 
@@ -31,6 +33,7 @@ const BOOT_KEY = "kros_booted";
 export default function MobileOS() {
   const [view, setView] = useState<View>("lock");
   const [activeApp, setActiveApp] = useState<string | null>(null);
+  const { starfieldWebgl } = useExperiments();
 
   // Hydration: skip lock if already booted this session
   useEffect(() => {
@@ -86,6 +89,8 @@ export default function MobileOS() {
     >
       {/* Wallpaper — always mounted */}
       <DesktopBg />
+      {/* Cosmic wallpaper covers the 2D sky when enabled (LABS toggle) */}
+      {starfieldWebgl && <StarfieldWebgl />}
       <MouseTrail />
 
       {/* Active view — sits above the wallpaper */}
