@@ -161,6 +161,11 @@ body {
 /* Typewriter */
 @keyframes typewriter { from { width: 0; } to { width: 100%; } }
 @keyframes blink { 50% { border-color: transparent; } }
+/* Minecraft advancement toast slide-in */
+@keyframes toastIn {
+  from { transform: translateY(-12px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
 .typewriter {
   overflow: hidden;
   white-space: nowrap;

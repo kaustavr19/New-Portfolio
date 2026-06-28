@@ -35,8 +35,9 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         {/* OS Shell */}
         <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet" />
-        {/* Minecraft Terminal */}
+        {/* Minecraft Terminal — Press Start 2P for titles, VT323 for readable body */}
         <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet" />
         {/* Detroit: Become Human — futuristic tech */}
         <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet" />
         {/* Cyberpunk 2077 — condensed angular */}

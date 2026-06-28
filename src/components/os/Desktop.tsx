@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { desktopIcons } from "@/data/content";
 import Window from "./Window";
@@ -105,6 +105,16 @@ export default function Desktop() {
       [id]: { isOpen: true, isMinimized: false, zIndex: zCounter },
     }));
   }, []);
+
+  // Let the Terminal (or anything) open an app window via a global event.
+  useEffect(() => {
+    const onOpen = (e: Event) => {
+      const id = (e as CustomEvent<string>).detail;
+      if (desktopIcons.some((ic) => ic.id === id)) openWindow(id);
+    };
+    window.addEventListener("kros:open-app", onOpen);
+    return () => window.removeEventListener("kros:open-app", onOpen);
+  }, [openWindow]);
 
   const closeWindow = useCallback((id: string) => {
     setWindows((prev) => ({
