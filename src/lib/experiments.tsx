@@ -9,9 +9,10 @@ import { createContext, useContext, useEffect, useState, ReactNode, useCallback 
    ALSO hydrates from a `?fx=` URL param so effects can be flipped
    on a preview link without any UI.
 
-   Every flag defaults FALSE — with all off, the app renders byte
-   for byte as it does today. Flags gate lazily-imported effects,
-   so OFF also means the effect's code is never downloaded.
+   Defaults (see DEFAULTS): CRT + WebGL boot ship ON as part of the
+   default OS look; the cosmic starfield is OFF and opt-in via the
+   desktop wallpaper switcher. Flags gate lazily-imported effects,
+   so an OFF flag means that effect's code is never downloaded.
 
    Toggle surfaces:
      · URL    →  ?fx=crt,skills3d   (aliases below)
@@ -31,10 +32,10 @@ type ExperimentsCtx = Experiments & {
 };
 
 const DEFAULTS: Experiments = {
-  crtShader: false,
+  crtShader: true,        // shipped on — part of the default OS look
+  bootWebgl: true,        // shipped on — synthwave cold-boot backdrop
   skills3d: false,
-  bootWebgl: false,
-  starfieldWebgl: false,
+  starfieldWebgl: false,  // opt-in wallpaper — toggled via the desktop switcher
 };
 
 /* Short URL aliases → flag keys. `?fx=crt,skills3d` */
