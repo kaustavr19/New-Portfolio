@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { A11yProvider } from "@/lib/a11y";
 import { DeviantProvider } from "@/lib/deviant";
+import { ExperimentsProvider } from "@/lib/experiments";
 import { useIsMobile } from "@/lib/use-is-mobile";
+import ExperimentLayer from "@/components/experiments/ExperimentLayer";
 
 const BootScreen = dynamic(() => import("@/components/os/BootScreen"), { ssr: false });
 const Desktop = dynamic(() => import("@/components/os/Desktop"), { ssr: false });
@@ -49,18 +51,22 @@ export default function Home() {
      to the Desktop shell, same as before. */
   return (
     <A11yProvider>
-      <DeviantProvider>
-        <div className="fixed inset-0 overflow-hidden">
-          {isMobile ? (
-            <MobileOS />
-          ) : !booted ? (
-            <BootScreen onComplete={handleBootComplete} />
-          ) : (
-            <Desktop />
-          )}
-          <DeviantOverlay />
-        </div>
-      </DeviantProvider>
+      <ExperimentsProvider>
+        <DeviantProvider>
+          <div className="fixed inset-0 overflow-hidden">
+            {isMobile ? (
+              <MobileOS />
+            ) : !booted ? (
+              <BootScreen onComplete={handleBootComplete} />
+            ) : (
+              <Desktop />
+            )}
+            <DeviantOverlay />
+            {/* WebGL experiments — render nothing unless a flag is on */}
+            <ExperimentLayer />
+          </div>
+        </DeviantProvider>
+      </ExperimentsProvider>
     </A11yProvider>
   );
 }

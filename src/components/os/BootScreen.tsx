@@ -1,10 +1,15 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
 import { useA11y } from "@/lib/a11y";
 import { useDeviant } from "@/lib/deviant";
+import { useExperiments } from "@/lib/experiments";
 import { osChrome, osChromeDeviant } from "@/data/content";
+
+// Lazy — only downloads when the bootWebgl experiment is on.
+const BootShaderBg = dynamic(() => import("@/components/experiments/BootShaderBg"), { ssr: false });
 
 /* ──────────────────────────────────────────────────────────
    KR//OS Boot Screen
@@ -62,6 +67,7 @@ const REVEAL_DURATION_MS = 2200;
 export default function BootScreen({ onComplete }: BootScreenProps) {
   const a11y = useA11y();
   const { deviant } = useDeviant();
+  const { bootWebgl } = useExperiments();
   const ch = deviant ? osChromeDeviant : osChrome;
   const STATUS_LINES = ch.bootStatuses;
   const a11yRef = useRef(a11y);
@@ -224,8 +230,8 @@ export default function BootScreen({ onComplete }: BootScreenProps) {
         <motion.div
           className="fixed inset-0 z-50 flex items-center justify-center"
           style={{
-            backgroundColor: "#6f4e2f",
-            backgroundImage: DIRT_BG,
+            backgroundColor: bootWebgl ? "#05060a" : "#6f4e2f",
+            backgroundImage: bootWebgl ? "none" : DIRT_BG,
             backgroundRepeat: "repeat",
             imageRendering: "pixelated",
             fontFamily: "'Press Start 2P', monospace",
@@ -234,6 +240,10 @@ export default function BootScreen({ onComplete }: BootScreenProps) {
           transition={{ duration: 0.4 }}
           onClick={handleTap}
         >
+          {/* WebGL boot backdrop — behind all content, taps fall through */}
+          {bootWebgl && <BootShaderBg />}
+
+          <div className="relative z-10 flex flex-col items-center">
           <AnimatePresence mode="wait">
             {phase === "tap" && (
               <motion.div
@@ -382,6 +392,7 @@ export default function BootScreen({ onComplete }: BootScreenProps) {
               </motion.div>
             )}
           </AnimatePresence>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>

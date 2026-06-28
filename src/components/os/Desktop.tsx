@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import dynamic from "next/dynamic";
 import { desktopIcons } from "@/data/content";
 import Window from "./Window";
 import Taskbar from "./Taskbar";
@@ -9,6 +10,10 @@ import DesktopBg from "./DesktopBg";
 import MouseTrail from "./MouseTrail";
 import { useA11y } from "@/lib/a11y";
 import { useDeviant } from "@/lib/deviant";
+import { useExperiments } from "@/lib/experiments";
+
+// Lazy — only downloads when the starfieldWebgl experiment is on.
+const StarfieldWebgl = dynamic(() => import("@/components/experiments/StarfieldWebgl"), { ssr: false });
 import AboutApp from "@/components/apps/AboutApp";
 import SkillsApp from "@/components/apps/SkillsApp";
 import ProjectsApp from "@/components/apps/ProjectsApp";
@@ -88,6 +93,7 @@ let zCounter = 10;
 export default function Desktop() {
   const { highContrast } = useA11y();
   const { deviant } = useDeviant();
+  const { starfieldWebgl, setFlag } = useExperiments();
   const labelFor = (icon: typeof desktopIcons[number]) => (deviant && icon.deviantLabel) ? icon.deviantLabel : icon.label;
   const [windows, setWindows] = useState<Record<string, WindowState>>({});
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
@@ -160,24 +166,15 @@ export default function Desktop() {
       {/* Pixel animation background */}
       <DesktopBg />
 
+      {/* Experiment: GPU starfield — covers the 2D sky, sits below icons */}
+      {starfieldWebgl && <StarfieldWebgl />}
+
       {/* Centered logo wallpaper */}
       <div
         className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none gap-5"
         style={{ bottom: 48 }}
       >
         <KROSLogo size={340} opacity={0.55} />
-        <div
-          style={{
-            fontFamily: "'Share Tech Mono', monospace",
-            fontSize: 10,
-            color: "rgba(79,195,247,0.3)",
-            letterSpacing: "0.5em",
-            userSelect: "none",
-            textTransform: "uppercase",
-          }}
-        >
-          Double-click an icon to open
-        </div>
       </div>
 
       {/* Desktop icons — constrained above taskbar */}
@@ -273,6 +270,41 @@ export default function Desktop() {
           }}
           onClick={(e) => e.stopPropagation()}
         >
+          {/* Wallpaper switcher */}
+          <div
+            style={{
+              fontFamily: "'Share Tech Mono', monospace",
+              fontSize: 9,
+              color: "rgba(255,255,255,0.35)",
+              letterSpacing: "0.2em",
+              padding: "6px 12px 4px",
+            }}
+          >
+            WALLPAPER
+          </div>
+          {[
+            { id: "classic", label: "Classic Sky", on: !starfieldWebgl },
+            { id: "cosmic", label: "Cosmic", on: starfieldWebgl },
+          ].map((w) => (
+            <button
+              key={w.id}
+              className="w-full flex items-center gap-2 px-3 py-1.5 text-left hover:bg-white/5 transition-colors"
+              style={{
+                fontFamily: "'Share Tech Mono', monospace",
+                fontSize: 10,
+                color: w.on ? "#4fc3f7" : "rgba(255,255,255,0.6)",
+                letterSpacing: "0.05em",
+              }}
+              onClick={() => { setFlag("starfieldWebgl", w.id === "cosmic"); setContextMenu(null); }}
+            >
+              <i className={`hn ${w.on ? "hn-check" : "hn-minus"}`} style={{ width: 12 }} />
+              <span>{w.label}</span>
+            </button>
+          ))}
+
+          {/* Divider */}
+          <div style={{ height: 1, background: "rgba(255,255,255,0.08)", margin: "4px 0" }} />
+
           {desktopIcons.map((icon) => (
             <button
               key={icon.id}
