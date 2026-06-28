@@ -8,8 +8,8 @@ import { useExperiments } from "@/lib/experiments";
 
    Each effect is dynamically imported and rendered ONLY when its
    flag is on, so a visitor with every flag off downloads none of
-   this code. Add future phases (skills3d, bootWebgl, starfield)
-   here the same way.
+   this code. (The boot backdrop and starfield mount in BootScreen /
+   Desktop respectively, since they need a specific z-position.)
    ────────────────────────────────────────────────────────── */
 
 const CrtOverlay = dynamic(() => import("./CrtOverlay"), { ssr: false });

@@ -108,7 +108,7 @@ export default function BootScreen({ onComplete }: BootScreenProps) {
 
   /* ── Audio synthesis (Web Audio API) ── */
   const playPop = useCallback((pitch: number) => {
-    if (a11yRef.current.audioMuted) return;
+    if (!a11yRef.current.soundEffects) return;
     const ctx = audioCtxRef.current;
     if (!ctx) return;
     const now = ctx.currentTime;
@@ -125,7 +125,7 @@ export default function BootScreen({ onComplete }: BootScreenProps) {
   }, []);
 
   const playChime = useCallback(() => {
-    if (a11yRef.current.audioMuted) return;
+    if (!a11yRef.current.soundEffects) return;
     const ctx = audioCtxRef.current;
     if (!ctx) return;
     const now = ctx.currentTime;

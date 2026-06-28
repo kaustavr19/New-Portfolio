@@ -31,8 +31,7 @@ export default function SettingsApp() {
   const experimentToggles: { key: keyof Experiments; label: string; hint: string }[] = [
     { key: "crtShader",      label: "CRT MONITOR",      hint: "Scanlines, vignette & phosphor glow over the whole OS." },
     { key: "bootWebgl",      label: "BOOT SEQUENCE FX",  hint: "Synthwave WebGL backdrop on the next cold boot." },
-    { key: "starfieldWebgl", label: "GPU STARFIELD",     hint: "Replace the desktop sky with a GPU starfield." },
-    { key: "skills3d",       label: "SKILLS · 3D GRAPH", hint: "Orbit your skills as a 3D node network. · SOON" },
+    { key: "starfieldWebgl", label: "GPU STARFIELD",     hint: "Replace the desktop sky with a cosmic GPU wallpaper." },
   ];
 
   // Deviant-aware color tokens — matches About panel + AccessibilityMenu
@@ -41,9 +40,10 @@ export default function SettingsApp() {
     : { accent: "#00e5ff", accentDim: "#00e5ff88", accentFaint: "#00e5ff1a", text: "#4fc3f7", bg: "#020c17", panelBg: "#050e1a", border: "#00e5ff1a", knobOff: "#0d2035" };
 
   const a11yToggles = [
-    { key: "motionReduced" as const, label: ch.reduceMotion,  hint: ch.reduceMotionHint,  value: a11y.motionReduced },
-    { key: "audioMuted"    as const, label: ch.muteAudio,     hint: ch.muteAudioHint,     value: a11y.audioMuted },
-    { key: "highContrast"  as const, label: ch.highContrast,  hint: ch.highContrastHint,  value: a11y.highContrast },
+    { key: "motionReduced" as const, label: ch.reduceMotion,  hint: ch.reduceMotionHint,   value: a11y.motionReduced },
+    { key: "soundEffects"  as const, label: ch.soundEffects,  hint: ch.soundEffectsHint,   value: a11y.soundEffects },
+    { key: "ambience"      as const, label: ch.ambience,      hint: ch.ambienceHint,       value: a11y.ambience },
+    { key: "highContrast"  as const, label: ch.highContrast,  hint: ch.highContrastHint,   value: a11y.highContrast },
   ];
 
   return (

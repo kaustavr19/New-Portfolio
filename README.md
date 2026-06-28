@@ -34,6 +34,7 @@ A game-themed browser OS portfolio built by **Kaustav Roy**, Design Consultant a
 - **Styling** — Tailwind CSS v4
 - **Animation** — Framer Motion (window open/close, boot phases), CSS transitions (maximize/restore)
 - **Canvas** — Custom multi-layer pixel animation (`DesktopBg`)
+- **WebGL / GLSL** — Hand-written fragment shaders via a tiny dependency-free runner (`lib/webgl/shaderQuad.ts`, ~1.5kb) — powers the CRT overlay, synthwave boot backdrop, and the cosmic wallpaper (no Three.js)
 - **Audio** — Web Audio API synthesis (no audio files — square/sine oscillators for boot chimes and pop sounds)
 - **Icons** — [@hackernoon/pixel-icon-library](https://github.com/hackernoon/pixel-icon-library) (pixel-art icon font, CC 4.0)
 - **State** — React Context for global preferences (Accessibility, Deviant Mode) with `localStorage` persistence
@@ -48,6 +49,7 @@ A game-themed browser OS portfolio built by **Kaustav Roy**, Design Consultant a
 - **Tap-to-enter splash** — dirt-tiled background, pulsing `CLICK TO BOOT` CTA. Required to unlock the browser AudioContext (per the autoplay policy).
 - **Minecraft chunk loader** — 24×14 grid of pixel "chunks" revealing from centre outward over ~2.2 s with light noise/jitter for organic feel. Cells are coloured from a curated mix of terrain tones and app theme accents.
 - **Per-chunk audio** — Web Audio synth pops climb in pitch as chunks load (220 Hz → 660 Hz), throttled every 8th chunk. A C-E-G-C arpeggio chime plays on completion.
+- **Synthwave WebGL backdrop (default on)** — behind the loader, a GLSL shader renders a receding neon grid + horizon glow + drifting stars. Toggleable in Settings → LABS (`bootWebgl`); falls back to the dirt-tiled background when off or when WebGL is unavailable.
 - **Skip** with `Space`, `Enter`, or `Escape`.
 - **Skip-on-refresh** — `sessionStorage` flag skips boot for the rest of the tab session; new tabs / incognito replay it.
 - **Deviant-aware copy** — when Deviant Mode is on, the boot title becomes `KR//DEVIANT`, the CTA becomes `BREAK PROTOCOL`, and the status arc shifts to a Detroit voice ("Initializing programming…" → "DEVIANT.").
@@ -65,6 +67,19 @@ A living sky with several layers running on one canvas:
 - **Palette drift** — full palette lerps across deep navy → midnight purple → dawn cyan on a 90 s loop. The KR//OS logo subscribes to the same cycle so the brand mark breathes with the sky.
 - **Deviant palette swap** — when Deviant Mode is on, the entire palette cycle locks to a deviant set (crimson rose → blood red → magenta dusk). Pulses, sky objects, constellations, and the logo all flip with it.
 
+### WebGL effects (LABS)
+
+An opt-in WebGL layer, built so every effect is **flag-gated and lazy-loaded** — an effect's shader code is only downloaded when its flag is on. All effects auto-degrade: no WebGL → the effect renders nothing (original behaviour stays); Reduce Motion → a single static frame (or skips entirely). Flags live in `lib/experiments.tsx` (Context + `localStorage`, sibling of the a11y/deviant providers).
+
+- **CRT monitor (default on)** — a full-screen overlay shader: scanlines, vignette, edge chromatic fringe, grain, and an occasional sparse rolling sync-bar. Sells the "real old monitor" look the OS metaphor reaches for.
+- **Synthwave boot backdrop (default on)** — see Boot sequence above.
+- **Cosmic wallpaper (opt-in)** — an alternate desktop sky rendered entirely on the GPU: sparse parallax stars, restrained drifting nebulae, procedurally-textured solar-system planets (Earth with oceans/continents/clouds, Mars, Jupiter with the Great Red Spot, ringed Saturn), and an Interstellar "Gargantua"-style black hole with a Doppler-brightened accretion disc, photon ring, and **gravitational lensing** that warps the background stars/nebula around it.
+
+**Toggle surfaces** (three views of one truth):
+- **Wallpaper switcher** — right-click the desktop → `WALLPAPER` → Classic Sky (2D canvas) / Cosmic (WebGL). OS-style, persisted.
+- **Settings → LABS** — pill toggles for every effect.
+- **URL params** — `?fx=crt,starfield` to force effects on a link; `?fx=none` clears.
+
 ### Desktop OS shell
 - Draggable, resizable windows with macOS-style traffic-light controls (close / minimise / maximise)
 - **Pixel-card icons** — desktop icons sit on solid dark cards with accent-tinted 1px borders, accent-coloured drop-shadow glow, and 4-direction 1px black outlines on labels for readability against any background state
@@ -73,13 +88,14 @@ A living sky with several layers running on one canvas:
 - Taskbar with live clock, open-app indicators, `RESUME.PDF` download button, Deviant Mode toggle, and the Accessibility menu
 
 ### Accessibility menu
-A taskbar popover (`hn-glasses` icon) with three pill-switch toggles, all persisted in `localStorage`:
+A taskbar popover (`hn-glasses` icon) with four pill-switch toggles, all persisted in `localStorage`:
 
 - **Reduce Motion** — disables wallpaper effects, particles, constellations, sky objects, meteors, mouse trail, and window animations. Auto-respects `prefers-reduced-motion` on first visit. Boot screen skips entirely.
-- **Mute Audio** — silences boot pops/chime and bubble-pop sounds.
+- **Sound Effects** — boot pops/chime, bubble-pop sounds, and UI blips (on by default). On the cosmic wallpaper the bubble-pops are suppressed entirely, since the pixel cells they react to are hidden.
+- **Galactic Ambience** — a very slight synthesized space hum behind both wallpapers (on by default). Built on the first user gesture; the toggle ramps its gain.
 - **High Contrast** — brightens icon labels, bolds them, and adds a solid black pill behind each.
 
-In Deviant Mode the menu and its options pick up Detroit language ("DEVIANT PROTOCOLS", "DAMPEN VISUAL FEED", "MUTE AUDITORY INPUT", "AMPLIFY SIGNAL", "OVERRIDES PERSISTED").
+In Deviant Mode the menu and its options pick up Detroit language ("DEVIANT PROTOCOLS", "DAMPEN VISUAL FEED", "ACOUSTIC OUTPUT", "AMBIENT SUBSPACE HUM", "AMPLIFY SIGNAL", "OVERRIDES PERSISTED").
 
 ### Deviant Mode (holistic)
 What started as a Detroit-themed colour flip inside `About.exe` is now a **site-wide narrative state**:
@@ -148,8 +164,9 @@ Open [http://localhost:3000](http://localhost:3000).
 | Key | Purpose |
 |---|---|
 | `kros_booted` (sessionStorage) | Skip boot animation on refresh within the session |
-| `kros_a11y` | `{motionReduced, audioMuted, highContrast}` preferences |
+| `kros_a11y` | `{motionReduced, soundEffects, ambience, highContrast}` preferences |
 | `kros_deviant` | `"1"` if Deviant Mode is on |
+| `kros_experiments` | `{crtShader, bootWebgl, starfieldWebgl}` WebGL effect flags (also settable via `?fx=`) |
 
 ---
 
@@ -168,6 +185,7 @@ src/
 │   │   ├── Desktop.tsx              # Desktop shell, window manager, icon grid (with pixel-card styling)
 │   │   ├── DesktopBg.tsx            # Multi-layer canvas (cells / pops / constellations / planets / DSOs / meteors / palette drift) + touch handlers
 │   │   ├── MouseTrail.tsx           # Pixelated cursor trail (motion-aware, disabled on touch)
+│   │   ├── AmbientAudio.tsx         # Synthesized galactic hum (gesture-gated, follows the ambience pref)
 │   │   ├── BootScreen.tsx           # Tap-to-enter splash + Minecraft chunk loader (Web Audio) — desktop only
 │   │   ├── Window.tsx               # Draggable window (motion-aware framer-motion)
 │   │   ├── Taskbar.tsx              # Bottom bar with clock + resume + Deviant toggle + A11Y menu
@@ -182,6 +200,11 @@ src/
 │   │       ├── AppView.tsx          # Full-screen app container with back arrow + theme-accented top bar
 │   │       ├── StatusBar.tsx        # iOS-style top bar (time / KR//OS / signal+battery) + safe-area
 │   │       └── HomeIndicator.tsx    # Bottom pill (tap = back to home) + safe-area-inset-bottom
+│   ├── experiments/             # Lazy WebGL effect components (mounted only when flagged)
+│   │   ├── ExperimentLayer.tsx  # Top-level mount point — lazy-renders enabled overlays
+│   │   ├── CrtOverlay.tsx       # Full-screen CRT shader overlay
+│   │   ├── BootShaderBg.tsx     # Synthwave boot backdrop canvas
+│   │   └── StarfieldWebgl.tsx   # Cosmic wallpaper canvas (covers DesktopBg when on)
 │   └── apps/
 │       ├── AboutApp.tsx       # Resume-aligned; desktop 2-col + mobile stacked branches
 │       ├── ProjectsApp.tsx    # Desktop dossier + mobile accordion list
@@ -198,6 +221,10 @@ src/
     ├── palette.ts           # Shared palette drift (normal + deviant palettes)
     ├── a11y.tsx             # Accessibility context, hook, localStorage persistence
     ├── deviant.tsx          # Deviant Mode context, hook, localStorage persistence
+    ├── experiments.tsx      # WebGL effect flags — context + localStorage + ?fx= URL params
+    ├── webgl/
+    │   ├── shaderQuad.ts    # Tiny dependency-free fullscreen fragment-shader runner
+    │   └── shaders/         # GLSL fragment shaders (crt / boot / starfield)
     ├── use-is-mobile.ts     # Viewport-based mobile detection (768px breakpoint, matchMedia)
     └── use-is-touch.ts      # Touch device detection (pointer:fine + ontouchstart)
 ```
@@ -206,7 +233,7 @@ src/
 
 ## Audio note
 
-All sound is synthesised on the fly via Web Audio API oscillators — no audio assets in the repo. The browser autoplay policy means audio only works after a user gesture, which is why the boot starts with a tap-to-enter splash. If a returning user skips boot via the `sessionStorage` flag, the first click anywhere on the desktop unlocks audio for the pop sounds. Mute Audio in the Accessibility menu silences everything.
+All sound is synthesised on the fly via Web Audio API oscillators — no audio assets in the repo. This includes the **Galactic Ambience** drone (low detuned oscillators + filtered noise through a slow LFO). The browser autoplay policy means audio only works after a user gesture, which is why the boot starts with a tap-to-enter splash. If a returning user skips boot via the `sessionStorage` flag, the first click anywhere unlocks audio. **Sound Effects** and **Galactic Ambience** in the Accessibility menu (or Settings) toggle each independently.
 
 ---
 

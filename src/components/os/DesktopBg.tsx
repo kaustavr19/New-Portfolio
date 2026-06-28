@@ -6,6 +6,7 @@ import { PLANETS, DSOS, PlanetName, DsoName, PlanetDef, DsoDef } from "@/data/ce
 import { samplePalette } from "@/lib/palette";
 import { useA11y } from "@/lib/a11y";
 import { useDeviant } from "@/lib/deviant";
+import { useExperiments } from "@/lib/experiments";
 
 /* ──────────────────────────────────────────────────────────
    KR//OS Desktop Background
@@ -88,12 +89,15 @@ export default function DesktopBg() {
   const ref = useRef<HTMLCanvasElement>(null);
   const a11y = useA11y();
   const { deviant } = useDeviant();
+  const { starfieldWebgl } = useExperiments();
 
   // Ref mirrors so the canvas RAF loop sees live values without restarting
   const a11yRef = useRef(a11y);
   const deviantRef = useRef(deviant);
+  const cosmicRef = useRef(starfieldWebgl);
   useEffect(() => { a11yRef.current = a11y; }, [a11y]);
   useEffect(() => { deviantRef.current = deviant; }, [deviant]);
+  useEffect(() => { cosmicRef.current = starfieldWebgl; }, [starfieldWebgl]);
 
   useEffect(() => {
     const canvas = ref.current;
@@ -145,7 +149,9 @@ export default function DesktopBg() {
       if (audioCtx.state === "suspended") audioCtx.resume().catch(() => {});
     };
     const playPop = (intensity: number) => {
-      if (a11yRef.current.audioMuted) return;
+      if (!a11yRef.current.soundEffects) return;
+      // No pop SFX when the cosmic wallpaper covers the pixel cells.
+      if (cosmicRef.current) return;
       if (!audioCtx || audioCtx.state !== "running") return;
       const t = audioCtx.currentTime;
       const osc = audioCtx.createOscillator();
@@ -311,6 +317,8 @@ export default function DesktopBg() {
     /* ── Bubble pop ── */
     const tryPop = (ts: number) => {
       if (mouseX < 0 || grid.length === 0) return;
+      // Cosmic wallpaper covers the pixel cells — no pops (visual or audio).
+      if (cosmicRef.current) return;
       const cellX = Math.floor(mouseX / CELL);
       const cellY = Math.floor(mouseY / CELL);
       const radCells = Math.ceil(POP_RADIUS / CELL);

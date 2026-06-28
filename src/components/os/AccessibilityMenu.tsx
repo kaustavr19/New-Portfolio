@@ -20,8 +20,9 @@ export default function AccessibilityMenu() {
   const { deviant } = useDeviant();
   const ch = deviant ? osChromeDeviant : osChrome;
   const TOGGLES: Toggle[] = [
-    { key: "motionReduced", label: ch.reduceMotion,  hint: ch.reduceMotionHint },
-    { key: "audioMuted",    label: ch.muteAudio,      hint: ch.muteAudioHint },
+    { key: "motionReduced", label: ch.reduceMotion,   hint: ch.reduceMotionHint },
+    { key: "soundEffects",  label: ch.soundEffects,   hint: ch.soundEffectsHint },
+    { key: "ambience",      label: ch.ambience,       hint: ch.ambienceHint },
     { key: "highContrast",  label: ch.highContrast,   hint: ch.highContrastHint },
   ];
   const [open, setOpen] = useState(false);
@@ -49,7 +50,8 @@ export default function AccessibilityMenu() {
     };
   }, [open]);
 
-  const activeCount = [a11y.motionReduced, a11y.audioMuted, a11y.highContrast].filter(Boolean).length;
+  // Count prefs flipped away from their default (motion/contrast on, sound off).
+  const activeCount = [a11y.motionReduced, a11y.highContrast, !a11y.soundEffects, !a11y.ambience].filter(Boolean).length;
 
   return (
     <div className="relative flex-shrink-0">

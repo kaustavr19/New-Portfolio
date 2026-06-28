@@ -10,7 +10,8 @@ import { createContext, useContext, useEffect, useState, ReactNode, useCallback 
 
 export type A11yPrefs = {
   motionReduced: boolean;
-  audioMuted: boolean;
+  soundEffects: boolean;   // pop sounds, boot chimes, UI blips
+  ambience: boolean;       // subtle galactic background hum
   highContrast: boolean;
 };
 
@@ -21,7 +22,8 @@ type A11yCtx = A11yPrefs & {
 
 const DEFAULTS: A11yPrefs = {
   motionReduced: false,
-  audioMuted: false,
+  soundEffects: true,
+  ambience: true,
   highContrast: false,
 };
 
@@ -39,8 +41,13 @@ export function A11yProvider({ children }: { children: ReactNode }) {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
-        const parsed = JSON.parse(raw) as Partial<A11yPrefs>;
+        const parsed = JSON.parse(raw) as Partial<A11yPrefs> & { audioMuted?: boolean };
         next = { ...next, ...parsed };
+        // Migrate the old single `audioMuted` flag → split sound toggles.
+        if (parsed.audioMuted !== undefined && parsed.soundEffects === undefined) {
+          next.soundEffects = !parsed.audioMuted;
+          next.ambience = !parsed.audioMuted;
+        }
       } else if (typeof window !== "undefined" && window.matchMedia) {
         // No user override yet — respect OS preference
         if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {

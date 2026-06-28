@@ -12,6 +12,7 @@ const BootScreen = dynamic(() => import("@/components/os/BootScreen"), { ssr: fa
 const Desktop = dynamic(() => import("@/components/os/Desktop"), { ssr: false });
 const MobileOS = dynamic(() => import("@/components/os/MobileOS"), { ssr: false });
 const DeviantOverlay = dynamic(() => import("@/components/os/DeviantOverlay"), { ssr: false });
+const AmbientAudio = dynamic(() => import("@/components/os/AmbientAudio"), { ssr: false });
 
 const BOOT_KEY = "kros_booted";
 
@@ -64,6 +65,8 @@ export default function Home() {
             <DeviantOverlay />
             {/* WebGL experiments — render nothing unless a flag is on */}
             <ExperimentLayer />
+            {/* Galactic ambient hum (gesture-gated, gain follows the a11y pref) */}
+            <AmbientAudio />
           </div>
         </DeviantProvider>
       </ExperimentsProvider>
