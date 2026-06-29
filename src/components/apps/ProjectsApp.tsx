@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { projects, type Project, type ProjectType, type Medal } from "@/data/content";
+import { projects, type Project, type ProjectType, type Medal, type Objective, type ProjectBlock, type ProjectSection } from "@/data/content";
 import { useIsMobile } from "@/lib/use-is-mobile";
 
 /* GTA V pause-menu type: clean humanist sans (Chalet stand-in) for UI,
@@ -165,6 +165,199 @@ function Section({ accent, title, children }: { accent: string; title: string; c
   );
 }
 
+/* FEATURED ribbon — marks the flagship mission. */
+function FeaturedTag({ accent }: { accent: string }) {
+  return (
+    <span
+      style={{
+        flexShrink: 0,
+        fontFamily: MONO,
+        fontSize: 9,
+        letterSpacing: "0.2em",
+        color: accent,
+        border: `1px solid ${accent}66`,
+        background: `${accent}14`,
+        padding: "3px 8px",
+        marginTop: 4,
+        whiteSpace: "nowrap",
+      }}
+    >
+      ★ FEATURED
+    </span>
+  );
+}
+
+/* INTEL stat strip — GTA V "stats" readout for headline / result numbers. */
+function IntelStats({ stats, accent }: { stats: { value: string; label: string; sub?: string }[]; accent: string }) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {stats.map((s) => (
+        <div
+          key={s.label}
+          style={{
+            flex: "1 1 110px",
+            minWidth: 100,
+            background: "rgba(0,0,0,0.5)",
+            border: "1px solid #ffffff14",
+            padding: "14px 16px",
+          }}
+        >
+          <div style={{ fontFamily: BEBAS, fontSize: 30, color: accent, letterSpacing: "0.03em", lineHeight: 1 }}>
+            {s.value}
+          </div>
+          <div style={{ fontFamily: MONO, fontSize: 9, color: "#ffffff66", letterSpacing: "0.18em", marginTop: 6, textTransform: "uppercase" }}>
+            {s.label}
+          </div>
+          {s.sub && (
+            <div style={{ fontFamily: MONO, fontSize: 8, color: "#ffffff44", letterSpacing: "0.1em", marginTop: 3 }}>
+              {s.sub}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* Three-up "pillars" — Core / Semantic / Component style architecture cards. */
+function Pillars({ items, accent }: { items: { title: string; sub: string }[]; accent: string }) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {items.map((p) => (
+        <div
+          key={p.title}
+          style={{ flex: "1 1 140px", minWidth: 130, background: `${accent}0d`, border: `1px solid ${accent}33`, padding: "16px 18px" }}
+        >
+          <div style={{ fontFamily: BEBAS, fontSize: 20, color: "#fff", letterSpacing: "0.05em", lineHeight: 1 }}>{p.title}</div>
+          <div style={{ fontFamily: MONO, fontSize: 9, color: "#ffffff88", letterSpacing: "0.12em", marginTop: 6, textTransform: "uppercase" }}>{p.sub}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* Research "intel reports" — a labelled finding per stakeholder group. */
+function Findings({ items, accent }: { items: { label: string; text: string }[]; accent: string }) {
+  return (
+    <div className="flex flex-col gap-3">
+      {items.map((f) => (
+        <div key={f.label} style={{ borderLeft: `2px solid ${accent}66`, paddingLeft: 14 }}>
+          <div style={{ fontFamily: MONO, fontSize: 10, color: accent, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 4 }}>{f.label}</div>
+          <div style={{ fontFamily: SANS, fontSize: 15, color: "#cfcfcf", lineHeight: 1.5 }}>{f.text}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* Accent-marker bullet list — deliverables, iterations. */
+function BulletList({ items, accent }: { items: string[]; accent: string }) {
+  return (
+    <div className="flex flex-col gap-2">
+      {items.map((it, i) => (
+        <div key={i} className="flex items-start gap-3">
+          <span style={{ color: accent, fontFamily: MONO, fontSize: 13, lineHeight: 1.5, flexShrink: 0 }}>▸</span>
+          <span style={{ fontFamily: SANS, fontSize: 15, color: "#cfcfcf", lineHeight: 1.5 }}>{it}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* Highlighted callout — THE PROBLEM, SURPRISING INSIGHT, THE BIGGER LEARNING, DEBRIEF. */
+function Callout({ label, text, accent }: { label: string; text: string; accent: string }) {
+  return (
+    <div style={{ background: `${accent}10`, borderLeft: `3px solid ${accent}`, padding: "14px 18px" }}>
+      <div style={{ fontFamily: MONO, fontSize: 10, color: accent, letterSpacing: "0.22em", marginBottom: 6 }}>{label}</div>
+      <p style={{ fontFamily: SANS, fontSize: 15, fontStyle: "italic", color: "#dcdcdc", lineHeight: 1.55 }}>{text}</p>
+    </div>
+  );
+}
+
+/* One dossier block → one styled element. */
+function Block({ block, accent }: { block: ProjectBlock; accent: string }) {
+  switch (block.kind) {
+    case "para":
+      return <p style={{ fontFamily: SANS, fontSize: 15, color: "#cfcfcf", lineHeight: 1.6 }}>{block.text}</p>;
+    case "subhead":
+      return <div style={{ fontFamily: BEBAS, fontSize: 18, color: "#fff", letterSpacing: "0.05em", marginTop: 2 }}>{block.text}</div>;
+    case "callout":
+      return <Callout label={block.label} text={block.text} accent={accent} />;
+    case "stats":
+      return <IntelStats stats={block.items} accent={accent} />;
+    case "pillars":
+      return <Pillars items={block.items} accent={accent} />;
+    case "list":
+      return <BulletList items={block.items} accent={accent} />;
+    case "findings":
+      return <Findings items={block.items} accent={accent} />;
+  }
+}
+
+/* Full dossier — ordered GTA-style heist sections (Setup → Debrief). */
+function Dossier({ sections, accent }: { sections: ProjectSection[]; accent: string }) {
+  return (
+    <div className="flex flex-col gap-7">
+      {sections.map((sec) => (
+        <Section key={sec.title} accent={accent} title={sec.title}>
+          <div className="flex flex-col gap-3.5">
+            {sec.blocks.map((b, i) => (
+              <Block key={i} block={b} accent={accent} />
+            ))}
+          </div>
+        </Section>
+      ))}
+    </div>
+  );
+}
+
+/* CLASSIFIED footer — NDA / available-on-request note. */
+function Classified({ text }: { text: string }) {
+  return (
+    <div className="flex items-start gap-3" style={{ background: "rgba(0,0,0,0.4)", border: "1px dashed #ffffff22", padding: "12px 16px" }}>
+      <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden style={{ flexShrink: 0, marginTop: 1 }}>
+        <rect x="5" y="11" width="14" height="9" rx="1.5" fill="none" stroke="#ffffff88" strokeWidth="1.6" />
+        <path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="#ffffff88" strokeWidth="1.6" />
+      </svg>
+      <span style={{ fontFamily: MONO, fontSize: 11, color: "#ffffff99", letterSpacing: "0.05em", lineHeight: 1.5 }}>{text}</span>
+    </div>
+  );
+}
+
+/* OBJECTIVES — GTA V mission checklist; completed objectives are ticked. */
+function Objectives({ items, accent }: { items: Objective[]; accent: string }) {
+  return (
+    <div className="flex flex-col gap-2.5">
+      {items.map((o, i) => (
+        <div key={i} className="flex items-start gap-3">
+          <span
+            style={{
+              width: 16,
+              height: 16,
+              flexShrink: 0,
+              marginTop: 2,
+              border: `1.5px solid ${o.done ? accent : "#ffffff33"}`,
+              background: o.done ? accent : "transparent",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            {o.done && (
+              <svg width="10" height="10" viewBox="0 0 24 24" aria-hidden>
+                <path d="M5 13l4 4L19 7" fill="none" stroke="#0a0a0a" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            )}
+          </span>
+          <span style={{ fontFamily: SANS, fontSize: 15, color: o.done ? "#d4d4d4" : "#9a9a9a", lineHeight: 1.4 }}>
+            {o.text}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function Tags({ tags, accent }: { tags: string[]; accent: string }) {
   return (
     <div className="flex flex-wrap gap-2">
@@ -275,16 +468,34 @@ export default function ProjectsApp() {
                     <div style={{ fontFamily: SANS, fontSize: 15, fontWeight: 500, color: "#fff", lineHeight: 1.35 }}>
                       {p.tagline}
                     </div>
+                    {p.role && (
+                      <div style={{ fontFamily: MONO, fontSize: 10, color: "#ffffff66", letterSpacing: "0.06em", marginTop: -8 }}>
+                        {p.role}
+                      </div>
+                    )}
                     <StarRating count={p.stars} color={accent} />
                     <MissionResult project={p} accent={accent} />
+                    {p.intel && p.intel.length > 0 && (
+                      <Section accent={accent} title="INTEL">
+                        <IntelStats stats={p.intel} accent={accent} />
+                      </Section>
+                    )}
                     <Section accent={accent} title="MISSION BRIEF">
                       <p style={{ fontFamily: SANS, fontSize: 15, color: "#cfcfcf", lineHeight: 1.55 }}>{p.description}</p>
                     </Section>
+                    {p.objectives && p.objectives.length > 0 && (
+                      <Section accent={accent} title="OBJECTIVES">
+                        <Objectives items={p.objectives} accent={accent} />
+                      </Section>
+                    )}
                     {p.tags.length > 0 && (
                       <Section accent={accent} title="INTEL TAGS">
                         <Tags tags={p.tags} accent={accent} />
                       </Section>
                     )}
+                    {p.dossier && p.dossier.length > 0 && <Dossier sections={p.dossier} accent={accent} />}
+                    {p.debrief && <Callout label="DEBRIEF" text={p.debrief} accent={accent} />}
+                    {p.classified && <Classified text={p.classified} />}
                   </div>
                 )}
               </div>
@@ -348,12 +559,20 @@ export default function ProjectsApp() {
           <div className="flex items-start gap-4" style={{ marginBottom: 28 }}>
             <Blip project={project} active />
             <div className="flex-1 min-w-0">
-              <div style={{ fontFamily: BEBAS, fontSize: 38, color: "#fff", letterSpacing: "0.05em", lineHeight: 0.95 }}>
-                {project.name}
+              <div className="flex items-start justify-between gap-3">
+                <div style={{ fontFamily: BEBAS, fontSize: 38, color: "#fff", letterSpacing: "0.05em", lineHeight: 0.95 }}>
+                  {project.name}
+                </div>
+                {project.featured && <FeaturedTag accent={accent} />}
               </div>
               <div style={{ fontFamily: SANS, fontSize: 16, fontWeight: 500, color: accent, marginTop: 6, letterSpacing: "0.01em" }}>
                 {project.tagline}
               </div>
+              {project.role && (
+                <div style={{ fontFamily: MONO, fontSize: 10, color: "#ffffff66", letterSpacing: "0.08em", marginTop: 8 }}>
+                  {project.role}
+                </div>
+              )}
               <div className="flex items-center gap-4" style={{ marginTop: 12 }}>
                 <StarRating count={project.stars} color={accent} />
                 <span style={{ fontFamily: MONO, fontSize: 10, color: "#ffffff55", letterSpacing: "0.1em" }}>{project.year}</span>
@@ -366,6 +585,15 @@ export default function ProjectsApp() {
             <MissionResult project={project} accent={accent} />
           </div>
 
+          {/* Intel stats */}
+          {project.intel && project.intel.length > 0 && (
+            <div style={{ marginBottom: 28 }}>
+              <Section accent={accent} title="INTEL">
+                <IntelStats stats={project.intel} accent={accent} />
+              </Section>
+            </div>
+          )}
+
           {/* Brief */}
           <div style={{ marginBottom: 28 }}>
             <Section accent={accent} title="MISSION BRIEF">
@@ -373,10 +601,40 @@ export default function ProjectsApp() {
             </Section>
           </div>
 
+          {/* Objectives */}
+          {project.objectives && project.objectives.length > 0 && (
+            <div style={{ marginBottom: 28 }}>
+              <Section accent={accent} title="OBJECTIVES">
+                <Objectives items={project.objectives} accent={accent} />
+              </Section>
+            </div>
+          )}
+
           {/* Tags */}
           <Section accent={accent} title="INTEL TAGS">
             <Tags tags={project.tags} accent={accent} />
           </Section>
+
+          {/* Dossier — full heist-style case study */}
+          {project.dossier && project.dossier.length > 0 && (
+            <div style={{ marginTop: 28 }}>
+              <Dossier sections={project.dossier} accent={accent} />
+            </div>
+          )}
+
+          {/* Debrief (standalone, for missions without a full dossier) */}
+          {project.debrief && (
+            <div style={{ marginTop: 28 }}>
+              <Callout label="DEBRIEF" text={project.debrief} accent={accent} />
+            </div>
+          )}
+
+          {/* Classified — NDA / on-request note */}
+          {project.classified && (
+            <div style={{ marginTop: 28 }}>
+              <Classified text={project.classified} />
+            </div>
+          )}
 
           {/* Other missions in this strand */}
           <div className="mt-auto" style={{ paddingTop: 32 }}>
