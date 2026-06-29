@@ -75,6 +75,16 @@ export default function MobileOS() {
     setView("app");
   };
 
+  // Let the Terminal (or anything) open an app via a global event.
+  useEffect(() => {
+    const onOpen = (e: Event) => {
+      const id = (e as CustomEvent<string>).detail;
+      if (id) handleOpenApp(id);
+    };
+    window.addEventListener("kros:open-app", onOpen);
+    return () => window.removeEventListener("kros:open-app", onOpen);
+  }, []);
+
   const handleBack = () => {
     setView("home");
     // Keep activeApp set briefly so AppView doesn't unmount mid-fade

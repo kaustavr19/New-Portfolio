@@ -3,6 +3,11 @@
 import { useEffect, useState } from "react";
 import { sampleAccent } from "@/lib/palette";
 import { useDeviant } from "@/lib/deviant";
+import { KRMarkPaths } from "./KRMark";
+
+/* Transform that fits the KR monogram into the 240×240 logo box,
+   centred above the //OS divider. (mark is 495.54×407.4) */
+const MARK_TRANSFORM = "translate(64.25, 50) scale(0.225)";
 
 export default function KROSLogo({
   size = 200,
@@ -111,40 +116,20 @@ export default function KROSLogo({
         </g>
       )}
 
-      {/* KR — main wordmark with optional glitch slice */}
+      {/* KR — custom monogram, colour-driven by the palette accent */}
       <g>
-        <text
-          x="120"
-          y="134"
-          textAnchor="middle"
-          fill={accent}
-          fontFamily="'Orbitron', monospace"
-          fontSize="80"
-          fontWeight="700"
-          filter="url(#kros-glow)"
-          letterSpacing="-2"
-        >
-          KR
-        </text>
+        <g transform={MARK_TRANSFORM} filter="url(#kros-glow)">
+          <KRMarkPaths fill={accent} />
+        </g>
         {/* Glitch slice overlay — only renders when glitchY is set */}
         {glitchY !== null && (
           <g transform={`translate(${Math.random() < 0.5 ? -3 : 3}, 0)`} opacity="0.6">
             <clipPath id="kros-glitch-clip">
               <rect x="40" y={glitchY} width="160" height="8" />
             </clipPath>
-            <text
-              x="120"
-              y="134"
-              textAnchor="middle"
-              fill="#ff3c8c"
-              fontFamily="'Orbitron', monospace"
-              fontSize="80"
-              fontWeight="700"
-              letterSpacing="-2"
-              clipPath="url(#kros-glitch-clip)"
-            >
-              KR
-            </text>
+            <g transform={MARK_TRANSFORM} clipPath="url(#kros-glitch-clip)">
+              <KRMarkPaths fill="#ff3c8c" />
+            </g>
           </g>
         )}
       </g>

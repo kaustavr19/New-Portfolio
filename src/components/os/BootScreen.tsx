@@ -8,6 +8,8 @@ import { useDeviant } from "@/lib/deviant";
 import { useExperiments } from "@/lib/experiments";
 import { osChrome, osChromeDeviant } from "@/data/content";
 
+import KRMark from "./KRMark";
+
 // Lazy — only downloads when the bootWebgl experiment is on.
 const BootShaderBg = dynamic(() => import("@/components/experiments/BootShaderBg"), { ssr: false });
 
@@ -267,8 +269,9 @@ export default function BootScreen({ onComplete }: BootScreenProps) {
                     marginBottom: 28,
                   }}
                 />
-                <div style={{ color: "#fff", fontSize: 28, letterSpacing: "0.1em", textShadow: "3px 3px 0 #000", marginBottom: 12 }}>
-                  {deviant ? "KR//DEVIANT" : "KR//OS"}
+                <div className="flex items-center justify-center" style={{ gap: 7, color: "#fff", fontSize: 28, letterSpacing: "0.1em", textShadow: "3px 3px 0 #000", marginBottom: 12 }}>
+                  <KRMark height={28} color="#fff" />
+                  <span>{deviant ? "//DEVIANT" : "//OS"}</span>
                 </div>
                 <div style={{ color: "#ddd", fontSize: 9, letterSpacing: "0.2em", textShadow: "2px 2px 0 #000", marginBottom: 36 }}>
                   {ch.bootSubtitle}
