@@ -300,6 +300,19 @@ export const experience = chapters.flatMap((c) =>
 export type ProjectType = "main" | "side";
 export type Medal = "gold" | "silver" | "bronze";
 
+/* Block-based dossier — long-form case-study content rendered as
+   GTA-V "heist" sections. Each block kind maps to one styled element. */
+export type ProjectBlock =
+  | { kind: "para"; text: string }
+  | { kind: "subhead"; text: string }
+  | { kind: "callout"; label: string; text: string }
+  | { kind: "stats"; items: { value: string; label: string; sub?: string }[] }
+  | { kind: "pillars"; items: { title: string; sub: string }[] }
+  | { kind: "list"; items: string[] }
+  | { kind: "findings"; items: { label: string; text: string }[] };
+
+export type ProjectSection = { title: string; blocks: ProjectBlock[] };
+
 export type Project = {
   id: string;
   name: string;
@@ -312,10 +325,184 @@ export type Project = {
   type: ProjectType;
   completion: number;
   medal?: Medal;
+  /* Optional expanded-brief content — rendered as GTA-style sections
+     (header subtitle, stat strip, objectives checklist, dossier, NDA note). */
+  role?: string;
+  featured?: boolean;
+  intel?: { value: string; label: string }[];
+  objectives?: Objective[];
+  dossier?: ProjectSection[];
+  debrief?: string;
+  classified?: string;
 };
 
 export const projects: Project[] = [
-  /* ── MAIN MISSIONS — work (placeholders, fill in later) ── */
+  /* ── MAIN MISSIONS — work ── */
+  {
+    id: "cogentiq-dls",
+    name: "Cogentiq Design Language",
+    tagline: "One language. Ten products.",
+    role: "Fractal Analytics · May–Nov 2025 · Design Lead, Systems & Governance",
+    featured: true,
+    description:
+      "Unified 10+ Cogentiq enterprise AI products under one design language system — 173 tokens, 42 components — enabling faster feature velocity, consistent UX, and shared governance across 6 designers and 10+ products.",
+    status: "SHIPPED",
+    stars: 5,
+    tags: ["Design Systems", "Design Tokens", "Governance", "Enterprise AI"],
+    year: "2025",
+    type: "main",
+    completion: 100,
+    medal: "gold",
+    intel: [
+      { value: "173", label: "Design tokens" },
+      { value: "42", label: "Components" },
+      { value: "10+", label: "Products unified" },
+      { value: "6", label: "Designers" },
+    ],
+    objectives: [
+      { text: "Stakeholder interviews — design, dev & leadership", done: true },
+      { text: "Cross-product audit of all pattern variants", done: true },
+      { text: "Token architecture: Core → Semantic → Component", done: true },
+      { text: "Component library: 31 base + 11 agentic-specific", done: true },
+      { text: "Governance model for system evolution", done: true },
+    ],
+    dossier: [
+      {
+        title: "THE SETUP",
+        blocks: [
+          {
+            kind: "para",
+            text: "Fractal's Cogentiq platform is a suite of 10+ interconnected enterprise AI products serving hundreds of organisations. By mid-2025 the design ecosystem had fragmented — every product team had evolved its own patterns. Buttons looked slightly different. Colour systems didn't align. Typography varied. Developers received ambiguous handoffs, and designers spent cycles recreating components instead of solving user problems.",
+          },
+          {
+            kind: "callout",
+            label: "THE PROBLEM",
+            text: "Fragmentation had real impact: slower feature velocity, inconsistent user experience, duplicated effort, and design debt accumulating faster than it could be addressed.",
+          },
+          {
+            kind: "para",
+            text: "Leadership assigned us to build a unified design language system that could scale with the organisation and guide hundreds of designers and developers.",
+          },
+        ],
+      },
+      {
+        title: "RECON",
+        blocks: [
+          {
+            kind: "para",
+            text: "Rather than imposing a system top-down, we started by understanding the problem from the inside — stakeholder interviews with product designers, developers, and engineering leaders across Fractal's Cogentiq division.",
+          },
+          {
+            kind: "findings",
+            items: [
+              { label: "Design", text: "Designers wanted a shared language to speed up work and focus on real problems." },
+              { label: "Development", text: "Without token documentation, developers made assumptions about colour, spacing, and behaviour." },
+              { label: "Leadership", text: "The organisation needed governance — who decides what's system-worthy?" },
+            ],
+          },
+          {
+            kind: "callout",
+            label: "SURPRISING INSIGHT",
+            text: "Designers actually wanted constraints. Constraints forced creativity on the problems that mattered; freedom on trivial choices felt like cognitive overhead. This shaped our entire approach.",
+          },
+        ],
+      },
+      {
+        title: "THE APPROACH",
+        blocks: [
+          { kind: "subhead", text: "Starting with an audit" },
+          {
+            kind: "para",
+            text: "We audited patterns across all 10+ products — every button, input, card, and modal variation. We found dozens of 'almost identical but slightly different' components that had evolved in isolation. That audit grounded us in reality and became our foundation.",
+          },
+          { kind: "subhead", text: "Token-first architecture" },
+          {
+            kind: "para",
+            text: "Start with tokens, not components. Tokens are the grammar of a design system — get the structure right and components follow naturally.",
+          },
+          {
+            kind: "pillars",
+            items: [
+              { title: "Core", sub: "173 primitive tokens" },
+              { title: "Semantic", sub: "Purpose-mapped aliases" },
+              { title: "Component", sub: "Consumed by each component" },
+            ],
+          },
+          { kind: "subhead", text: "Iterations" },
+          {
+            kind: "list",
+            items: [
+              "Colour tokens: pruned from 200+ → 50 with consistent naming conventions",
+              "Typography: simplified from 12 styles → 6 core scales",
+              "Components: 31 base + 11 agentic-specific patterns",
+            ],
+          },
+          { kind: "subhead", text: "Governance layer" },
+          {
+            kind: "para",
+            text: "Teams could request new components; the design-system team reviewed them. If something was truly new — not a variant — it shipped. This prevented chaos while staying flexible.",
+          },
+        ],
+      },
+      {
+        title: "THE SCORE",
+        blocks: [
+          {
+            kind: "list",
+            items: [
+              "173 design tokens across 7 core element categories",
+              "31 base components + 11 agentic-specific components",
+              "Accessibility guidelines covering WCAG standards",
+              "White-labelling specifications",
+              "Figma component library with full documentation",
+            ],
+          },
+        ],
+      },
+      {
+        title: "THE TAKE",
+        blocks: [
+          {
+            kind: "stats",
+            items: [
+              { value: "10+", label: "Products on system", sub: "within 6 months" },
+              { value: "~10%", label: "Pattern variance", sub: "down from ~40%" },
+              { value: "20–30%", label: "Faster feature build" },
+            ],
+          },
+          {
+            kind: "para",
+            text: "Designers could focus on real problems. Developers knew exactly which token to use. Design critiques became about strategy, not debate.",
+          },
+        ],
+      },
+      {
+        title: "DEBRIEF",
+        blocks: [
+          {
+            kind: "para",
+            text: "This project taught me that design systems aren't really about design — they're about governance, change management, and how organisations work.",
+          },
+          { kind: "subhead", text: "What I'd do differently" },
+          {
+            kind: "list",
+            items: [
+              "Earlier accessibility involvement — token decisions have accessibility implications; specialists belong at the start, not the end.",
+              "Metrics from day one — component usage, design-to-dev time, and consistency scores should drive evolution decisions.",
+              "Customer feedback — interview actual Cogentiq users; are the patterns intuitive to them?",
+            ],
+          },
+          {
+            kind: "callout",
+            label: "THE BIGGER LEARNING",
+            text: "Building a design system requires research rigour beyond typical design. You're designing for designers and developers as users — different research, different metrics, different success measures. Systems design is still underexplored territory.",
+          },
+        ],
+      },
+    ],
+    classified:
+      "Figma component library and full documentation available on request — NDA applies to final screens.",
+  },
   {
     id: "underwriting",
     name: "Operation Underwriting",
