@@ -187,10 +187,12 @@ export default function Desktop() {
         <KROSLogo size={340} opacity={0.55} />
       </div>
 
-      {/* Desktop icons — constrained above taskbar */}
+      {/* Desktop icons — bounded above the taskbar; overflow wraps into
+          the next column instead of hiding behind it (deviant labels are
+          longer and wrap to two lines, so the column grows taller). */}
       <div
-        className="absolute top-6 left-6 flex flex-col gap-4"
-        style={{ paddingTop: 8, paddingBottom: 8 }}
+        className="absolute top-6 left-6 flex flex-col flex-wrap content-start gap-x-4 gap-y-4"
+        style={{ paddingTop: 8, paddingBottom: 8, bottom: 64 }}
       >
         {desktopIcons.map((icon) => {
           const accent = themeAccent[icon.theme] ?? "#e0e0e8";
@@ -236,7 +238,8 @@ export default function Desktop() {
                   textShadow: isOpen
                     ? `1px 1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000, 0 0 10px ${accent}`
                     : `1px 1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000, 0 0 6px ${accent}66`,
-                  wordBreak: "break-all",
+                  overflowWrap: "break-word",
+                  hyphens: "auto",
                   maxWidth: 84,
                   // High contrast: opaque pill behind label
                   background: highContrast ? "rgba(0, 0, 0, 0.85)" : "transparent",
