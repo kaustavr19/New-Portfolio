@@ -339,11 +339,244 @@ export type Project = {
 export const projects: Project[] = [
   /* ── MAIN MISSIONS — work ── */
   {
+    id: "underwriting",
+    name: "Operation Underwriting",
+    tagline: "Judgment, not automation. Boring, on purpose.",
+    role: "Fractal Analytics · Dec 2025–Present · Design Lead (sole owner since May 2026)",
+    featured: true,
+    description:
+      "AI-assisted underwriting platform for small commercial P&C risk — four independently deployable modules, a self-learning agent that never auto-applies a change, and zero binary approve/decline calls.",
+    status: "IN PROGRESS",
+    stars: 5,
+    tags: ["Enterprise AI", "Insurance UX", "Human-in-the-Loop", "Design for AI"],
+    year: "2025–Present",
+    type: "main",
+    completion: 65,
+    intel: [
+      { value: "4", label: "Modules, each deployable solo" },
+      { value: "3", label: "Personas: prep, decide, audit" },
+      { value: "0", label: "Rule changes applied without human approval" },
+      { value: "1", label: "Designer, sole owner since May" },
+    ],
+    objectives: [
+      { text: "Map three personas — Priya (prep), Sarah (decide), James (audit)", done: true },
+      { text: "Data Triage, Rule Engine & QA shipped to sales/demo build", done: true },
+      { text: "Three Rule Engine experiences locked (negative triggers, subjective reasoning, Copilot)", done: true },
+      { text: "AgentEvolve — human-approval learning loop for rule changes", done: true },
+      { text: "Performance dashboard + Case Studio synthetic data generator", done: true },
+      { text: "Human-in-the-loop interface — pending touchpoint audit", done: false },
+      { text: "Copilot widgets repository — gated behind real backend data", done: false },
+    ],
+    dossier: [
+      {
+        title: "THE SETUP",
+        blocks: [
+          {
+            kind: "para",
+            text: "Cogentiq Underwriting is an AI-assisted platform for commercial property and casualty underwriting, built to sit above a carrier's existing systems and integrate in weeks instead of quarters. It targets small commercial risk — general liability, commercial auto, workers' comp, businesses under roughly $5M in revenue — a segment too varied for pure automation and too high-volume for the manual attention larger accounts get.",
+          },
+          {
+            kind: "callout",
+            label: "THE PROBLEM",
+            text: "Underwriters in this segment spend most of a day not underwriting — untangling documents, cross-checking the same fields across five or six sources, re-verifying rules they already know. Three earlier fixes had already failed: more data didn't help because the problem was never a shortage of it, it was synthesis. Straight-through rule engines didn't help because uniform logic can't handle a risk that's approvable \"with conditions.\" Task automation sped up individual steps but left the judgment buried in files nobody had time to read closely.",
+          },
+          {
+            kind: "para",
+            text: "The job was to design a system that could reason across a submission the way an experienced underwriter does — without pretending it could replace that underwriter's authority.",
+          },
+        ],
+      },
+      {
+        title: "THE CREW",
+        blocks: [
+          {
+            kind: "para",
+            text: "Before any screen got designed, three personas — not the usual composite-sketch kind. They map to three distinct jobs that get conflated in most underwriting software: preparing data, deciding on it, and auditing the decision afterward.",
+          },
+          {
+            kind: "pillars",
+            items: [
+              { title: "Priya", sub: "Reconciles intake — 3+ hrs per submission cross-checking documents. Her job is to hand off a clean file, not decide anything." },
+              { title: "Sarah", sub: "Makes the call. Her frustration wasn't complexity, it was a binary system that forced APPROVE or DECLINE on decisions that were neither." },
+              { title: "James", sub: "Audits after the fact. His real problem was a broken feedback loop — a rule fix took three to six months to land." },
+            ],
+          },
+          {
+            kind: "callout",
+            label: "THE INSIGHT",
+            text: "Underwriters don't distrust AI because it's AI. They distrust systems that force nuance into a binary outcome. A tool built on APPROVE/DECLINE was never going to earn trust from someone with eight years of experience making conditional calls.",
+          },
+          {
+            kind: "para",
+            text: "One recurring scenario pressure-tested every module as it got built: a property submission where the ACORD and SOV both claim full sprinkler coverage, the inspection shows 65–70 percent, there's no upgrade proof, and the inspection itself is 22 months old. A scenario that only works in one module isn't a real design.",
+          },
+        ],
+      },
+      {
+        title: "THE APPROACH",
+        blocks: [
+          { kind: "subhead", text: "Designing for eyeballing, not exploration" },
+          {
+            kind: "para",
+            text: "The hardest constraint wasn't technical — it was resisting the urge to build something impressive. Underwriters have a mental model built over years on legacy systems; the instinct on an AI project is to build something that looks new. Every module was designed around eyeballing a case in under thirty seconds and making a fast, confident call, because that's how the job already works.",
+          },
+          {
+            kind: "list",
+            items: [
+              "QA's case view puts risk posture above the fold — no scrolling required to decide if a case needs attention",
+              "Rule Engine shows only the rules a flagged issue actually touches, not the full rule universe",
+              "Visual language reused the Cogentiq Design Language System instead of inventing a new one — familiarity as the feature, not novelty",
+            ],
+          },
+          { kind: "subhead", text: "Module boundaries as a design law" },
+          {
+            kind: "para",
+            text: "A screen can summarize another module's content and link out to it, but it can never reproduce it. Data Triage surfaces a conflict but doesn't own the disposition — that's Rule Engine territory, even when it would be faster to just show a decision status. Every shortcut that blurred a boundary became a data model problem two modules downstream.",
+          },
+          {
+            kind: "callout",
+            label: "THE PAYOFF",
+            text: "A carrier can adopt Data Triage without touching decisioning, or run QA against a rules engine they already trust. That flexibility wasn't an original goal — it was a side effect of holding the boundary. It's now one of the platform's stronger selling points with other carriers.",
+          },
+        ],
+      },
+      {
+        title: "THE RULES",
+        blocks: [
+          {
+            kind: "para",
+            text: "The Rule Engine resolved into three distinct experiences — getting them to feel like one coherent module while behaving completely differently took several rounds of argument.",
+          },
+          {
+            kind: "findings",
+            items: [
+              { label: "Negative triggers", text: "Pre-programmed and explainable. The underwriter's real task is capturing a rationale for the override, not re-evaluating the rule. No bulk action — every override earns its own reasoning." },
+              { label: "Subjective reasoning", text: "Built around data the rules never see — documents outside the standard fields, escalated triage items. Capped at two or three vertical blocks so it can't turn into the open-ended data dump the eyeballing principle rules out." },
+              { label: "Copilot", text: "Explains, drafts, and highlights risk — but can never invent a rule or an outcome. Getting it to say \"I don't have evidence for that\" instead of guessing is harder to design than making it sound smart." },
+            ],
+          },
+        ],
+      },
+      {
+        title: "THE MEMORY",
+        blocks: [
+          {
+            kind: "para",
+            text: "AgentEvolve is the layer that lets the Rule Engine improve over time, built around one guardrail that wasn't negotiable: rule output never changes automatically.",
+          },
+          {
+            kind: "list",
+            items: [
+              "Every override logs the case, the engine's original output, and the underwriter's actual decision as a scenario",
+              "A pattern that recurs gets proposed back to a reviewer, with every case behind it",
+              "Nothing reaches the agent's working playbook until a human approves it",
+              "A separate health check retires stale or duplicate patterns on its own schedule, so the playbook stays current",
+            ],
+          },
+          {
+            kind: "callout",
+            label: "WHY IT MATTERS",
+            text: "The distinction sounds small in a diagram and is enormous in practice: the difference between a system that learns from underwriters and one that quietly starts deciding for them.",
+          },
+        ],
+      },
+      {
+        title: "THE INTEL",
+        blocks: [
+          {
+            kind: "para",
+            text: "Once the core modules were running, the next problem was making the platform's own performance legible to the people using it — which meant separating two kinds of metrics that kept getting talked about as one thing.",
+          },
+          {
+            kind: "findings",
+            items: [
+              { label: "Technical metrics", text: "Throughput, latency, error rate — tracked at submission, module, and agent level. Originally meant to replace an internal dashboard nobody actually used." },
+              { label: "Functional metrics", text: "Flags raised, override rates, escalation rates — speaks to underwriters who have no reason to know what model throughput means." },
+            ],
+          },
+          {
+            kind: "para",
+            text: "One dashboard for everyone didn't survive contact with actual users. Solving it meant applying the same lane discipline already built into the Copilot: different roles see different views of the same underlying data, rather than one dense screen everyone has to learn to filter.",
+          },
+          {
+            kind: "callout",
+            label: "VOCABULARY AS A DESIGN SURFACE",
+            text: "\"Override\" already meant something specific inside the Rule Engine, so it had to be renamed in the performance dashboard. A minor fix, but a sign of the discipline running through the whole platform — letting the same word mean two things in two modules is exactly the kind of small inconsistency that erodes trust in a system built to earn it.",
+          },
+          { kind: "subhead", text: "Case Studio" },
+          {
+            kind: "para",
+            text: "A scenario and synthetic data generator that lets a client, or anyone evaluating the platform, run real cases through Data Triage, the Rule Engine, and QA without touching a single piece of protected data. Proving a reasoning system actually reasons requires showing it work on something specific — but the specific submissions that would prove it best are exactly the ones a carrier can't hand over before a contract exists. Case Studio lets a prospect watch the platform handle a genuinely hard case, sprinkler mismatch and all, on day one of evaluation instead of month three.",
+          },
+        ],
+      },
+      {
+        title: "THE SCORE",
+        blocks: [
+          {
+            kind: "para",
+            text: "Broker pack in, API-ready output out. A submission arrives, Data Triage reconciles it into a decision-grade file, the Rule Engine turns flagged issues into an explainable decision, QA reconstructs the lineage and builds the scrutiny list, and the result ships as a structured payload a carrier's own systems can consume. The Copilot sits underneath all of it, pulling from the same data warehouse that feeds AgentEvolve.",
+          },
+          {
+            kind: "callout",
+            label: "STATUS",
+            text: "Data Triage, Rule Engine, and QA are built and running in the sales and demo version. V1 of the broader platform is in progress.",
+          },
+          {
+            kind: "list",
+            items: [
+              "Agent and pipeline configuration",
+              "A human-in-the-loop interface — needs an audit of existing touchpoints before it can be designed responsibly",
+              "A widgets repository for the Copilot, gated behind real backend data — a widget full of placeholder numbers was called out early as actively dangerous to ship",
+              "One open interaction problem: rows in the Data Triage grid can carry both a reconciliation verdict and a manual rule verdict, and how a resolved row should collapse without losing density is still unsettled",
+            ],
+          },
+        ],
+      },
+      {
+        title: "THE TAKE",
+        blocks: [
+          {
+            kind: "para",
+            text: "There's no downtime number for this yet — nothing's live in front of an underwriter's queue, so there's no adoption curve to point to. What exists instead is a different kind of evidence.",
+          },
+          {
+            kind: "stats",
+            items: [
+              { value: "Feb 12", label: "Rule Engine's three experiences locked" },
+              { value: "Feb 19", label: "QA's five-check structure & IA settled" },
+              { value: "2→1", label: "Team shrank to solo, decisions kept shipping on schedule" },
+            ],
+          },
+          {
+            kind: "para",
+            text: "Four modules, three personas, a learning agent, a metrics layer, and a synthetic data generator — all built to run independently. That's not a KPI in the usual sense, but stated as a count it tells you how much system got built by a team that shrank to one person halfway through. The platform is now in active discussion with carriers beyond the first client, largely on the strength of module independence — a side effect of holding a boundary that was inconvenient to hold in the moment.",
+          },
+        ],
+      },
+      {
+        title: "DEBRIEF",
+        blocks: [
+          {
+            kind: "para",
+            text: "The shift from a two-person team to sole ownership on May 16 changed more than the workload. With a partner, contested calls got argued out loud before they shipped — that argument was doing real work even when it felt like friction. Solo, that friction had to get built into the process deliberately, mostly by writing out the case for a decision before committing to it, the same way it would've had to be defended to a collaborator.",
+          },
+          {
+            kind: "callout",
+            label: "THE BIGGER LEARNING",
+            text: "A design system asks how consistent an interface can be. This asked how much authority an interface can responsibly claim — and how to design restraint into an assistant, a learning agent, and even a metrics dashboard convincingly enough that an underwriter with eight years of experience would trust it over their own instinct. The test for every feature: does this help the underwriter decide faster, or does it just look intelligent doing it?",
+          },
+        ],
+      },
+    ],
+    classified:
+      "Client identity and product screens withheld under NDA — full platform walkthrough and case-study detail available on request.",
+  },
+  {
     id: "cogentiq-dls",
     name: "Cogentiq Design Language",
     tagline: "One language. Ten products.",
     role: "Fractal Analytics · May–Nov 2025 · Design Lead, Systems & Governance",
-    featured: true,
     description:
       "Unified 10+ Cogentiq enterprise AI products under one design language system — 173 tokens, 42 components — enabling faster feature velocity, consistent UX, and shared governance across 6 designers and 10+ products.",
     status: "SHIPPED",
@@ -502,20 +735,6 @@ export const projects: Project[] = [
     ],
     classified:
       "Figma component library and full documentation available on request — NDA applies to final screens.",
-  },
-  {
-    id: "underwriting",
-    name: "Operation Underwriting",
-    tagline: "Real money, real stakes",
-    description:
-      "[PLACEHOLDER] Enterprise AI for insurance underwriting at Fractal. Dragged the screens out of the Windows-98 era and made human-in-the-loop decisions legible. Swap in the real brief later.",
-    status: "IN PROGRESS",
-    stars: 5,
-    tags: ["Enterprise UX", "Design for AI", "Human-in-the-Loop"],
-    year: "2023–Present",
-    type: "main",
-    completion: 80,
-    medal: "gold",
   },
   {
     id: "classified-a",

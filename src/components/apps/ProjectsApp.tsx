@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { projects, type Project, type ProjectType, type Medal, type Objective, type ProjectBlock, type ProjectSection } from "@/data/content";
 import { useIsMobile } from "@/lib/use-is-mobile";
 
@@ -9,6 +9,10 @@ import { useIsMobile } from "@/lib/use-is-mobile";
 const BEBAS = "'Bebas Neue', cursive";
 const MONO = "'Share Tech Mono', monospace";
 const SANS = "'Rajdhani', sans-serif";
+/* Declassify view uses the OS's native reading font — plain, high-legibility,
+   and no extra webfont load, unlike the HUD's condensed/decorative type. */
+const READER_SANS =
+  "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
 
 /* Per-category accent — GTA V codes identity by colour.
    Main missions (work) = Franklin green. Side missions = Trevor orange. */
@@ -311,6 +315,137 @@ function Dossier({ sections, accent }: { sections: ProjectSection[]; accent: str
   );
 }
 
+/* Persisted "declassify view" preference — plain-reader dossiers, global across missions. */
+const DECLASSIFY_KEY = "kr-os-declassify-view";
+function useDeclassifyMode(): [boolean, () => void] {
+  const [on, setOn] = useState(false);
+  useEffect(() => {
+    setOn(localStorage.getItem(DECLASSIFY_KEY) === "1");
+  }, []);
+  function toggle() {
+    setOn((prev) => {
+      const next = !prev;
+      localStorage.setItem(DECLASSIFY_KEY, next ? "1" : "0");
+      return next;
+    });
+  }
+  return [on, toggle];
+}
+
+/* DECLASSIFY VIEW toggle — swaps the HUD-styled dossier for a plain-reader one. */
+function DeclassifyToggle({ on, toggle, accent }: { on: boolean; toggle: () => void; accent: string }) {
+  return (
+    <button
+      onClick={toggle}
+      className="transition-colors"
+      style={{
+        flexShrink: 0,
+        fontFamily: MONO,
+        fontSize: 9,
+        letterSpacing: "0.18em",
+        color: on ? "#0a0a0a" : accent,
+        background: on ? accent : `${accent}14`,
+        border: `1px solid ${accent}66`,
+        padding: "5px 10px",
+        marginTop: 4,
+        cursor: "pointer",
+        whiteSpace: "nowrap",
+      }}
+    >
+      {on ? "◉ DECLASSIFIED" : "○ DECLASSIFY VIEW"}
+    </button>
+  );
+}
+
+/* Plain-reader block — same data as Block(), rendered as ordinary prose in the OS's native sans. */
+function ReaderBlock({ block }: { block: ProjectBlock }) {
+  switch (block.kind) {
+    case "para":
+      return <p style={{ fontFamily: READER_SANS, fontSize: 17, color: "#dcdcdc", lineHeight: 1.75 }}>{block.text}</p>;
+    case "subhead":
+      return <h4 style={{ fontFamily: READER_SANS, fontWeight: 600, fontSize: 18, color: "#fff", marginTop: 6 }}>{block.text}</h4>;
+    case "callout":
+      return (
+        <blockquote style={{ borderLeft: "2px solid #ffffff33", paddingLeft: 16 }}>
+          <div style={{ fontFamily: MONO, fontSize: 11, fontWeight: 600, color: "#ffffff77", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 5 }}>
+            {block.label}
+          </div>
+          <p style={{ fontFamily: READER_SANS, fontSize: 17, color: "#e2e2e2", lineHeight: 1.7 }}>{block.text}</p>
+        </blockquote>
+      );
+    case "stats":
+      return (
+        <p style={{ fontFamily: READER_SANS, fontSize: 16, color: "#cfcfcf", lineHeight: 1.9 }}>
+          {block.items.map((s, i) => (
+            <span key={s.label}>
+              <strong style={{ color: "#fff" }}>{s.value}</strong> {s.label}
+              {i < block.items.length - 1 ? "  ·  " : ""}
+            </span>
+          ))}
+        </p>
+      );
+    case "pillars":
+      return (
+        <ul style={{ fontFamily: READER_SANS, fontSize: 16, color: "#cfcfcf", lineHeight: 1.8, paddingLeft: 22 }}>
+          {block.items.map((p) => (
+            <li key={p.title}>
+              <strong style={{ color: "#fff" }}>{p.title}</strong> — {p.sub}
+            </li>
+          ))}
+        </ul>
+      );
+    case "list":
+      return (
+        <ul style={{ fontFamily: READER_SANS, fontSize: 16, color: "#cfcfcf", lineHeight: 1.8, paddingLeft: 22 }}>
+          {block.items.map((it, i) => (
+            <li key={i}>{it}</li>
+          ))}
+        </ul>
+      );
+    case "findings":
+      return (
+        <div className="flex flex-col gap-2.5">
+          {block.items.map((f) => (
+            <p key={f.label} style={{ fontFamily: READER_SANS, fontSize: 16, color: "#cfcfcf", lineHeight: 1.75 }}>
+              <strong style={{ color: "#fff" }}>{f.label}.</strong> {f.text}
+            </p>
+          ))}
+        </div>
+      );
+  }
+}
+
+/* Plain-reader dossier — same sections, ordinary article layout instead of HUD panels.
+   Section labels stay in the mono HUD type for structural contrast against the serif body. */
+function ReaderDossier({ sections }: { sections: ProjectSection[] }) {
+  return (
+    <div className="flex flex-col gap-8" style={{ maxWidth: 680 }}>
+      {sections.map((sec) => (
+        <div key={sec.title}>
+          <h3
+            style={{
+              fontFamily: MONO,
+              fontWeight: 700,
+              fontSize: 13,
+              color: "#ffffff88",
+              textTransform: "uppercase",
+              letterSpacing: "0.12em",
+              marginBottom: 12,
+            }}
+          >
+            {sec.title}
+          </h3>
+          <div className="flex flex-col gap-3">
+            {sec.blocks.map((b, i) => (
+              <ReaderBlock key={i} block={b} />
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 /* CLASSIFIED footer — NDA / available-on-request note. */
 function Classified({ text }: { text: string }) {
   return (
@@ -386,6 +521,7 @@ export default function ProjectsApp() {
   const [tab, setTab] = useState<ProjectType>("main");
   const visible = projects.filter((p) => p.type === tab);
   const [selectedId, setSelectedId] = useState(visible[0].id);
+  const [declassified, toggleDeclassified] = useDeclassifyMode();
 
   // Resolve selection within the active tab (selection can be stale after a switch).
   const project = visible.find((p) => p.id === selectedId) ?? visible[0];
@@ -465,8 +601,13 @@ export default function ProjectsApp() {
 
                 {isOpen && (
                   <div className="flex flex-col gap-5" style={{ padding: "4px 18px 22px" }}>
-                    <div style={{ fontFamily: SANS, fontSize: 15, fontWeight: 500, color: "#fff", lineHeight: 1.35 }}>
-                      {p.tagline}
+                    <div className="flex items-start justify-between gap-3">
+                      <div style={{ fontFamily: SANS, fontSize: 15, fontWeight: 500, color: "#fff", lineHeight: 1.35 }}>
+                        {p.tagline}
+                      </div>
+                      {p.dossier && p.dossier.length > 0 && (
+                        <DeclassifyToggle on={declassified} toggle={toggleDeclassified} accent={accent} />
+                      )}
                     </div>
                     {p.role && (
                       <div style={{ fontFamily: MONO, fontSize: 10, color: "#ffffff66", letterSpacing: "0.06em", marginTop: -8 }}>
@@ -493,7 +634,7 @@ export default function ProjectsApp() {
                         <Tags tags={p.tags} accent={accent} />
                       </Section>
                     )}
-                    {p.dossier && p.dossier.length > 0 && <Dossier sections={p.dossier} accent={accent} />}
+                    {p.dossier && p.dossier.length > 0 && (declassified ? <ReaderDossier sections={p.dossier} /> : <Dossier sections={p.dossier} accent={accent} />)}
                     {p.debrief && <Callout label="DEBRIEF" text={p.debrief} accent={accent} />}
                     {p.classified && <Classified text={p.classified} />}
                   </div>
@@ -563,7 +704,12 @@ export default function ProjectsApp() {
                 <div style={{ fontFamily: BEBAS, fontSize: 38, color: "#fff", letterSpacing: "0.05em", lineHeight: 0.95 }}>
                   {project.name}
                 </div>
-                {project.featured && <FeaturedTag accent={accent} />}
+                <div className="flex items-center gap-2">
+                  {project.featured && <FeaturedTag accent={accent} />}
+                  {project.dossier && project.dossier.length > 0 && (
+                    <DeclassifyToggle on={declassified} toggle={toggleDeclassified} accent={accent} />
+                  )}
+                </div>
               </div>
               <div style={{ fontFamily: SANS, fontSize: 16, fontWeight: 500, color: accent, marginTop: 6, letterSpacing: "0.01em" }}>
                 {project.tagline}
@@ -618,7 +764,7 @@ export default function ProjectsApp() {
           {/* Dossier — full heist-style case study */}
           {project.dossier && project.dossier.length > 0 && (
             <div style={{ marginTop: 28 }}>
-              <Dossier sections={project.dossier} accent={accent} />
+              {declassified ? <ReaderDossier sections={project.dossier} /> : <Dossier sections={project.dossier} accent={accent} />}
             </div>
           )}
 
