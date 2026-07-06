@@ -573,6 +573,143 @@ export const projects: Project[] = [
       "Client identity and product screens withheld under NDA — full platform walkthrough and case-study detail available on request.",
   },
   {
+    id: "agent-compose",
+    name: "Cogentiq Agent Compose — Realignment",
+    tagline: "Building inside a system you also have to follow.",
+    role: "Fractal Analytics · 2025 · Co-designer, shared ownership — no single lead",
+    description:
+      "Realigned Fractal's agent management workbench to the Cogentiq Design Language System, resolving 28 of 28 audit findings and rebuilding four legacy surfaces — then extended DLS itself where the system had no answer yet.",
+    status: "SHIPPED",
+    stars: 5,
+    tags: ["Design Systems", "Enterprise AI", "Governance", "Low-Code Tooling"],
+    year: "2025",
+    type: "main",
+    completion: 100,
+    medal: "gold",
+    intel: [
+      { value: "28/28", label: "Audit findings resolved" },
+      { value: "4", label: "Legacy surfaces rebuilt" },
+      { value: "1", label: "New DLS extension segment" },
+      { value: "2", label: "Co-designers, no single lead" },
+    ],
+    objectives: [
+      { text: "Screen-by-screen audit of the old product against DLS", done: true },
+      { text: "Resolve all 28 audit findings", done: true },
+      { text: "Rebuild canvas, execution flow, taxonomy & version history from stubs", done: true },
+      { text: "Establish a DLS extension segment for agent-orchestration patterns", done: true },
+      { text: "Document and review new components to core-library standard", done: true },
+    ],
+    dossier: [
+      {
+        title: "THE SETUP",
+        blocks: [
+          {
+            kind: "para",
+            text: "Agent Compose is the agent management and governance workbench inside Fractal Analytics' Cogentiq suite — a low-code canvas for building, running, and governing AI agents. It started life as AgenTwin, built before Cogentiq had a shared design language. By the time the DLS shipped in late 2025, AgenTwin had its own login flow, its own card patterns, its own icon logic. None of it was wrong exactly — it was just built in isolation, the way every Cogentiq product had been before the system existed.",
+          },
+          {
+            kind: "callout",
+            label: "THE CHALLENGE",
+            text: "Two things had to happen at once. The surface-level product — login, navigation, component listings, help center — needed to speak the same visual language as the rest of Cogentiq. Underneath that, a handful of core workflows had never worked especially well, DLS or no DLS. Aligning the shell without fixing what was broken underneath would have just shipped a better-looking version of the same problems.",
+          },
+          {
+            kind: "para",
+            text: "Two of us picked this up together, without a formal lead splitting the work between us. A single point of contact coordinated with stakeholders, but the design calls — from the audit through to the final components — were made jointly.",
+          },
+        ],
+      },
+      {
+        title: "RECON",
+        blocks: [
+          {
+            kind: "para",
+            text: "Before touching anything, a screen-by-screen audit ran the old product against the DLS: login, workflow listing, sidebar navigation, the components library, component creation, connection settings, execution history, and help & support. Each screen got annotated directly against what DLS already prescribed — 28 distinct findings, from a sort icon that didn't sort to a login screen that still looked like the old product rather than the new suite.",
+          },
+          {
+            kind: "callout",
+            label: "THE SIGNAL",
+            text: "One note showed up three separate times across unrelated screens, always some version of \"make the cards look like CX's cards.\" That wasn't three opinions arriving independently — it was the same instinct surfacing again and again: borrow a pattern that already existed in the system instead of inventing a new one. One of the clearest signals from the audit that DLS could be pulled through directly, not just referenced in principle.",
+          },
+          {
+            kind: "para",
+            text: "The second discovery came from looking past the shell. Four workflows — the canvas builder, the execution flow, the component taxonomy, and version history — existed in the old product only as rough functional stubs. None of this had much to do with DLS, because DLS had never had to think about it. No other Cogentiq product runs a low-code agent canvas, so there was no existing pattern to borrow.",
+          },
+        ],
+      },
+      {
+        title: "THE APPROACH",
+        blocks: [
+          { kind: "subhead", text: "Track one — straight alignment" },
+          {
+            kind: "para",
+            text: "Work through all 28 findings and match each to what DLS already defined. Icon-only actions became labeled buttons or got tooltips. The card pattern from CX got applied to login, documentation, and help & support consistently. None of this needed new design thinking — it needed discipline in applying what the system had already settled.",
+          },
+          { kind: "subhead", text: "Track two — where the system had no answer" },
+          {
+            kind: "para",
+            text: "The canvas, the execution flow, the taxonomy system, and version history needed components DLS simply didn't have: a persistent color-coded legend for component types, a searchable component drawer with bookmarking, a stepper for execution progress, a category and sub-category structure for organizing agents, tasks, and tools. None of these existed anywhere else in Cogentiq to copy from.",
+          },
+          {
+            kind: "callout",
+            label: "THE GOVERNANCE CALL",
+            text: "A sub-category picker built for agent taxonomies has no reason to live inside a system meant to serve ten-plus products across entirely different domains. So the new components didn't go into the shared core — they went into a dedicated extension segment inside DLS: documented, reviewed, and available if another product ever needs agent-orchestration patterns like these, but not forced into a library every other team has to carry the weight of.",
+          },
+        ],
+      },
+      {
+        title: "THE SCORE",
+        blocks: [
+          {
+            kind: "para",
+            text: "All 28 audit findings resolved — from small consistency corrections (icon behavior, button color, tooltip coverage) to full component rebuilds. The component creation modal, for example, went from two bare fields (name and type) to a structured form with category, sub-category, expected output, and a tooltip explaining what \"expected output\" actually means.",
+          },
+          {
+            kind: "findings",
+            items: [
+              { label: "Execution flow", text: "Went from a single code box and a spinner to a proper hub: structured input, a real stepper showing agent-by-agent progress, and a final output panel separating input, planning steps, and reasoning." },
+              { label: "Canvas", text: "Gained a real component drawer with search and bookmarking; the color-coded legend moved from an afterthought in the corner to a persistent reference rail." },
+              { label: "New components", text: "The stepper, the drawer pattern, and the taxonomy management screens now live in DLS's extension segment — documented and reviewed the same way any core component would be, just scoped to a category of product rather than the whole suite." },
+            ],
+          },
+        ],
+      },
+      {
+        title: "THE TAKE",
+        blocks: [
+          {
+            kind: "para",
+            text: "There's no adoption or usage data yet — this shipped recently, and the honest measure of impact right now is completeness: 28 for 28, and the fact that reusable patterns came out of the work rather than one-off fixes that only Agent Compose will ever benefit from.",
+          },
+        ],
+      },
+      {
+        title: "DEBRIEF",
+        blocks: [
+          {
+            kind: "para",
+            text: "A design system can only encode what it's already seen. DLS was built from ten-plus products that mostly share the same kinds of screens: lists, forms, dashboards. Agent Compose needed a low-code canvas builder, and no amount of good token architecture was going to anticipate that on day one. That's not a flaw in DLS — it's what happens when a genuinely new kind of product shows up inside a system built for the products that came before it.",
+          },
+          {
+            kind: "callout",
+            label: "THE REAL DECISION",
+            text: "Folding the four new surfaces straight into the core library would have been faster and would have looked like more progress on paper. Keeping them in a separate segment, reviewed on their own terms, was slower and less immediately satisfying — but it's the same discipline DLS was built on in the first place: constraints where they help everyone, room to build where the problem is genuinely new.",
+          },
+          {
+            kind: "para",
+            text: "Working this without a single lead meant every call, big or small, got argued out between two people instead of decided and handed down. Slower in the moment. Fewer blind spots by the end, because neither designer could just defer to the other's judgment and move on.",
+          },
+          {
+            kind: "callout",
+            label: "THE BIGGER LEARNING",
+            text: "If this ran again, specialists would come into the extension-segment review earlier rather than closer to ship — a gap already flagged in the DLS case study itself, and one that showed up again here for the same reason: it's always tempting to move fast and check later. Contributing new work back into a system you also have to follow day to day is a different skill from building the system in the first place.",
+          },
+        ],
+      },
+    ],
+    classified:
+      "Interface screens withheld under NDA — full walkthrough available on request during portfolio review.",
+  },
+  {
     id: "cogentiq-dls",
     name: "Cogentiq Design Language",
     tagline: "One language. Ten products.",
