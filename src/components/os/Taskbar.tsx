@@ -11,14 +11,28 @@ interface TaskbarProps {
   openWindows: Record<string, { isOpen: boolean; isMinimized: boolean }>;
   onIconClick: (id: string) => void;
   onTaskbarClick: (id: string) => void;
+  recentAppId?: string | null;
 }
 
-export default function Taskbar({ openWindows, onIconClick, onTaskbarClick }: TaskbarProps) {
+// Must match BOOT_KEY in app/page.tsx — clearing it makes the boot screen play again on reload.
+const BOOT_SESSION_KEY = "kros_booted";
+
+function reboot() {
+  try {
+    sessionStorage.removeItem(BOOT_SESSION_KEY);
+  } catch {
+    // ignore
+  }
+  window.location.reload();
+}
+
+export default function Taskbar({ openWindows, onIconClick, onTaskbarClick, recentAppId }: TaskbarProps) {
   const { deviant } = useDeviant();
   const labelFor = (icon: typeof desktopIcons[number]) => (deviant && icon.deviantLabel) ? icon.deviantLabel : icon.label;
   const [time, setTime] = useState("");
   const [date, setDate] = useState("");
   const [startOpen, setStartOpen] = useState(false);
+  const recentIcon = desktopIcons.find((ic) => ic.id === recentAppId);
 
   useEffect(() => {
     const update = () => {
@@ -66,41 +80,132 @@ export default function Taskbar({ openWindows, onIconClick, onTaskbarClick }: Ta
         {/* Start menu */}
         {startOpen && (
           <div
-            className="absolute bottom-14 left-0 w-52 rounded-sm shadow-2xl py-2 z-50"
+            className="absolute bottom-14 left-0 w-80 rounded-sm shadow-2xl z-50 flex flex-col gap-5"
             style={{
-              background: "rgba(18, 18, 24, 0.99)",
-              border: "1px solid rgba(255,255,255,0.09)",
-              backdropFilter: "blur(20px)",
+              background: "#141419",
+              border: "1px solid rgba(255,255,255,0.1)",
+              padding: "20px",
             }}
           >
-            <div className="px-4 py-2 mb-1">
-              <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 11, color: "#6b6b7e", letterSpacing: "0.12em" }}>
+            {/* User */}
+            <div>
+              <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 12, color: "#c8c8d8", letterSpacing: "0.12em" }}>
                 KAUSTAV ROY
               </div>
-              <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 10, color: "#3a3a4e", letterSpacing: "0.08em" }}>
+              <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 10, color: "#83839a", letterSpacing: "0.08em", marginTop: 3 }}>
                 {deviant ? "KR-19 · DEVIANT" : "KR-19 · Design Consultant"}
               </div>
             </div>
-            <div className="h-px mx-3 mb-1" style={{ background: "rgba(255,255,255,0.06)" }} />
-            {desktopIcons.map((icon) => (
+
+            {/* Recently opened */}
+            {recentIcon && (
+              <>
+                <div className="h-px" style={{ background: "rgba(255,255,255,0.08)" }} />
+                <div>
+                  <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 10, color: "rgba(255,255,255,0.55)", letterSpacing: "0.2em", marginBottom: 10 }}>
+                    RECENTLY OPENED
+                  </div>
+                  <button
+                    className="w-full flex items-center gap-3 py-2 px-2 -mx-2 text-left hover:bg-white/5 transition-colors rounded-sm"
+                    style={{
+                      fontFamily: "'Share Tech Mono', monospace",
+                      fontSize: 12,
+                      color: themeAccent[recentIcon.theme] ?? "#e0e0e8",
+                      letterSpacing: "0.04em",
+                    }}
+                    onClick={() => { onIconClick(recentIcon.id); setStartOpen(false); }}
+                  >
+                    <i className={`hn hn-${recentIcon.icon}`} style={{ fontSize: 16 }} />
+                    <span>{labelFor(recentIcon)}</span>
+                  </button>
+                </div>
+              </>
+            )}
+
+            <div className="h-px" style={{ background: "rgba(255,255,255,0.08)" }} />
+
+            {/* Pinned apps grid */}
+            <div>
+              <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 10, color: "rgba(255,255,255,0.55)", letterSpacing: "0.2em", marginBottom: 10 }}>
+                PINNED
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                {desktopIcons.map((icon) => {
+                  const accent = themeAccent[icon.theme] ?? "#e0e0e8";
+                  return (
+                    <button
+                      key={icon.id}
+                      className="flex flex-col items-center gap-2 py-3 transition-colors hover:bg-white/5 rounded-sm"
+                      onClick={() => { onIconClick(icon.id); setStartOpen(false); }}
+                    >
+                      <i className={`hn hn-${icon.icon}`} style={{ fontSize: 20, color: accent }} />
+                      <span
+                        style={{
+                          fontFamily: "'Share Tech Mono', monospace",
+                          fontSize: 10,
+                          color: "#dcdce4",
+                          letterSpacing: "0.02em",
+                          textAlign: "center",
+                          lineHeight: 1.3,
+                        }}
+                      >
+                        {labelFor(icon)}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="h-px" style={{ background: "rgba(255,255,255,0.08)" }} />
+
+            {/* Quick actions */}
+            <div>
+              <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 10, color: "rgba(255,255,255,0.55)", letterSpacing: "0.2em", marginBottom: 10 }}>
+                QUICK ACTIONS
+              </div>
+              <div className="flex items-center flex-wrap gap-2">
+                <DeviantToggle />
+                <AccessibilityMenu />
+                <a
+                  href="/Kaustav_Roy_CV.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  download
+                  className="flex items-center gap-2 px-3 py-1 transition-all hover:bg-white/5 flex-shrink-0 group"
+                  style={{
+                    fontFamily: "'Share Tech Mono', monospace",
+                    fontSize: 11,
+                    color: "#a0a0b8",
+                    letterSpacing: "0.1em",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    borderRadius: 2,
+                    textDecoration: "none",
+                  }}
+                  title="Download Resume (PDF)"
+                >
+                  <i className="hn hn-download" style={{ fontSize: 12, color: "#f5e642" }} />
+                  <span className="group-hover:text-white transition-colors">RESUME.PDF</span>
+                </a>
+              </div>
+            </div>
+
+            <div className="h-px" style={{ background: "rgba(255,255,255,0.08)" }} />
+
+            {/* Footer — version + reboot */}
+            <div className="flex items-center justify-between">
+              <span style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 10, color: "#6a6a7e" }}>
+                {deviant ? "BARRIER BROKEN · rA9" : "v2.077 · Design × AI"}
+              </span>
               <button
-                key={icon.id}
-                className="w-full flex items-center gap-3 px-4 py-2 text-left hover:bg-white/5 transition-colors"
-                style={{
-                  fontFamily: "'Share Tech Mono', monospace",
-                  fontSize: 12,
-                  color: themeAccent[icon.theme] ?? "#e0e0e8",
-                  letterSpacing: "0.04em",
-                }}
-                onClick={() => { onIconClick(icon.id); setStartOpen(false); }}
+                onClick={reboot}
+                className="flex items-center gap-1.5 px-2 py-1 -mr-2 transition-colors hover:bg-white/5 rounded-sm"
+                style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 10, color: "#a0a0b8", letterSpacing: "0.08em" }}
+                title="Reboot — replay the boot sequence"
               >
-                <i className={`hn hn-${icon.icon}`} style={{ fontSize: 16 }} />
-                <span>{labelFor(icon)}</span>
+                <span style={{ fontSize: 12, color: "#f5e642" }}>⏻</span>
+                REBOOT
               </button>
-            ))}
-            <div className="h-px mx-3 mt-1 mb-1" style={{ background: "rgba(255,255,255,0.06)" }} />
-            <div className="px-4 py-1.5" style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 10, color: "#3a3a4e" }}>
-              {deviant ? "BARRIER BROKEN · rA9" : "v2.077 · Design × AI"}
             </div>
           </div>
         )}

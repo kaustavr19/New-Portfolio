@@ -90,6 +90,9 @@ const DEFAULT_POSITIONS: Record<string, { x: number; y: number }> = {
 
 let zCounter = 10;
 
+// Last-opened app, persisted — surfaces as "RECENTLY OPENED" in the Start menu.
+const RECENT_APP_KEY = "kros_last_opened";
+
 export default function Desktop() {
   const { highContrast } = useA11y();
   const { deviant } = useDeviant();
@@ -97,6 +100,15 @@ export default function Desktop() {
   const labelFor = (icon: typeof desktopIcons[number]) => (deviant && icon.deviantLabel) ? icon.deviantLabel : icon.label;
   const [windows, setWindows] = useState<Record<string, WindowState>>({});
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
+  const [recentAppId, setRecentAppId] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      setRecentAppId(localStorage.getItem(RECENT_APP_KEY));
+    } catch {
+      // localStorage unavailable — Start menu just skips the recent row
+    }
+  }, []);
 
   const openWindow = useCallback((id: string) => {
     zCounter += 1;
@@ -104,6 +116,12 @@ export default function Desktop() {
       ...prev,
       [id]: { isOpen: true, isMinimized: false, zIndex: zCounter },
     }));
+    setRecentAppId(id);
+    try {
+      localStorage.setItem(RECENT_APP_KEY, id);
+    } catch {
+      // ignore
+    }
   }, []);
 
   // Let the Terminal (or anything) open an app window via a global event.
@@ -367,6 +385,7 @@ export default function Desktop() {
         openWindows={windows}
         onIconClick={openWindow}
         onTaskbarClick={handleTaskbarClick}
+        recentAppId={recentAppId}
       />
 
       {/* Pixelated mouse trail — floats above everything */}
