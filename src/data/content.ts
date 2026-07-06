@@ -874,62 +874,247 @@ export const projects: Project[] = [
       "Figma component library and full documentation available on request — NDA applies to final screens.",
   },
   {
-    id: "classified-a",
-    name: "Mission: [Classified]",
-    tagline: "Intel pending declassification",
+    id: "eugenie-digital-twin",
+    name: "Eugenie Digital Twin Platform",
+    tagline: "Rebuilding an industrial AI platform from the inside out.",
+    role: "Eugenie · Jul 2022–Jul 2024 · Design Intern → Member of Design Staff II",
     description:
-      "[PLACEHOLDER] A flagship work project — details under wraps. Replace this entry with the real mission brief, objectives, and outcome.",
+      "Rebuilt two industrial digital-twin products and designed a third from zero for Eugenie — translating plant-floor sensor data into decisions operators could actually act on, deployed across steel, oil & gas, mining, and chemical plants.",
     status: "SHIPPED",
-    stars: 4,
-    tags: ["Design for AI", "Research", "Strategy"],
-    year: "2022",
+    stars: 5,
+    tags: ["Industrial AI", "Digital Twin", "Enterprise UX", "Information Architecture"],
+    year: "2022–2024",
     type: "main",
     completion: 100,
     medal: "gold",
-  },
-  {
-    id: "classified-b",
-    name: "Mission: [Redacted]",
-    tagline: "Awaiting clearance",
-    description:
-      "[PLACEHOLDER] Another work mission. Add the name, brief, and results when you're ready to declassify.",
-    status: "SHIPPED",
-    stars: 3,
-    tags: ["Enterprise UX", "Design Systems"],
-    year: "2021",
-    type: "main",
-    completion: 100,
-    medal: "silver",
+    intel: [
+      { value: "3", label: "Modules across 3+ industries" },
+      { value: "+11%", label: "Throughput at Tata Metaliks" },
+      { value: "80%", label: "Operator adoption of AI recs" },
+      { value: "3", label: "US patents on detection tech" },
+    ],
+    objectives: [
+      { text: "Rebuild Process Control — collapse a 4-stage model into one dashboard", done: true },
+      { text: "Rebuild Asset Control's information architecture into a plant hierarchy", done: true },
+      { text: "Design Emissions Intelligence from zero — map + graphical views", done: true },
+      { text: "On-site research at Tata Metaliks' Kharagpur sinter plant", done: true },
+      { text: "Ship across steel, oil & gas, mining, semiconductor & chemical plants", done: true },
+    ],
+    dossier: [
+      {
+        title: "THE SETUP",
+        blocks: [
+          {
+            kind: "para",
+            text: "Joined Eugenie in July 2022 as a design intern. The company built AI-driven digital twins for heavy industry — steel plants, oil and gas facilities, chemical manufacturing. Two products already existed: Asset Control and Process Control, both meant to help plant operators catch equipment failures and process inefficiencies before they became expensive problems.",
+          },
+          {
+            kind: "callout",
+            label: "THE PROBLEM",
+            text: "Neither one worked the way it needed to. They'd been designed early, before the team fully understood who was using them or why. The purpose of each product was fuzzy even internally, and the interfaces reflected that: dense, sensor-first, built around what the data could show rather than what an operator needed to decide.",
+          },
+          {
+            kind: "para",
+            text: "The first months weren't about adding features — they were about figuring out what these products were actually for, then rebuilding both from the base up. A year later, the scope grew again: Eugenie needed an Emissions Intelligence module for a sustainability engagement tied to Google, with no prior version to inherit. By the end of two years, the work spanned all three modules — the dashboard and in-depth views for Process Control, the hierarchical machine-and-process view for Asset Control, and the map-based and graphical views for Emissions Intelligence — carrying design ownership across three industrial domains at once after going from intern to full-time Member of Design Staff II.",
+          },
+        ],
+      },
+      {
+        title: "RECON",
+        blocks: [
+          {
+            kind: "para",
+            text: "Some research already existed from the earlier version of Asset and Process Control — used as a starting map of where the previous team had already learned something, rather than thrown out. But inherited research answers old questions, not new ones. Once both products were rebuilt, the team went back to real users to find out if the rework had actually landed.",
+          },
+          {
+            kind: "callout",
+            label: "THE FIELD VISIT",
+            text: "A visit to Tata Metaliks' plant in Kharagpur, where Eugenie's digital twin ran on a sinter manufacturing line, told us things a remote interview couldn't — which screen an operator glances at first under time pressure, and which one they never open at all. Operators didn't want more data; they already had plenty, scattered across SCADA systems, CMMS logs, and paper SOPs, none of it talking to the others. What they lacked was a fast way to tell \"this is normal\" from \"this needs attention right now,\" and then a fast way to find out what to do about it.",
+          },
+          {
+            kind: "findings",
+            items: [
+              { label: "Asset Control", text: "Wasn't a monitoring tool with too little structure — it was missing a way to see how machines related to each other and the broader process, so an anomaly on one pump could be understood in context rather than as an isolated red flag." },
+              { label: "Process Control", text: "Wasn't short on metrics — it was short on a clear line from \"here's an anomaly\" to \"here's what to do about it.\"" },
+            ],
+          },
+          {
+            kind: "para",
+            text: "Emissions Intelligence started from a different kind of research problem — no earlier version to test against and no existing user base to interview. The closest thing to research was understanding two very different audiences: plant-floor engineers tracing an emission spike back to a specific process step, and sustainability or compliance officers needing a defensible, reportable answer to where emissions were coming from. Building for only one of them would have made the module half as useful as it needed to be.",
+          },
+        ],
+      },
+      {
+        title: "THE APPROACH",
+        blocks: [
+          { kind: "subhead", text: "Process Control — collapsing four screens into one" },
+          {
+            kind: "para",
+            text: "Eugenie's underlying model worked in four stages: monitoring, prediction, diagnostics, prescription. The old product treated these as four separate places to look, so an operator chasing an anomaly had to piece the story together across several screens. The redesign collapsed that into a single dashboard where an alert carried its own context — what happened, why it likely happened, what to change — with sensor-level detail one layer down for anyone who wanted to check the reasoning.",
+          },
+          {
+            kind: "callout",
+            label: "THE HARDER CALL",
+            text: "How much of that reasoning to show by default. Each recommendation card leads with the action and its predicted impact; the sensor chart sits right next to it, not hidden behind a click. Nobody has to dig for the evidence — it's just not the first thing they see.",
+          },
+          { kind: "subhead", text: "Asset Control — an information-architecture problem" },
+          {
+            kind: "para",
+            text: "Plants aren't flat: a site has processes, processes have machines, machines have sub-assemblies and sensors, and a failure at one level cascades up through the others. The old version flattened this, surfacing sensor-level anomalies without much sense of where they sat in the bigger picture. The redesign let an operator start at the plant level and drill down into the specific asset behind a flagged anomaly, so a failing pump showed up as part of a system rather than one red flag competing with a hundred other data points.",
+          },
+          {
+            kind: "para",
+            text: "Getting the hierarchy depth right took a fair number of passes — too shallow told you almost nothing about where a problem sat; too deep recreated the same flat wall of sensors with extra clicks in front of it. The depth that worked matched how operators actually reasoned, which only showed up by watching people navigate it rather than guessing at the \"right\" depth on paper.",
+          },
+          { kind: "subhead", text: "Emissions Intelligence — designed for two audiences at once" },
+          {
+            kind: "para",
+            text: "This module didn't inherit anything, which meant deciding its purpose before deciding its interface. Emissions problems are spatial in a way asset failures aren't — a plant needs to know where a leak or super-emitter event is happening, not just that one is happening somewhere. The map view layers satellite and remote sensing data against ground sensor readings, plus a graphical in-depth view for tracing a flagged event back to the specific process or asset causing it.",
+          },
+          {
+            kind: "callout",
+            label: "THE SHARED SOURCE",
+            text: "Plant engineers wanted to get from map to root cause as fast as possible. Compliance and sustainability officers needed something closer to a reportable summary they could stand behind externally. Building two separate interfaces would have doubled the design and maintenance cost and split the product. Instead, the map and graphical views were built as one shared source — the level of detail someone drilled into depended on what they clicked, not on which version of the product they'd been handed.",
+          },
+          {
+            kind: "para",
+            text: "Across all three modules, the same tension kept showing up: technical users trusted a system more when they could see the reasoning behind an alert, but showing all of that reasoning by default buried the one number they actually needed first. Every dashboard ended up structured the same way underneath, even though the domains — steel, oil and gas, emissions — had almost nothing else in common: lead with the decision, keep the evidence in view but out of the way.",
+          },
+        ],
+      },
+      {
+        title: "THE SCORE",
+        blocks: [
+          {
+            kind: "para",
+            text: "The rebuilt platform shipped across all three modules and scaled into steel, semiconductors, oil and gas, mining, and chemical manufacturing. Gartner ranked Eugenie among the world's top three digital twin solutions, and the underlying detection work is protected by three US patents — unsupervised anomaly detection, unsupervised anomaly prediction, and automated insight curation and alerting. Eugenie went on to be backed by Fractal, endorsed by Google, and recognized by Forbes, CB Insights, Forrester, CNBC, and NASSCOM.",
+          },
+          {
+            kind: "callout",
+            label: "TATA METALIKS — KHARAGPUR SINTER PLANT",
+            text: "The plant where in-person testing happened later ran a formal deployment (July–September 2023), measured with and without Eugenie running.",
+          },
+          {
+            kind: "stats",
+            items: [
+              { value: "+11%", label: "Throughput (2,141 → 2,378 t/day)" },
+              { value: "-5%", label: "Emissions (SPM)" },
+              { value: "-5%", label: "Quality wastage (return fines)" },
+              { value: "80%", label: "Operator adoption of AI recs" },
+            ],
+          },
+          {
+            kind: "para",
+            text: "A Tata Metaliks engineering manager credited the tool with a real improvement in production yield and a meaningful drop in return fines and emissions. That adoption number matters as much as the efficiency ones — a tool that improves a process on paper but gets ignored on the floor hasn't actually improved anything, and 80% adoption meant operators were choosing to act on what the interface told them.",
+          },
+        ],
+      },
+      {
+        title: "THE TAKE",
+        blocks: [
+          {
+            kind: "para",
+            text: "Beyond steel, the same approach carried into other industries and client bases.",
+          },
+          {
+            kind: "findings",
+            items: [
+              { label: "US oil & gas", text: "Predicted equipment failures with roughly 87% accuracy across 12 assets." },
+              { label: "3,400+ interconnected assets", text: "Cut unscheduled downtime by 96% for one industrial client." },
+              { label: "ExxonMobil", text: "Reduced OPEX by 15% using the operational intelligence tooling." },
+              { label: "Fresnillo (mining)", text: "Cut production wastage by 20% for Mexico's largest mining company." },
+              { label: "Indian gas producers", text: "Fugitive emissions down 17% at one site; outlier detection alone saved another $384M by catching deviations in hydrocarbon processing data." },
+            ],
+          },
+          {
+            kind: "para",
+            text: "Across the client base as a whole, Eugenie reported a 20% average reduction in production wastage, a 15% increase in asset reliability, and a 10% increase in operational efficiency.",
+          },
+        ],
+      },
+      {
+        title: "DEBRIEF",
+        blocks: [
+          {
+            kind: "para",
+            text: "Rebuilding a product is a different skill from designing one from nothing, and both got practiced inside the same two years. With Asset and Process Control, the hard part wasn't generating ideas — it was figuring out which of the existing assumptions were wrong versus which ones just weren't understood yet.",
+          },
+          {
+            kind: "callout",
+            label: "THE MISTAKE TO CATCH",
+            text: "Everything about the old versions looked like a design flaw at first glance — dense screens, buried alerts, no clear hierarchy — and some of that was genuinely wrong. But some of it existed because whoever built it first understood a constraint not yet encountered: a sensor limitation, a data-latency issue, a workflow rule from the plant floor. It's easy to mistake unfamiliarity for a design flaw, and that happened more than once before the Kharagpur visit gave enough context to tell the difference.",
+          },
+          {
+            kind: "para",
+            text: "Emissions Intelligence was the opposite problem: no legacy to argue with, but no existing user base to test assumptions against either, and a dual audience that made \"who is this for\" a genuinely open question rather than a given. Designing without inherited baggage felt faster in the moment. In hindsight, it was riskier, because there was no earlier version's mistakes to learn from before shipping.",
+          },
+          {
+            kind: "callout",
+            label: "THE BIGGER LEARNING",
+            text: "Going from intern to owning parts of three modules across three industries in about a year taught something less about design craft and more about pacing — making calls faster than there was evidence to fully back them. Most held up once tested; some didn't and got reworked. What I'd do differently: build a more consistent testing rhythm across all three modules from the start, rather than validating each one in whatever way the timeline allowed. Some decisions here rest on a plant visit and real operator feedback. Others rest mostly on pattern-matching from modules already tested. Better to know the confidence is uneven than assume it isn't.",
+          },
+        ],
+      },
+    ],
+    classified:
+      "Interface screens and client-specific detail withheld under NDA — full case study available on request.",
   },
 
   /* ── SIDE MISSIONS — personal projects ── */
   {
-    id: "flInq",
-    name: "FlinQ",
-    tagline: "Connecting designers across the globe",
+    id: "wild-india-atlas",
+    name: "Wild India Atlas",
+    tagline: "Mapping India's wild places, one sighting at a time",
     description:
-      "An ongoing project focused on building a community-driven design platform. Details under wraps — stay tuned.",
+      "A community-driven atlas for logging and mapping India's wildlife sightings and protected habitats — built for enthusiasts and citizen naturalists to share encounters on a shared map.",
     status: "IN PROGRESS",
-    stars: 4,
-    tags: ["Product Design", "Community", "Next.js"],
-    year: "2024–Present",
+    stars: 3,
+    tags: ["Maps", "Wildlife", "Community"],
+    year: "2025–Present",
     type: "side",
-    completion: 60,
-    medal: "silver",
+    completion: 35,
   },
   {
-    id: "devcom",
-    name: "DevCom",
-    tagline: "Connect. Collaborate. Develop.",
+    id: "linkhive",
+    name: "LinkHive",
+    tagline: "One link, all your links",
     description:
-      "A web application where developers can find collaborators for hackathons and projects. Search by skills, connect instantly, build together.",
+      "A link-in-bio and shared-bookmarking tool — one page to collect, organize, and share every link that matters, built for creators and small teams alike.",
     status: "LIVE",
-    stars: 4,
-    tags: ["Web App", "Developer Tools", "Community"],
-    year: "2024–Present",
+    stars: 3,
+    tags: ["Web App", "Productivity", "Next.js"],
+    year: "2024",
     type: "side",
     completion: 100,
-    medal: "gold",
+    medal: "bronze",
+  },
+  {
+    id: "jotmd",
+    name: "JotMD",
+    tagline: "Markdown notes, zero friction",
+    description:
+      "A minimal markdown note-taking app — write, sync, and export without the bloat of a full workspace tool.",
+    status: "LIVE",
+    stars: 3,
+    tags: ["Markdown", "Notes", "Web App"],
+    year: "2024",
+    type: "side",
+    completion: 100,
+    medal: "bronze",
+  },
+  {
+    id: "claude-skills-repo",
+    name: "Claude Skills Repo",
+    tagline: "Reusable skills for Claude Code",
+    description:
+      "An open collection of custom Claude Code skills and slash commands — reusable workflows for design, docs, and everyday dev tasks.",
+    status: "LIVE",
+    stars: 4,
+    tags: ["Claude Code", "Developer Tools", "Open Source"],
+    year: "2025–Present",
+    type: "side",
+    completion: 90,
+    medal: "silver",
   },
   {
     id: "stayput",
@@ -946,18 +1131,30 @@ export const projects: Project[] = [
     medal: "silver",
   },
   {
-    id: "shikshalay",
-    name: "Project Shikshalay",
-    tagline: "Education reimagined",
+    id: "arbitask",
+    name: "Arbitask",
+    tagline: "Let the task decide who does it",
     description:
-      "UX research and prototype design for an education platform. Published ideation process on Medium.",
-    status: "SHIPPED",
+      "A lightweight task-arbitration tool for small teams — routes and re-routes tasks based on load and availability instead of manual triage.",
+    status: "IN PROGRESS",
     stars: 3,
-    tags: ["UX Research", "Education", "Prototype"],
-    year: "2021",
+    tags: ["Productivity", "Team Tools", "Next.js"],
+    year: "2025–Present",
     type: "side",
-    completion: 100,
-    medal: "bronze",
+    completion: 30,
+  },
+  {
+    id: "ideaforge",
+    name: "Ideaforge",
+    tagline: "Where scattered thoughts become a plan",
+    description:
+      "A capture-to-structure tool for early-stage ideas — jot down fragments, then forge them into an outline, brief, or plan.",
+    status: "IN PROGRESS",
+    stars: 3,
+    tags: ["Productivity", "Ideation", "Next.js"],
+    year: "2025–Present",
+    type: "side",
+    completion: 20,
   },
 ];
 
