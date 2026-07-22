@@ -334,6 +334,7 @@ export type Project = {
   dossier?: ProjectSection[];
   debrief?: string;
   classified?: string;
+  github?: string;
 };
 
 export const projects: Project[] = [
@@ -1064,97 +1065,134 @@ export const projects: Project[] = [
   {
     id: "wild-india-atlas",
     name: "Wild India Atlas",
-    tagline: "Mapping India's wild places, one sighting at a time",
+    tagline: "India's wildlife, as landscapes and living stories",
     description:
-      "A community-driven atlas for logging and mapping India's wildlife sightings and protected habitats — built for enthusiasts and citizen naturalists to share encounters on a shared map.",
-    status: "IN PROGRESS",
-    stars: 3,
-    tags: ["Maps", "Wildlife", "Community"],
-    year: "2025–Present",
+      "An interactive, map-first field guide to India's wildlife — 42 protected landscapes, 1,300+ citizen-science species profiles, and real eBird/iNaturalist data woven into seasonal travel planning, cinematic species stories, and a saved Field Journal.",
+    status: "LIVE",
+    stars: 4,
+    tags: ["Maps", "Wildlife", "Next.js"],
+    year: "2026–Present",
     type: "side",
-    completion: 35,
+    completion: 85,
+    github: "https://github.com/kaustavr19/Wild-India-Atlas",
+    debrief:
+      "Started as a weekend idea — a map of tiger reserves — and kept growing because the data kept being more interesting than the UI could show. Most of the build is about earning trust in what's actually verified: eBird and iNaturalist records are treated as evidence, not gospel, and every hotspot flags its own confidence and freshness. It's the project that's taught the most about restraint — resisting the urge to fake certainty a dataset doesn't have.",
+  },
+  {
+    id: "aurora-wallpaper-generator",
+    name: "Aurora Wallpaper Generator",
+    tagline: "Generative wallpapers, no server required",
+    description:
+      "A local-first generative wallpaper studio that runs entirely in the browser — five deterministic generators, layered compositing with blend modes, and exports up to 4K, all reproducible from a single seed.",
+    status: "LIVE",
+    stars: 3,
+    tags: ["Generative Art", "Canvas", "Local-First"],
+    year: "2026",
+    type: "side",
+    completion: 75,
+    github: "https://github.com/kaustavr19/Aurora_Wallpaper-Generator",
+    debrief:
+      "Built to answer one question: can a wallpaper generator run entirely in the browser with no account, no upload, and no server, and still feel like a real creative tool? Every composition is seeded and deterministic, so the same settings always reproduce the same result — locking a palette and nudging the geometry feels more like tuning an instrument than gambling on 'regenerate.'",
   },
   {
     id: "linkhive",
     name: "LinkHive",
     tagline: "One link, all your links",
     description:
-      "A link-in-bio and shared-bookmarking tool — one page to collect, organize, and share every link that matters, built for creators and small teams alike.",
-    status: "LIVE",
+      "A native Android app for saving and organizing links without them turning into a graveyard — Firebase Auth for sign-in, and Gemini-powered scraping that reads each link's page to auto-fill its title and category.",
+    status: "IN PROGRESS",
     stars: 3,
-    tags: ["Web App", "Productivity", "Next.js"],
-    year: "2024",
+    tags: ["Android", "Kotlin", "Firebase"],
+    year: "2026",
     type: "side",
-    completion: 100,
-    medal: "bronze",
+    completion: 60,
+    github: "https://github.com/kaustavr19/Link-Hive",
+    debrief:
+      "Started as a web app, then got rebuilt from scratch as a native Android app once it became clear a bookmarking tool needed to live where links actually get shared — inside other apps, not in a browser tab. Firebase handles auth and sync; Gemini reads the page behind each saved link and fills in the title and category automatically, so saving a link takes one tap instead of a form.",
   },
   {
     id: "jotmd",
     name: "JotMD",
     tagline: "Markdown notes, zero friction",
     description:
-      "A minimal markdown note-taking app — write, sync, and export without the bloat of a full workspace tool.",
+      "A distraction-free markdown editor with a live WYSIWYG preview, a Fabric.js drawing layer for sketching over notes, three themes, and full import/export — no backend, everything runs and saves locally.",
     status: "LIVE",
     stars: 3,
-    tags: ["Markdown", "Notes", "Web App"],
-    year: "2024",
+    tags: ["Markdown", "Editor", "No-Backend"],
+    year: "2026",
     type: "side",
     completion: 100,
     medal: "bronze",
+    github: "https://github.com/kaustavr19/JotMD",
+    debrief:
+      "Every markdown editor either buries the raw text behind a WYSIWYG layer or makes you live in the syntax. JotMD keeps both panes open and synced in real time, plus a drawing layer on top for the moments text isn't enough. No backend, no account — everything autosaves to the browser and exports to markdown or PDF on demand.",
   },
   {
     id: "claude-skills-repo",
     name: "Claude Skills Repo",
     tagline: "Reusable skills for Claude Code",
     description:
-      "An open collection of custom Claude Code skills and slash commands — reusable workflows for design, docs, and everyday dev tasks.",
+      "An open, community-maintained collection of Claude Code skills for UX audits, competitive benchmarking, SEO, and writing cleanup — installable as a marketplace plugin or downloaded individually from a searchable site.",
     status: "LIVE",
     stars: 4,
-    tags: ["Claude Code", "Developer Tools", "Open Source"],
-    year: "2025–Present",
+    tags: ["Claude Code", "Open Source", "Marketplace"],
+    year: "2026–Present",
     type: "side",
     completion: 90,
     medal: "silver",
+    github: "https://github.com/kaustavr19/claude-skills",
+    debrief:
+      "A running list of the Claude Code skills actually used day to day — UX audits, competitive benchmarks, writing cleanup — packaged so anyone can install them with one command instead of rebuilding the same prompt from scratch. Open to contributions on purpose: skills get better with more edge cases thrown at them than one person can generate alone.",
   },
   {
     id: "stayput",
     name: "StayPut",
     tagline: "A polite request to your brain",
     description:
-      "A focus tool built with Next.js. No timers, no alarm clocks. Just a gentle nudge: 'Hey. Stay put.' Built for deep work and fighting the YouTube rabbit hole.",
+      "A calm, no-gamification focus app with Open/Pomodoro/Deep Work/Custom sessions, a distraction log, a parking lot for stray thoughts, and a Groq-powered AI planner that turns a goal into a trackable step-by-step plan.",
     status: "LIVE",
     stars: 3,
-    tags: ["Productivity", "Next.js", "Vibe Coded"],
-    year: "2025",
+    tags: ["Next.js", "Focus", "AI"],
+    year: "2025–2026",
     type: "side",
     completion: 100,
     medal: "silver",
-  },
-  {
-    id: "arbitask",
-    name: "Arbitask",
-    tagline: "Let the task decide who does it",
-    description:
-      "A lightweight task-arbitration tool for small teams — routes and re-routes tasks based on load and availability instead of manual triage.",
-    status: "IN PROGRESS",
-    stars: 3,
-    tags: ["Productivity", "Team Tools", "Next.js"],
-    year: "2025–Present",
-    type: "side",
-    completion: 30,
+    github: "https://github.com/kaustavr19/stayput-gentle-anchor",
+    debrief:
+      "No streaks, no gamified guilt — just a timer, a place to park distracting thoughts without losing the thread, and an AI planner that turns a vague goal into a checklist when starting is the hard part. Built to be the opposite of every productivity app that turns focus into a leaderboard.",
   },
   {
     id: "ideaforge",
     name: "Ideaforge",
-    tagline: "Where scattered thoughts become a plan",
+    tagline: "Ideas, tasks, and XP bars in one workspace",
     description:
-      "A capture-to-structure tool for early-stage ideas — jot down fragments, then forge them into an outline, brief, or plan.",
+      "A React/Vite workspace that bundled kanban boards, notes, and a gamified XP system into one place for turning personal ideas into finished work — the prototype that proved the concept before Arbitask rebuilt it properly.",
+    status: "SHIPPED",
+    stars: 2,
+    tags: ["React", "Vite", "Prototype"],
+    year: "2026",
+    type: "side",
+    completion: 100,
+    medal: "bronze",
+    github: "https://github.com/kaustavr19/Ideaforge",
+    debrief:
+      "The first pass at a gamified project tracker — built fast in React and Vite to test whether XP and levels actually made task management more likely to stick. It did, enough to justify rebuilding it properly: Arbitask picks up the same idea with real auth, a database, and multiple people working in one project instead of one person's local state.",
+  },
+  {
+    id: "arbitask",
+    name: "Arbitask",
+    tagline: "Ideas become shipped work, one XP bar at a time",
+    description:
+      "The Next.js rebuild of Ideaforge — the same gamified kanban/timeline/notes workflow, now with Auth.js sign-in, a Prisma-backed database, and role-based multi-user collaboration on shared projects.",
     status: "IN PROGRESS",
     stars: 3,
-    tags: ["Productivity", "Ideation", "Next.js"],
-    year: "2025–Present",
+    tags: ["Next.js", "Prisma", "Collaboration"],
+    year: "2026",
     type: "side",
-    completion: 20,
+    completion: 65,
+    github: "https://github.com/kaustavr19/Arbitask",
+    debrief:
+      "The production rebuild of Ideaforge — same kanban-timeline-notes-XP core, but with Auth.js, a Prisma-backed database, and role-based collaboration so a project isn't stuck on one machine. The gamification stayed because it worked in the prototype; everything else got rebuilt to survive more than one user.",
   },
 ];
 
