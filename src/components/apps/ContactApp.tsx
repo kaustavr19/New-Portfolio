@@ -98,21 +98,45 @@ function MobilePortrait({ icon, label, sub }: { icon: string; label: string; sub
   );
 }
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export default function ContactApp() {
   const isMobile = useIsMobile();
-  const [sent, setSent]       = useState(false);
+  const [status, setStatus]   = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [name, setName]       = useState("");
+  const [email, setEmail]     = useState("");
   const [message, setMessage] = useState("");
+  const [honeypot, setHoneypot] = useState("");
   const [tick, setTick]       = useState(0);
+  const sent = status === "sent";
 
   useEffect(() => {
     const id = setInterval(() => setTick((t) => t + 1), 80);
     return () => clearInterval(id);
   }, []);
 
-  const handleSend = () => {
-    if (!message.trim()) return;
-    setSent(true);
+  const canSend = message.trim() !== "" && EMAIL_RE.test(email.trim());
+
+  const handleSend = async () => {
+    if (!canSend || status === "sending") return;
+    setStatus("sending");
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, message, honeypot }),
+      });
+      setStatus(res.ok ? "sent" : "error");
+    } catch {
+      setStatus("error");
+    }
+  };
+
+  const resetForm = () => {
+    setStatus("idle");
+    setName("");
+    setEmail("");
+    setMessage("");
   };
 
   // Animated waveform heights
@@ -224,6 +248,41 @@ export default function ContactApp() {
                 />
               </div>
 
+              {/* Reply channel */}
+              <div style={{ marginBottom: 14 }}>
+                <div style={{ fontFamily: MONO, fontSize: 8, color: DIM, letterSpacing: "0.35em", marginBottom: 6 }}>
+                  REPLY CHANNEL
+                </div>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="YOUR.CALLBACK@FREQ.COM"
+                  style={{
+                    width: "100%",
+                    background: "#020902",
+                    border: `1px solid ${GREEN}33`,
+                    color: GREEN,
+                    fontFamily: MONO,
+                    fontSize: 14,
+                    padding: "10px 12px",
+                    outline: "none",
+                    letterSpacing: "0.04em",
+                  }}
+                />
+              </div>
+
+              {/* Honeypot — hidden from sighted users and screen readers, catches naive bots */}
+              <input
+                type="text"
+                value={honeypot}
+                onChange={(e) => setHoneypot(e.target.value)}
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                style={{ position: "absolute", left: -9999, width: 1, height: 1, opacity: 0 }}
+              />
+
               {/* Transmission */}
               <div style={{ marginBottom: 14 }}>
                 <div style={{ fontFamily: MONO, fontSize: 8, color: DIM, letterSpacing: "0.35em", marginBottom: 6 }}>
@@ -252,22 +311,30 @@ export default function ContactApp() {
               </div>
 
               {/* Transmit button */}
+              {status === "error" && (
+                <div style={{ fontFamily: MONO, fontSize: 10, color: AMBER, letterSpacing: "0.1em", marginBottom: 10 }}>
+                  ⚠ TRANSMISSION FAILED — TRY AGAIN OR EMAIL DIRECTLY
+                </div>
+              )}
               <button
                 onClick={handleSend}
+                disabled={!canSend || status === "sending"}
                 style={{
-                  background: message.trim() ? `${GREEN}18` : "transparent",
-                  border: `1px solid ${message.trim() ? GREEN + "99" : DIM + "66"}`,
-                  color: message.trim() ? GREEN : DIM,
+                  background: canSend ? `${GREEN}18` : "transparent",
+                  border: `1px solid ${canSend ? GREEN + "99" : DIM + "66"}`,
+                  color: canSend ? GREEN : DIM,
                   fontFamily: MONO,
                   fontSize: 12,
                   padding: "12px 8px",
-                  cursor: message.trim() ? "pointer" : "not-allowed",
+                  cursor: canSend && status !== "sending" ? "pointer" : "not-allowed",
                   letterSpacing: "0.25em",
                   transition: "all 0.2s",
                   flexShrink: 0,
                 }}
               >
-                {message.trim() ? (
+                {status === "sending" ? (
+                  <><i className="hn hn-play" style={{ opacity: 0.6 }} />{"  TRANSMITTING..."}</>
+                ) : canSend ? (
                   <><i className="hn hn-play" />{"  TRANSMIT"}</>
                 ) : (
                   <><i className="hn hn-play" style={{ opacity: 0.4 }} />{"  AWAITING INPUT..."}</>
@@ -286,7 +353,7 @@ export default function ContactApp() {
                 <span style={{ color: DIM }}>KR-19 WILL RESPOND.</span>
               </div>
               <button
-                onClick={() => { setSent(false); setName(""); setMessage(""); }}
+                onClick={resetForm}
                 style={{
                   marginTop: 4,
                   background: "transparent",
@@ -427,6 +494,41 @@ export default function ContactApp() {
                 />
               </div>
 
+              {/* Reply channel */}
+              <div style={{ marginBottom: 12 }}>
+                <div style={{ fontFamily: MONO, fontSize: 8, color: DIM, letterSpacing: "0.35em", marginBottom: 5 }}>
+                  REPLY CHANNEL
+                </div>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="YOUR.CALLBACK@FREQ.COM"
+                  style={{
+                    width: "100%",
+                    background: "#020902",
+                    border: `1px solid ${GREEN}33`,
+                    color: GREEN,
+                    fontFamily: MONO,
+                    fontSize: 14,
+                    padding: "9px 12px",
+                    outline: "none",
+                    letterSpacing: "0.04em",
+                  }}
+                />
+              </div>
+
+              {/* Honeypot — hidden from sighted users and screen readers, catches naive bots */}
+              <input
+                type="text"
+                value={honeypot}
+                onChange={(e) => setHoneypot(e.target.value)}
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                style={{ position: "absolute", left: -9999, width: 1, height: 1, opacity: 0 }}
+              />
+
               {/* Transmission textarea */}
               <div className="flex flex-col flex-1" style={{ marginBottom: 12 }}>
                 <div style={{ fontFamily: MONO, fontSize: 8, color: DIM, letterSpacing: "0.35em", marginBottom: 5 }}>
@@ -454,22 +556,34 @@ export default function ContactApp() {
               </div>
 
               {/* Transmit button */}
+              {status === "error" && (
+                <div style={{ fontFamily: MONO, fontSize: 9, color: AMBER, letterSpacing: "0.1em", marginBottom: 8 }}>
+                  ⚠ TRANSMISSION FAILED — TRY AGAIN OR EMAIL DIRECTLY
+                </div>
+              )}
               <button
                 onClick={handleSend}
+                disabled={!canSend || status === "sending"}
                 style={{
-                  background: message.trim() ? `${GREEN}18` : "transparent",
-                  border: `1px solid ${message.trim() ? GREEN + "99" : DIM + "66"}`,
-                  color: message.trim() ? GREEN : DIM,
+                  background: canSend ? `${GREEN}18` : "transparent",
+                  border: `1px solid ${canSend ? GREEN + "99" : DIM + "66"}`,
+                  color: canSend ? GREEN : DIM,
                   fontFamily: MONO,
                   fontSize: 11,
                   padding: "9px 8px",
-                  cursor: message.trim() ? "pointer" : "not-allowed",
+                  cursor: canSend && status !== "sending" ? "pointer" : "not-allowed",
                   letterSpacing: "0.25em",
                   transition: "all 0.2s",
                   flexShrink: 0,
                 }}
               >
-                {message.trim() ? <><i className="hn hn-play" />{"  TRANSMIT"}</> : <><i className="hn hn-play" style={{ opacity: 0.4 }} />{"  AWAITING INPUT..."}</>}
+                {status === "sending" ? (
+                  <><i className="hn hn-play" style={{ opacity: 0.6 }} />{"  TRANSMITTING..."}</>
+                ) : canSend ? (
+                  <><i className="hn hn-play" />{"  TRANSMIT"}</>
+                ) : (
+                  <><i className="hn hn-play" style={{ opacity: 0.4 }} />{"  AWAITING INPUT..."}</>
+                )}
               </button>
             </>
           ) : (
@@ -485,7 +599,7 @@ export default function ContactApp() {
                 <span style={{ color: DIM }}>KR-19 WILL RESPOND.</span>
               </div>
               <button
-                onClick={() => { setSent(false); setName(""); setMessage(""); }}
+                onClick={resetForm}
                 style={{
                   marginTop: 8,
                   background: "transparent",
