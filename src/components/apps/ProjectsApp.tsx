@@ -3,6 +3,15 @@
 import { useEffect, useState } from "react";
 import { projects, type Project, type ProjectType, type Medal, type Objective, type ProjectBlock, type ProjectSection } from "@/data/content";
 import { useIsMobile } from "@/lib/use-is-mobile";
+import { parseHash, setHash } from "@/lib/deep-link";
+
+// Deep-linked project, if the URL hash names one that actually exists — read
+// once at module scope so both initial-state hooks below can agree on it.
+function deepLinkedProject(): Project | undefined {
+  const target = parseHash();
+  if (target?.app !== "projects" || !target.subId) return undefined;
+  return projects.find((p) => p.id === target.subId);
+}
 
 /* GTA V pause-menu type: clean humanist sans (Chalet stand-in) for UI,
    Bebas for big display, mono for data readouts. */
@@ -551,14 +560,32 @@ function Tags({ tags, accent }: { tags: string[]; accent: string }) {
 
 export default function ProjectsApp() {
   const isMobile = useIsMobile();
-  const [tab, setTab] = useState<ProjectType>("main");
+  const [tab, setTab] = useState<ProjectType>(() => deepLinkedProject()?.type ?? "main");
   const visible = projects.filter((p) => p.type === tab);
-  const [selectedId, setSelectedId] = useState(visible[0].id);
+  const [selectedId, setSelectedId] = useState(() => deepLinkedProject()?.id ?? visible[0].id);
   const [declassified, toggleDeclassified] = useDeclassifyMode();
 
   // Resolve selection within the active tab (selection can be stale after a switch).
   const project = visible.find((p) => p.id === selectedId) ?? visible[0];
   const accent = ACCENT[tab];
+
+  // Shareable link — reflects the current tab/selection in the URL, and
+  // re-syncs if a different project hash is pasted into an already-open tab.
+  useEffect(() => {
+    setHash("projects", selectedId);
+  }, [selectedId]);
+
+  useEffect(() => {
+    const onHashChange = () => {
+      const match = deepLinkedProject();
+      if (match) {
+        setTab(match.type);
+        setSelectedId(match.id);
+      }
+    };
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
 
   function switchTab(next: ProjectType) {
     setTab(next);
