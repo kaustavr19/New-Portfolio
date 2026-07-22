@@ -169,6 +169,39 @@ function Section({ accent, title, children }: { accent: string; title: string; c
   );
 }
 
+/* VIEW REPO — links out to the GitHub source for side missions with a public repo. */
+function RepoLink({ href, accent }: { href: string; accent: string }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="transition-colors"
+      style={{
+        flexShrink: 0,
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 6,
+        fontFamily: MONO,
+        fontSize: 9,
+        letterSpacing: "0.18em",
+        color: accent,
+        background: `${accent}14`,
+        border: `1px solid ${accent}66`,
+        padding: "5px 10px",
+        marginTop: 4,
+        whiteSpace: "nowrap",
+        textDecoration: "none",
+      }}
+    >
+      <svg width="11" height="11" viewBox="0 0 24 24" aria-hidden fill={accent}>
+        <path d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.1.68-.22.68-.5 0-.24-.01-.87-.01-1.71-2.78.62-3.37-1.36-3.37-1.36-.45-1.18-1.11-1.5-1.11-1.5-.91-.64.07-.62.07-.62 1 .07 1.53 1.05 1.53 1.05.89 1.56 2.34 1.11 2.91.85.09-.66.35-1.11.63-1.37-2.22-.26-4.56-1.14-4.56-5.07 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.31.1-2.74 0 0 .84-.28 2.75 1.05a9.34 9.34 0 0 1 5 0c1.91-1.33 2.75-1.05 2.75-1.05.55 1.43.2 2.48.1 2.74.64.72 1.03 1.63 1.03 2.75 0 3.94-2.35 4.8-4.58 5.06.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .28.18.61.69.5A10.26 10.26 0 0 0 22 12.25C22 6.58 17.52 2 12 2Z" />
+      </svg>
+      VIEW REPO
+    </a>
+  );
+}
+
 /* FEATURED ribbon — marks the flagship mission. */
 function FeaturedTag({ accent }: { accent: string }) {
   return (
@@ -605,6 +638,7 @@ export default function ProjectsApp() {
                       <div style={{ fontFamily: SANS, fontSize: 15, fontWeight: 500, color: "#fff", lineHeight: 1.35 }}>
                         {p.tagline}
                       </div>
+                      {p.github && <RepoLink href={p.github} accent={accent} />}
                       {p.dossier && p.dossier.length > 0 && (
                         <DeclassifyToggle on={declassified} toggle={toggleDeclassified} accent={accent} />
                       )}
@@ -706,6 +740,7 @@ export default function ProjectsApp() {
                 </div>
                 <div className="flex items-center gap-2">
                   {project.featured && <FeaturedTag accent={accent} />}
+                  {project.github && <RepoLink href={project.github} accent={accent} />}
                   {project.dossier && project.dossier.length > 0 && (
                     <DeclassifyToggle on={declassified} toggle={toggleDeclassified} accent={accent} />
                   )}
