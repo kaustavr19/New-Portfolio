@@ -11,6 +11,7 @@ import MouseTrail from "./MouseTrail";
 import { useA11y } from "@/lib/a11y";
 import { useDeviant } from "@/lib/deviant";
 import { useExperiments } from "@/lib/experiments";
+import { parseHash, setAppHash } from "@/lib/deep-link";
 
 // Lazy — only downloads when the starfieldWebgl experiment is on.
 const StarfieldWebgl = dynamic(() => import("@/components/experiments/StarfieldWebgl"), { ssr: false });
@@ -122,6 +123,9 @@ export default function Desktop() {
     } catch {
       // ignore
     }
+    // App-level only — ProjectsApp writes its own "/<projectId>" suffix once
+    // it mounts, so this must not clobber a deep-linked project selection.
+    setAppHash(id);
   }, []);
 
   // Let the Terminal (or anything) open an app window via a global event.
@@ -132,6 +136,19 @@ export default function Desktop() {
     };
     window.addEventListener("kros:open-app", onOpen);
     return () => window.removeEventListener("kros:open-app", onOpen);
+  }, [openWindow]);
+
+  // Deep link — open straight into the app named in the URL hash on first
+  // paint, and again if the hash changes while the desktop is already open
+  // (e.g. a different link pasted into the same tab).
+  useEffect(() => {
+    const openFromHash = () => {
+      const target = parseHash();
+      if (target && desktopIcons.some((ic) => ic.id === target.app)) openWindow(target.app);
+    };
+    openFromHash();
+    window.addEventListener("hashchange", openFromHash);
+    return () => window.removeEventListener("hashchange", openFromHash);
   }, [openWindow]);
 
   const closeWindow = useCallback((id: string) => {
@@ -154,6 +171,7 @@ export default function Desktop() {
       ...prev,
       [id]: { ...prev[id], zIndex: zCounter },
     }));
+    setAppHash(id);
   }, []);
 
   const handleTaskbarClick = useCallback(

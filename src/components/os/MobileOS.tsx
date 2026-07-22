@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import LockScreen from "./mobile/LockScreen";
 import HomeScreen from "./mobile/HomeScreen";
 import AppView from "./mobile/AppView";
 import { useExperiments } from "@/lib/experiments";
+import { desktopIcons } from "@/data/content";
+import { parseHash, setAppHash } from "@/lib/deep-link";
 
 /* DesktopBg and MouseTrail are dynamically imported, same pattern as
    Desktop.tsx — keeps SSR happy (both touch window/canvas). */
@@ -35,11 +37,22 @@ export default function MobileOS() {
   const [activeApp, setActiveApp] = useState<string | null>(null);
   const { starfieldWebgl } = useExperiments();
 
+  // Parsed once — a deep-linked target (e.g. "#projects/operation-underwriting")
+  // has to survive past the lock screen, so it's read up front and consumed by
+  // whichever unlock path actually fires (already-booted vs. fresh tap).
+  const deepLinkTarget = useRef(parseHash());
+
   // Hydration: skip lock if already booted this session
   useEffect(() => {
     try {
       if (sessionStorage.getItem(BOOT_KEY) === "1") {
-        setView("home");
+        const target = deepLinkTarget.current;
+        if (target && desktopIcons.some((ic) => ic.id === target.app)) {
+          setActiveApp(target.app);
+          setView("app");
+        } else {
+          setView("home");
+        }
       }
     } catch {
       // sessionStorage unavailable — keep showing lock
@@ -67,12 +80,19 @@ export default function MobileOS() {
     } catch {
       // ignore storage errors
     }
-    setView("home");
+    const target = deepLinkTarget.current;
+    if (target && desktopIcons.some((ic) => ic.id === target.app)) {
+      setActiveApp(target.app);
+      setView("app");
+    } else {
+      setView("home");
+    }
   };
 
   const handleOpenApp = (id: string) => {
     setActiveApp(id);
     setView("app");
+    setAppHash(id);
   };
 
   // Let the Terminal (or anything) open an app via a global event.
@@ -84,6 +104,18 @@ export default function MobileOS() {
     window.addEventListener("kros:open-app", onOpen);
     return () => window.removeEventListener("kros:open-app", onOpen);
   }, []);
+
+  // A different hash pasted into an already-open tab — don't yank the user
+  // mid-lock-screen, only react once they're past it.
+  useEffect(() => {
+    const onHashChange = () => {
+      if (view === "lock") return;
+      const target = parseHash();
+      if (target && desktopIcons.some((ic) => ic.id === target.app)) handleOpenApp(target.app);
+    };
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, [view]);
 
   const handleBack = () => {
     setView("home");
