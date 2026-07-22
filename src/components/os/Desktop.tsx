@@ -8,6 +8,7 @@ import Taskbar from "./Taskbar";
 import KROSLogo from "./KROSLogo";
 import DesktopBg from "./DesktopBg";
 import MouseTrail from "./MouseTrail";
+import WelcomeNotification from "./WelcomeNotification";
 import { useA11y } from "@/lib/a11y";
 import { useDeviant } from "@/lib/deviant";
 import { useExperiments } from "@/lib/experiments";
@@ -214,6 +215,9 @@ export default function Desktop() {
 
       {/* Experiment: GPU starfield — covers the 2D sky, sits below icons */}
       {starfieldWebgl && <StarfieldWebgl />}
+
+      {/* First-visit hook — only ever shows once, per localStorage */}
+      <WelcomeNotification />
 
       {/* Centered logo wallpaper */}
       <div

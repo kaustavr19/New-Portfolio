@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import LockScreen from "./mobile/LockScreen";
 import HomeScreen from "./mobile/HomeScreen";
 import AppView from "./mobile/AppView";
+import WelcomeNotification from "./WelcomeNotification";
 import { useExperiments } from "@/lib/experiments";
 import { desktopIcons } from "@/data/content";
 import { parseHash, setAppHash } from "@/lib/deep-link";
@@ -134,6 +135,10 @@ export default function MobileOS() {
       {/* Cosmic wallpaper covers the 2D sky when enabled (LABS toggle) */}
       {starfieldWebgl && <StarfieldWebgl />}
       <MouseTrail />
+
+      {/* First-visit hook — waits until past the lock screen, only ever
+          shows once per localStorage */}
+      {view !== "lock" && <WelcomeNotification />}
 
       {/* Active view — sits above the wallpaper */}
       <div className="absolute inset-0" style={{ zIndex: 10 }}>
