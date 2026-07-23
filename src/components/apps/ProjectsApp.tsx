@@ -501,6 +501,48 @@ function Classified({ text }: { text: string }) {
   );
 }
 
+/* Blurs everything past the Mission Brief behind an NDA overlay — for a
+   mission that's still an active, in-progress client engagement rather
+   than a finished case study, so detail isn't published before it's
+   settled. */
+function ClassifiedGate({ text, accent, children }: { text: string; accent: string; children: React.ReactNode }) {
+  return (
+    <div style={{ position: "relative" }}>
+      <div style={{ filter: "blur(7px)", opacity: 0.5, pointerEvents: "none", userSelect: "none" }} aria-hidden>
+        {children}
+      </div>
+      <div className="absolute inset-0 flex justify-center">
+        {/* Sticky, not just centered — a dossier can scroll well past one
+            screen, and the notice needs to stay in view the whole time,
+            not just at the top of the blurred region. */}
+        <div style={{ position: "sticky", top: 24, alignSelf: "flex-start" }}>
+          <div
+            className="flex items-start gap-3"
+            style={{
+              background: "rgba(8,8,8,0.94)",
+              border: `1px solid ${accent}66`,
+              padding: "18px 22px",
+              maxWidth: 420,
+              boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
+            }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden style={{ flexShrink: 0, marginTop: 2 }}>
+              <rect x="5" y="11" width="14" height="9" rx="1.5" fill="none" stroke={accent} strokeWidth="1.6" />
+              <path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke={accent} strokeWidth="1.6" />
+            </svg>
+            <div>
+              <div style={{ fontFamily: MONO, fontSize: 10, color: accent, letterSpacing: "0.2em", marginBottom: 6 }}>
+                CLASSIFIED — ACTIVE ENGAGEMENT
+              </div>
+              <div style={{ fontFamily: SANS, fontSize: 14, color: "#e8e8e8", lineHeight: 1.5 }}>{text}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* OBJECTIVES — GTA V mission checklist; completed objectives are ticked. */
 function Objectives({ items, accent }: { items: Objective[]; accent: string }) {
   return (
@@ -685,19 +727,27 @@ export default function ProjectsApp() {
                     <Section accent={accent} title="MISSION BRIEF">
                       <p style={{ fontFamily: SANS, fontSize: 15, color: "#cfcfcf", lineHeight: 1.55 }}>{p.description}</p>
                     </Section>
-                    {p.objectives && p.objectives.length > 0 && (
-                      <Section accent={accent} title="OBJECTIVES">
-                        <Objectives items={p.objectives} accent={accent} />
-                      </Section>
-                    )}
-                    {p.tags.length > 0 && (
-                      <Section accent={accent} title="INTEL TAGS">
-                        <Tags tags={p.tags} accent={accent} />
-                      </Section>
-                    )}
-                    {p.dossier && p.dossier.length > 0 && (declassified ? <ReaderDossier sections={p.dossier} /> : <Dossier sections={p.dossier} accent={accent} />)}
-                    {p.debrief && <Callout label="DEBRIEF" text={p.debrief} accent={accent} />}
-                    {p.classified && <Classified text={p.classified} />}
+                    {(() => {
+                      const gated = p.status === "IN PROGRESS" && !!p.classified;
+                      const rest = (
+                        <div className="flex flex-col gap-5">
+                          {p.objectives && p.objectives.length > 0 && (
+                            <Section accent={accent} title="OBJECTIVES">
+                              <Objectives items={p.objectives} accent={accent} />
+                            </Section>
+                          )}
+                          {p.tags.length > 0 && (
+                            <Section accent={accent} title="INTEL TAGS">
+                              <Tags tags={p.tags} accent={accent} />
+                            </Section>
+                          )}
+                          {p.dossier && p.dossier.length > 0 && (declassified ? <ReaderDossier sections={p.dossier} /> : <Dossier sections={p.dossier} accent={accent} />)}
+                          {p.debrief && <Callout label="DEBRIEF" text={p.debrief} accent={accent} />}
+                          {!gated && p.classified && <Classified text={p.classified} />}
+                        </div>
+                      );
+                      return gated ? <ClassifiedGate text={p.classified!} accent={accent}>{rest}</ClassifiedGate> : rest;
+                    })()}
                   </div>
                 )}
               </div>
@@ -809,40 +859,48 @@ export default function ProjectsApp() {
             </Section>
           </div>
 
-          {/* Objectives */}
-          {project.objectives && project.objectives.length > 0 && (
-            <div style={{ marginBottom: 28 }}>
-              <Section accent={accent} title="OBJECTIVES">
-                <Objectives items={project.objectives} accent={accent} />
-              </Section>
-            </div>
-          )}
+          {(() => {
+            const gated = project.status === "IN PROGRESS" && !!project.classified;
+            const rest = (
+              <>
+                {/* Objectives */}
+                {project.objectives && project.objectives.length > 0 && (
+                  <div style={{ marginBottom: 28 }}>
+                    <Section accent={accent} title="OBJECTIVES">
+                      <Objectives items={project.objectives} accent={accent} />
+                    </Section>
+                  </div>
+                )}
 
-          {/* Tags */}
-          <Section accent={accent} title="INTEL TAGS">
-            <Tags tags={project.tags} accent={accent} />
-          </Section>
+                {/* Tags */}
+                <Section accent={accent} title="INTEL TAGS">
+                  <Tags tags={project.tags} accent={accent} />
+                </Section>
 
-          {/* Dossier — full heist-style case study */}
-          {project.dossier && project.dossier.length > 0 && (
-            <div style={{ marginTop: 28 }}>
-              {declassified ? <ReaderDossier sections={project.dossier} /> : <Dossier sections={project.dossier} accent={accent} />}
-            </div>
-          )}
+                {/* Dossier — full heist-style case study */}
+                {project.dossier && project.dossier.length > 0 && (
+                  <div style={{ marginTop: 28 }}>
+                    {declassified ? <ReaderDossier sections={project.dossier} /> : <Dossier sections={project.dossier} accent={accent} />}
+                  </div>
+                )}
 
-          {/* Debrief (standalone, for missions without a full dossier) */}
-          {project.debrief && (
-            <div style={{ marginTop: 28 }}>
-              <Callout label="DEBRIEF" text={project.debrief} accent={accent} />
-            </div>
-          )}
+                {/* Debrief (standalone, for missions without a full dossier) */}
+                {project.debrief && (
+                  <div style={{ marginTop: 28 }}>
+                    <Callout label="DEBRIEF" text={project.debrief} accent={accent} />
+                  </div>
+                )}
 
-          {/* Classified — NDA / on-request note */}
-          {project.classified && (
-            <div style={{ marginTop: 28 }}>
-              <Classified text={project.classified} />
-            </div>
-          )}
+                {/* Classified — NDA / on-request note (shown separately only when not gated) */}
+                {!gated && project.classified && (
+                  <div style={{ marginTop: 28 }}>
+                    <Classified text={project.classified} />
+                  </div>
+                )}
+              </>
+            );
+            return gated ? <ClassifiedGate text={project.classified!} accent={accent}>{rest}</ClassifiedGate> : rest;
+          })()}
 
           {/* Other missions in this strand */}
           <div className="mt-auto" style={{ paddingTop: 32 }}>
