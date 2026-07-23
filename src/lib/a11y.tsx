@@ -34,30 +34,42 @@ const Ctx = createContext<A11yCtx | null>(null);
 export function A11yProvider({ children }: { children: ReactNode }) {
   const [prefs, setPrefs] = useState<A11yPrefs>(DEFAULTS);
   const [ready, setReady] = useState(false);
+  // Whether the user has ever explicitly touched the Reduce Motion switch
+  // themselves, as opposed to it just reflecting the auto-detected OS
+  // preference. Only once this is true does motionReduced stop re-syncing
+  // to the live `prefers-reduced-motion` query on every load.
+  const [motionUserSet, setMotionUserSet] = useState(false);
 
   // Hydrate from localStorage + check prefers-reduced-motion on mount
   useEffect(() => {
     let next = { ...DEFAULTS };
+    let userSetMotion = false;
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
-        const parsed = JSON.parse(raw) as Partial<A11yPrefs> & { audioMuted?: boolean };
+        const parsed = JSON.parse(raw) as Partial<A11yPrefs> & { audioMuted?: boolean; motionReducedUserSet?: boolean };
         next = { ...next, ...parsed };
+        userSetMotion = !!parsed.motionReducedUserSet;
         // Migrate the old single `audioMuted` flag → split sound toggles.
         if (parsed.audioMuted !== undefined && parsed.soundEffects === undefined) {
           next.soundEffects = !parsed.audioMuted;
           next.ambience = !parsed.audioMuted;
         }
-      } else if (typeof window !== "undefined" && window.matchMedia) {
-        // No user override yet — respect OS preference
-        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-          next.motionReduced = true;
-        }
+      }
+      // Unless the user has explicitly chosen Reduce Motion themselves,
+      // always follow the live OS preference rather than whatever it
+      // happened to read on a long-ago first visit — otherwise a stale
+      // `true` (e.g. from testing in an environment that reports reduced
+      // motion) sticks forever, surviving cache clears and hard reloads
+      // since it lives in localStorage, not the cache.
+      if (!userSetMotion && typeof window !== "undefined" && window.matchMedia) {
+        next.motionReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       }
     } catch {
       // ignore parse / storage errors
     }
     setPrefs(next);
+    setMotionUserSet(userSetMotion);
     setReady(true);
   }, []);
 
@@ -65,17 +77,19 @@ export function A11yProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!ready) return;
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...prefs, motionReducedUserSet: motionUserSet }));
     } catch {
       // storage unavailable
     }
-  }, [prefs, ready]);
+  }, [prefs, motionUserSet, ready]);
 
   const setPref: A11yCtx["setPref"] = useCallback((key, value) => {
+    if (key === "motionReduced") setMotionUserSet(true);
     setPrefs((p) => ({ ...p, [key]: value }));
   }, []);
 
   const toggle: A11yCtx["toggle"] = useCallback((key) => {
+    if (key === "motionReduced") setMotionUserSet(true);
     setPrefs((p) => ({ ...p, [key]: !p[key] }));
   }, []);
 
