@@ -294,8 +294,6 @@ export const experience = chapters.flatMap((c) =>
      "side" = personal projects (side missions / strangers & freaks)
    `completion` (0–100) + `medal` drive the MISSION PASSED card.
    `stars` doubles as the GTA "wanted level" / difficulty.
-
-   NOTE: main missions are placeholders — swap in real work later.
    ────────────────────────────────────────────────────────── */
 export type ProjectType = "main" | "side";
 export type Medal = "gold" | "silver" | "bronze";

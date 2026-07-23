@@ -5,6 +5,7 @@ import { useIsMobile } from "@/lib/use-is-mobile";
 import { useDeviant } from "@/lib/deviant";
 import { useExperiments } from "@/lib/experiments";
 import { runTerminal, TERM_VERBS, type TermLine } from "@/lib/terminal/engine";
+import { setHash } from "@/lib/deep-link";
 
 const TITLE = "'Press Start 2P', monospace";
 const BODY = "'VT323', monospace";
@@ -96,7 +97,19 @@ export default function TerminalApp() {
       setInput(""); setHistIdx(-1);
       return;
     }
-    if (a?.kind === "open") window.dispatchEvent(new CustomEvent("kros:open-app", { detail: a.app }));
+    if (a?.kind === "open") {
+      if (a.projectId) {
+        // Set before dispatching — Desktop/MobileOS write the app-level hash
+        // on open via setAppHash (which preserves an existing subId for the
+        // same app), so this project id needs to already be in place first.
+        setHash("projects", a.projectId);
+        // setHash uses replaceState, which doesn't fire a native hashchange
+        // event — dispatch one manually so ProjectsApp's own listener picks
+        // up the new selection if the window is already open.
+        window.dispatchEvent(new Event("hashchange"));
+      }
+      window.dispatchEvent(new CustomEvent("kros:open-app", { detail: a.app }));
+    }
     if (a?.kind === "link") window.open(a.url, "_blank", "noopener,noreferrer");
     if (a?.kind === "toggleDeviant") toggleDeviant();
     if (a?.kind === "toggleWallpaper") setFlag("starfieldWebgl", !starfieldWebgl);
