@@ -45,6 +45,10 @@ function bar(level: number): string {
 
 const FLAT_SKILLS = Object.values(skills).flat();
 
+// `experience` is chronological (oldest first) — the current role is the
+// last entry, not the first.
+const CURRENT_ROLE = experience[experience.length - 1];
+
 /* App aliases for `open <app>` / `/tp <app>`. */
 const APP_ALIASES: Record<string, string> = {
   about: "about", me: "about", bio: "about", who: "about",
@@ -193,7 +197,7 @@ const INTENTS: Intent[] = [
       if (/where.*(live|based|from)|location|city/.test(q)) {
         return { lines: [`§7Kaustav is based in §f${profile.location}§7.`].map(out) };
       }
-      const cur = experience[0];
+      const cur = CURRENT_ROLE;
       return {
         lines: [
           `§7Right now he's a §f${cur.role}§7`,
@@ -238,7 +242,7 @@ const INTENTS: Intent[] = [
         "§7Kaustav specializes in §fAI-powered enterprise UX§7 —",
         "§7human-in-the-loop decisioning, explainable AI, and",
         "§7workflows complex domains can actually trust.",
-        `§8Currently: ${experience[0].role} @ ${experience[0].company}.`,
+        `§8Currently: ${CURRENT_ROLE.role} @ ${CURRENT_ROLE.company}.`,
       ].map(out),
     }),
   },
