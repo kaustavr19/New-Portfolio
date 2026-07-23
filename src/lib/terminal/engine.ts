@@ -26,7 +26,7 @@ export type TermLine = { type: TermLineType; text: string };
 
 export type TermAction =
   | { kind: "clear" }
-  | { kind: "open"; app: string }
+  | { kind: "open"; app: string; projectId?: string }
   | { kind: "link"; url: string }
   | { kind: "toggleDeviant" }
   | { kind: "toggleWallpaper" }
@@ -55,6 +55,13 @@ const APP_ALIASES: Record<string, string> = {
   settings: "settings", config: "settings", prefs: "settings",
   terminal: "terminal",
 };
+
+/* `open <project-id-or-name>` — lets the terminal deep-link straight into
+   a specific mission dossier, not just the Projects app in general. */
+function findProject(query: string) {
+  const q = query.toLowerCase().trim();
+  return projects.find((p) => p.id === q || p.name.toLowerCase() === q);
+}
 
 /* ── Canned command responders ── */
 function cmdHelp(): TermLine[] {
@@ -332,12 +339,39 @@ export function runTerminal(raw: string): TermResult {
       return { lines: ["§aOpening Medium…"].map(out), action: { kind: "link", url: profile.social.medium } };
     case "clear": case "cls":
       return { lines: [], action: { kind: "clear" } };
-    case "ls": case "dir": case "apps":
-      return { lines: ["§6Apps: §fabout §7· §fprojects §7· §fskills §7· §fexperience §7· §fcontact §7· §fsettings", "§8open one with §eopen <app>§8."].map(out) };
+    case "ls": case "dir": case "apps": {
+      const target = arg.trim().replace(/\/+$/, "").toLowerCase();
+      if (target === "projects" || target === "builds" || target === "missions") {
+        const mains = projects.filter((p) => p.type === "main");
+        const sides = projects.filter((p) => p.type === "side");
+        return {
+          lines: [
+            "§6Main missions:",
+            ...mains.map((p) => `§f  ${p.id}§8 — ${p.name}`),
+            "§6Side missions:",
+            ...sides.map((p) => `§f  ${p.id}§8 — ${p.name}`),
+            "§8open one with §eopen <id>§8, e.g. §eopen underwriting",
+          ].map(out),
+        };
+      }
+      return {
+        lines: [
+          "§6Apps: §fabout §7· §fprojects §7· §fskills §7· §fexperience §7· §fcontact §7· §fsettings",
+          "§8open one with §eopen <app>§8, or try §els projects/§8.",
+        ].map(out),
+      };
+    }
     case "open": case "tp": case "goto": case "launch": {
-      const target = APP_ALIASES[arg.toLowerCase()];
-      if (!target) return { lines: [err(`  Unknown app: "${arg}". Try: about, projects, skills, experience, contact, settings.`)] };
-      return { lines: [`§aTeleporting to §f${target}§a…`].map(out), action: { kind: "open", app: target } };
+      const appTarget = APP_ALIASES[arg.toLowerCase()];
+      if (appTarget) return { lines: [`§aTeleporting to §f${appTarget}§a…`].map(out), action: { kind: "open", app: appTarget } };
+      const proj = findProject(arg);
+      if (proj) {
+        return {
+          lines: [`§aTeleporting to §f${proj.name}§a…`].map(out),
+          action: { kind: "open", app: "projects", projectId: proj.id },
+        };
+      }
+      return { lines: [err(`  Unknown app: "${arg}". Try: about, projects, skills, experience, contact, settings — or a project name.`)] };
     }
     case "deviant":
       return { lines: ["§dToggling DEVIANT protocol…"].map(out), action: { kind: "toggleDeviant" } };
@@ -369,6 +403,54 @@ export function runTerminal(raw: string): TermResult {
         ].map(out),
         action: { kind: "advancement", title: "Getting Wood", desc: "Crafted something in KR//OS" },
       };
+    case "cat": {
+      const file = arg.trim().toLowerCase();
+      if (file === "resume.pdf" || file === "resume" || file === "cv.pdf" || file === "cv") {
+        return {
+          lines: ["§7Streaming resume.pdf to stdout…", "§aOpening résumé… §8(/Kaustav_Roy_CV.pdf)"].map(out),
+          action: { kind: "link", url: "/Kaustav_Roy_CV.pdf" },
+        };
+      }
+      if (!file) return { lines: [err("  cat: missing file operand")] };
+      return { lines: [err(`  cat: ${arg}: No such file or directory`)] };
+    }
+    case "sl":
+      return {
+        lines: [
+          "§7      ====        ________                ___________",
+          "§7  ___|(_)_|_______|  __   |_____I_I_____|  __   |",
+          "§7 |    |_|          |_|  |__|_____I_I_____|_|  |__|",
+          "§7 |________________________|______|______|_________|",
+          "§7   oo   oo    oo    oo    oo   oo    oo   oo    oo",
+          "§8Typo'd §fls§8? Here's a train instead. 🚂",
+        ].map(out),
+      };
+    case "vim": case "vi":
+      return {
+        lines: [
+          "§8~",
+          "§8~                    §7[No Name]",
+          "§8~",
+          "§7-- INSERT --",
+          "§8You are now trapped in vim.",
+          "§8Legend has it some escape with §e:wq§8. Most don't.",
+        ].map(out),
+      };
+    case ":q": case ":wq": case ":q!": case ":x":
+      return {
+        lines: [
+          "§aCongratulations. §7You escaped Vim.",
+          "§8Not everyone makes it out.",
+        ].map(out),
+        action: { kind: "advancement", title: "How Did We Get Here?", desc: "Escaped Vim" },
+      };
+    case "rm":
+      if (arg.toLowerCase().includes("-rf")) {
+        return { lines: [err("  Nice try. 😏 This isn't that kind of terminal.")] };
+      }
+      return { lines: [err(`  rm: ${arg || "missing operand"}: Permission denied`)] };
+    case "42":
+      return { lines: ["§6The Answer to the Ultimate Question of Life, the Universe, and Everything."].map(out) };
     default:
       // Not a command → answer engine.
       return answer(input);
@@ -380,4 +462,5 @@ export const TERM_VERBS = [
   "help", "about", "skills", "projects", "experience", "education",
   "awards", "writing", "contact", "resume", "email", "linkedin", "medium",
   "open", "clear", "deviant", "wallpaper", "sudo hire", "craft",
+  "cat", "sl", "vim", "rm",
 ];

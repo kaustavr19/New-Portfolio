@@ -135,28 +135,6 @@ function MissionResult({ project, accent }: { project: Project; accent: string }
   );
 }
 
-/* GTA-style intel ticker — flags that mission content is still incoming. */
-function ComingSoonBanner({ accent }: { accent: string }) {
-  return (
-    <div
-      className="flex items-center gap-2"
-      style={{
-        padding: "8px 18px",
-        background: `${accent}10`,
-        borderBottom: `1px solid ${accent}33`,
-        fontFamily: MONO,
-        fontSize: 10,
-        letterSpacing: "0.22em",
-        color: "#e8e8e8",
-      }}
-    >
-      <span style={{ color: accent }}>●</span>
-      <span style={{ color: accent }}>INTEL UPDATE INCOMING</span>
-      <span style={{ color: "#ffffff66" }}>— FULL MISSION BRIEFS COMING SOON</span>
-    </div>
-  );
-}
-
 function Section({ accent, title, children }: { accent: string; title: string; children: React.ReactNode }) {
   return (
     <div>
@@ -629,7 +607,6 @@ export default function ProjectsApp() {
     return (
       <div className="h-full overflow-auto" style={{ background: "#0a0a0a", color: "#e8e8e8" }}>
         {tabBar}
-        <ComingSoonBanner accent={accent} />
         <div className="flex flex-col">
           {visible.map((p) => {
             const isOpen = project.id === p.id;
@@ -712,7 +689,6 @@ export default function ProjectsApp() {
   return (
     <div className="h-full flex flex-col overflow-hidden" style={{ background: "#0a0a0a", color: "#e8e8e8" }}>
       {tabBar}
-      <ComingSoonBanner accent={accent} />
 
       <div className="flex-1 flex overflow-hidden">
         {/* Left — mission list rail */}
