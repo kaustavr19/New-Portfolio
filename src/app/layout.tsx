@@ -2,14 +2,24 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "@hackernoon/pixel-icon-library/fonts/iconfont.css";
 
+const DESCRIPTION =
+  "Portfolio of Kaustav Roy — Design Consultant specializing in AI-powered enterprise UX. An interactive OS-themed experience.";
+
 export const metadata: Metadata = {
+  metadataBase: new URL("https://kr-os-folio.vercel.app"),
   title: "Kaustav Roy — KR//OS",
-  description:
-    "Portfolio of Kaustav Roy — Design Consultant specializing in AI-powered enterprise UX.",
+  description: DESCRIPTION,
   openGraph: {
     title: "Kaustav Roy — KR//OS",
-    description: "Design × AI × Enterprise UX. An interactive OS-themed portfolio.",
+    description: DESCRIPTION,
     type: "website",
+    siteName: "KR//OS",
+    url: "/",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Kaustav Roy — KR//OS",
+    description: DESCRIPTION,
   },
 };
 
