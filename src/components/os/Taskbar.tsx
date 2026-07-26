@@ -6,12 +6,20 @@ import ControlCenter from "./ControlCenter";
 import KRMark from "./KRMark";
 import SystemStatus from "./SystemStatus";
 import { useDeviant } from "@/lib/deviant";
+import {
+  audienceProfiles,
+  useAudience,
+} from "@/lib/audience";
+import { requestPersonnelBrief } from "@/lib/personnel-brief";
 
 interface TaskbarProps {
   openWindows: Record<string, { isOpen: boolean; isMinimized: boolean }>;
   onIconClick: (id: string) => void;
   onTaskbarClick: (id: string) => void;
   recentAppId?: string | null;
+  onOpenCommandCenter: () => void;
+  onMinimizeAll: () => void;
+  onCloseAll: () => void;
 }
 
 // Must match BOOT_KEY in app/page.tsx — clearing it makes the boot screen play again on reload.
@@ -26,13 +34,23 @@ function reboot() {
   window.location.reload();
 }
 
-export default function Taskbar({ openWindows, onIconClick, onTaskbarClick, recentAppId }: TaskbarProps) {
+export default function Taskbar({
+  openWindows,
+  onIconClick,
+  onTaskbarClick,
+  recentAppId,
+  onOpenCommandCenter,
+  onMinimizeAll,
+  onCloseAll,
+}: TaskbarProps) {
   const { deviant } = useDeviant();
   const labelFor = (icon: typeof desktopIcons[number]) => (deviant && icon.deviantLabel) ? icon.deviantLabel : icon.label;
   const [time, setTime] = useState("");
   const [date, setDate] = useState("");
   const [startOpen, setStartOpen] = useState(false);
+  const audience = useAudience();
   const recentIcon = desktopIcons.find((ic) => ic.id === recentAppId);
+  const activeAudience = audienceProfiles.find((item) => item.id === audience);
 
   useEffect(() => {
     const update = () => {
@@ -74,7 +92,7 @@ export default function Taskbar({ openWindows, onIconClick, onTaskbarClick, rece
           style={{ fontFamily: "'Share Tech Mono', monospace", letterSpacing: "0.12em" }}
         >
           <KRMark height={16} color={deviant ? "#ff3c8c" : "#4fc3f7"} />
-          <span style={{ color: "#3a3a4e", fontSize: 14 }}>//</span>
+          <span style={{ color: "#3a3a4e", fontSize: 14 }}>{"//"}</span>
           <span style={{ color: "#f5e642", fontWeight: 700, fontSize: 14 }}>{deviant ? "DEVIANT" : "OS"}</span>
         </button>
 
@@ -86,6 +104,8 @@ export default function Taskbar({ openWindows, onIconClick, onTaskbarClick, rece
               background: "#141419",
               border: "1px solid rgba(255,255,255,0.1)",
               padding: "20px",
+              maxHeight: "calc(100vh - 72px)",
+              overflowY: "auto",
             }}
           >
             {/* User */}
@@ -96,6 +116,42 @@ export default function Taskbar({ openWindows, onIconClick, onTaskbarClick, rece
               <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 10, color: "#83839a", letterSpacing: "0.08em", marginTop: 3 }}>
                 {deviant ? "KR-19 · DEVIANT" : "KR-19 · Design Consultant"}
               </div>
+            </div>
+
+            <div
+              className="flex items-center justify-between gap-3"
+              style={{
+                padding: "10px 11px",
+                border: `1px solid ${activeAudience?.accent ?? "#4fc3f7"}33`,
+                background: `${activeAudience?.accent ?? "#4fc3f7"}08`,
+              }}
+            >
+              <div className="min-w-0">
+                <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 8, color: "#738594", letterSpacing: "0.16em" }}>
+                  VISITOR ROUTE
+                </div>
+                <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 10, color: activeAudience?.accent ?? "#aab8c2", letterSpacing: "0.09em", marginTop: 3 }}>
+                  {activeAudience?.shortLabel ?? "NOT SET"}
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  requestPersonnelBrief();
+                  setStartOpen(false);
+                }}
+                className="transition-colors hover:bg-white/5"
+                style={{
+                  padding: "5px 7px",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  color: "#a8b8c4",
+                  fontFamily: "'Share Tech Mono', monospace",
+                  fontSize: 8,
+                  letterSpacing: "0.08em",
+                }}
+              >
+                {activeAudience ? "CHANGE" : "CHOOSE"}
+              </button>
             </div>
 
             {/* Recently opened */}
@@ -155,6 +211,41 @@ export default function Taskbar({ openWindows, onIconClick, onTaskbarClick, rece
                     </button>
                   );
                 })}
+              </div>
+            </div>
+
+            <div className="h-px" style={{ background: "rgba(255,255,255,0.08)" }} />
+
+            <div>
+              <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 10, color: "rgba(255,255,255,0.55)", letterSpacing: "0.2em", marginBottom: 10 }}>
+                SYSTEM
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { label: "COMMAND", icon: "search", action: onOpenCommandCenter },
+                  { label: "DESKTOP", icon: "minus", action: onMinimizeAll },
+                  { label: "CLEAR", icon: "times", action: onCloseAll },
+                ].map((item) => (
+                  <button
+                    key={item.label}
+                    type="button"
+                    onClick={() => {
+                      item.action();
+                      setStartOpen(false);
+                    }}
+                    className="flex flex-col items-center gap-1.5 py-2 transition-colors hover:bg-white/5"
+                    style={{
+                      border: "1px solid rgba(255,255,255,0.07)",
+                      color: "#8ea1af",
+                      fontFamily: "'Share Tech Mono', monospace",
+                      fontSize: 8,
+                      letterSpacing: "0.06em",
+                    }}
+                  >
+                    <i className={`hn hn-${item.icon}`} aria-hidden style={{ color: "#4fc3f7", fontSize: 13 }} />
+                    {item.label}
+                  </button>
+                ))}
               </div>
             </div>
 

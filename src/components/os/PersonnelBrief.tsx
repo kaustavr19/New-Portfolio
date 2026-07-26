@@ -4,6 +4,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { profile } from "@/data/content";
 import { useA11y } from "@/lib/a11y";
+import {
+  audienceProfiles,
+  saveAudience,
+  type AudienceId,
+} from "@/lib/audience";
 import { setHash } from "@/lib/deep-link";
 import { PERSONNEL_BRIEF_EVENT } from "@/lib/personnel-brief";
 import { useReaderMode } from "@/lib/reader-mode";
@@ -22,6 +27,7 @@ const proofSignals = [
 
 export default function PersonnelBrief() {
   const [visible, setVisible] = useState(false);
+  const [selectedAudience, setSelectedAudience] = useState<AudienceId | null>(null);
   const dialogRef = useRef<HTMLElement>(null);
   const { motionReduced } = useA11y();
   const { setOpen: setReaderOpen } = useReaderMode();
@@ -51,7 +57,10 @@ export default function PersonnelBrief() {
   }, []);
 
   useEffect(() => {
-    const reopen = () => setVisible(true);
+    const reopen = () => {
+      setSelectedAudience(null);
+      setVisible(true);
+    };
     window.addEventListener(PERSONNEL_BRIEF_EVENT, reopen);
     return () => window.removeEventListener(PERSONNEL_BRIEF_EVENT, reopen);
   }, []);
@@ -102,7 +111,27 @@ export default function PersonnelBrief() {
     dismiss();
   }
 
+  function chooseAudience(audience: AudienceId) {
+    saveAudience(audience);
+    setSelectedAudience(audience);
+  }
+
+  function continueRoute() {
+    if (selectedAudience === "recruiter") {
+      openRecruiterView();
+      return;
+    }
+    if (selectedAudience === "collaborator") {
+      openFlagshipMission();
+      return;
+    }
+    dismiss();
+  }
+
   const duration = motionReduced ? 0 : 0.28;
+  const selectedProfile = audienceProfiles.find(
+    (audience) => audience.id === selectedAudience,
+  );
 
   return (
     <AnimatePresence>
@@ -382,23 +411,91 @@ export default function PersonnelBrief() {
                   ))}
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-2.5" style={{ marginTop: 24 }}>
+                <fieldset style={{ marginTop: 24 }}>
+                  <legend
+                    style={{
+                      fontFamily: MONO,
+                      fontSize: 9,
+                      color: "#9fb2bf",
+                      letterSpacing: "0.18em",
+                      marginBottom: 10,
+                    }}
+                  >
+                    SELECT VISITOR ROUTE
+                  </legend>
+                  <div className="grid sm:grid-cols-3 gap-2.5">
+                    {audienceProfiles.map((audience) => {
+                      const selected = audience.id === selectedAudience;
+                      return (
+                        <button
+                          key={audience.id}
+                          type="button"
+                          aria-pressed={selected}
+                          onClick={() => chooseAudience(audience.id)}
+                          className="text-left transition-all hover:-translate-y-0.5 focus-visible:-translate-y-0.5"
+                          style={{
+                            minHeight: 112,
+                            padding: "12px 13px",
+                            border: `1px solid ${audience.accent}${selected ? "bb" : "44"}`,
+                            background: selected ? `${audience.accent}12` : "rgba(255,255,255,0.018)",
+                            boxShadow: selected ? `inset 3px 0 0 ${audience.accent}` : "none",
+                            borderRadius: 2,
+                          }}
+                        >
+                          <span
+                            style={{
+                              display: "block",
+                              fontFamily: MONO,
+                              fontSize: 9,
+                              color: audience.accent,
+                              letterSpacing: "0.12em",
+                            }}
+                          >
+                            {selected ? "● " : "○ "}
+                            {audience.eyebrow}
+                          </span>
+                          <span
+                            style={{
+                              display: "block",
+                              fontFamily: SANS,
+                              fontSize: 14,
+                              color: "#f2f6f8",
+                              fontWeight: 600,
+                              marginTop: 7,
+                            }}
+                          >
+                            {audience.label}
+                          </span>
+                          <span
+                            style={{
+                              display: "block",
+                              fontFamily: SANS,
+                              fontSize: 11,
+                              color: "rgba(235,244,248,0.52)",
+                              lineHeight: 1.35,
+                              marginTop: 4,
+                            }}
+                          >
+                            {audience.description}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </fieldset>
+
+                <div className="flex flex-col sm:flex-row gap-2.5" style={{ marginTop: 14 }}>
                   <ActionButton
-                    label="OPEN FLAGSHIP MISSION"
-                    detail="Operation Underwriting"
-                    accent="#f5e642"
-                    primary
-                    onClick={openFlagshipMission}
+                    label={selectedProfile?.action ?? "SELECT A ROUTE"}
+                    detail={selectedProfile?.actionDetail ?? "The brief will adapt to your visit"}
+                    accent={selectedProfile?.accent ?? "#617784"}
+                    primary={Boolean(selectedProfile)}
+                    disabled={!selectedProfile}
+                    onClick={continueRoute}
                   />
                   <ActionButton
-                    label="OPEN RECRUITER VIEW"
-                    detail="Fast, readable overview"
-                    accent="#4fc3f7"
-                    onClick={openRecruiterView}
-                  />
-                  <ActionButton
-                    label="ENTER KR//OS"
-                    detail="Explore freely"
+                    label="SKIP GUIDANCE"
+                    detail="Enter the desktop freely"
                     accent="#a8b8c4"
                     onClick={dismiss}
                   />
@@ -432,18 +529,21 @@ function ActionButton({
   detail,
   accent,
   primary = false,
+  disabled = false,
   onClick,
 }: {
   label: string;
   detail: string;
   accent: string;
   primary?: boolean;
+  disabled?: boolean;
   onClick: () => void;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
+      disabled={disabled}
       className="flex-1 text-left transition-all hover:-translate-y-0.5 focus-visible:-translate-y-0.5"
       style={{
         padding: "12px 14px",
@@ -451,6 +551,8 @@ function ActionButton({
         background: primary ? `${accent}12` : "rgba(255,255,255,0.018)",
         boxShadow: primary ? `inset 3px 0 0 ${accent}` : "none",
         borderRadius: 2,
+        cursor: disabled ? "not-allowed" : "pointer",
+        opacity: disabled ? 0.55 : 1,
       }}
     >
       <span
