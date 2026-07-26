@@ -1231,6 +1231,146 @@ export const skills = {
   ],
 };
 
+export type CapabilityEvidence = {
+  signal: string;
+  detail: string;
+  projectId?: string;
+  href?: string;
+  source: "CASE STUDY" | "EXPERIENCE" | "PUBLIC";
+};
+
+export type EvidenceLinkedCapability = {
+  name: string;
+  claim: string;
+  methods: string[];
+  evidence: CapabilityEvidence[];
+};
+
+/* Evidence-linked capability model used by Skills.tree.
+   Self-ratings remain available to the terminal, while the visual app leads
+   with claims a recruiter can inspect and trace back to actual work. */
+export const capabilityGroups: Record<
+  "intelligence" | "technical" | "cool" | "body",
+  EvidenceLinkedCapability[]
+> = {
+  intelligence: [
+    {
+      name: "Human-centered AI decisioning",
+      claim: "Turns model output into reviewable decisions without erasing expert judgment or uncertainty.",
+      methods: ["Human-in-the-loop", "Decision support", "Guardrails"],
+      evidence: [
+        { signal: "4 modules · 0 auto-applied rules", detail: "Underwriting system keeps every learned change under human approval.", projectId: "underwriting", source: "CASE STUDY" },
+        { signal: "3 decision personas", detail: "Distinct workflows for preparation, risk decisions, and governance.", projectId: "underwriting", source: "CASE STUDY" },
+      ],
+    },
+    {
+      name: "Explainability and trust",
+      claim: "Makes AI reasoning, confidence, and limitations legible at the moment a person needs to act.",
+      methods: ["XAI patterns", "Audit trails", "Progressive disclosure"],
+      evidence: [
+        { signal: "80% operator adoption", detail: "Recommendations paired action, predicted impact, and sensor evidence.", projectId: "eugenie-digital-twin", source: "CASE STUDY" },
+        { signal: "Regulator-ready traceability", detail: "Audit and feedback patterns designed into insurance workflows.", projectId: "underwriting", source: "CASE STUDY" },
+      ],
+    },
+    {
+      name: "AI-assisted design practice",
+      claim: "Uses AI to accelerate synthesis, exploration, and prototyping while keeping design judgment accountable.",
+      methods: ["Research synthesis", "Rapid prototyping", "Reusable agents"],
+      evidence: [
+        { signal: "Eureka Award · 2026", detail: "Recognized for practical AI integration across product-development workflows.", href: "https://www.linkedin.com/in/kaustavr19/", source: "PUBLIC" },
+        { signal: "Open skills marketplace", detail: "Reusable UX audit, benchmarking, SEO, and writing workflows.", projectId: "claude-skills-repo", source: "CASE STUDY" },
+      ],
+    },
+  ],
+  technical: [
+    {
+      name: "Design systems at scale",
+      claim: "Builds the shared foundations that let multiple products move faster without drifting apart.",
+      methods: ["Tokens", "Component architecture", "Governance"],
+      evidence: [
+        { signal: "173 tokens · 42 components", detail: "A common language spanning more than ten Cogentiq products.", projectId: "cogentiq-dls", source: "CASE STUDY" },
+        { signal: "28/28 findings resolved", detail: "Legacy agent-building surfaces realigned to the system.", projectId: "agent-compose", source: "CASE STUDY" },
+      ],
+    },
+    {
+      name: "Enterprise workflow architecture",
+      claim: "Reduces dense, multi-role systems to a clear sequence of decisions, exceptions, and handoffs.",
+      methods: ["Service flows", "Role modelling", "Information architecture"],
+      evidence: [
+        { signal: "4 independently deployable modules", detail: "Insurance workflows can be adopted without forcing a platform-wide rollout.", projectId: "underwriting", source: "CASE STUDY" },
+        { signal: "3 modules across 3+ industries", detail: "One interaction logic adapted to steel, energy, and emissions contexts.", projectId: "eugenie-digital-twin", source: "CASE STUDY" },
+      ],
+    },
+    {
+      name: "Information visualization",
+      claim: "Structures complex operational data so the next action is visible before the supporting detail.",
+      methods: ["Operational dashboards", "Visual hierarchy", "Data storytelling"],
+      evidence: [
+        { signal: "+11% throughput", detail: "Decision-led digital-twin workflows deployed at Tata Metaliks.", projectId: "eugenie-digital-twin", source: "CASE STUDY" },
+        { signal: "Technical + functional metrics", detail: "Separated platform health from the signals underwriters use to decide.", projectId: "underwriting", source: "CASE STUDY" },
+      ],
+    },
+  ],
+  cool: [
+    {
+      name: "Research in complex domains",
+      claim: "Learns the language, constraints, and decision habits of specialists before simplifying their tools.",
+      methods: ["Contextual inquiry", "Expert interviews", "Usability testing"],
+      evidence: [
+        { signal: "10+ industrial operators", detail: "Research and plant-floor observation reshaped priority and hierarchy.", projectId: "eugenie-digital-twin", source: "CASE STUDY" },
+        { signal: "Uneven evidence made explicit", detail: "Case studies distinguish observed findings from pattern-based inference.", projectId: "eugenie-digital-twin", source: "CASE STUDY" },
+      ],
+    },
+    {
+      name: "Cross-functional product leadership",
+      claim: "Creates alignment across product, engineering, data science, and design when ownership is ambiguous.",
+      methods: ["Co-design", "Decision framing", "Design critique"],
+      evidence: [
+        { signal: "Sole design owner", detail: "Held the underwriting system together as the delivery team changed.", projectId: "underwriting", source: "EXPERIENCE" },
+        { signal: "10+ products unified", detail: "Shared rules reduced duplicated decisions across product teams.", projectId: "cogentiq-dls", source: "CASE STUDY" },
+      ],
+    },
+    {
+      name: "Accessibility as infrastructure",
+      claim: "Treats inclusive interaction as a system constraint, not a final compliance pass.",
+      methods: ["WCAG 2.2", "Contrast systems", "Keyboard and motion"],
+      evidence: [
+        { signal: "WCAG 2.2 baseline", detail: "Accessibility standards embedded into the Cogentiq design language.", projectId: "cogentiq-dls", source: "CASE STUDY" },
+        { signal: "AAA dark-mode delivery", detail: "HDFC SmartSearch patterns paired accessibility with real usage.", source: "EXPERIENCE" },
+      ],
+    },
+  ],
+  body: [
+    {
+      name: "Evidence-aware product building",
+      claim: "Builds working products while making data quality, provenance, and uncertainty visible to users.",
+      methods: ["Next.js", "Data modelling", "Progressive disclosure"],
+      evidence: [
+        { signal: "42 landscapes · 1,300+ species", detail: "Citizen-science evidence powers a map-first wildlife field guide.", projectId: "wild-india-atlas", source: "CASE STUDY" },
+        { signal: "Confidence and freshness surfaced", detail: "The atlas avoids presenting probability as guaranteed sightings.", projectId: "wild-india-atlas", source: "CASE STUDY" },
+      ],
+    },
+    {
+      name: "Prototype-to-product engineering",
+      claim: "Uses code to test interaction ideas, then rebuilds the ones that deserve production foundations.",
+      methods: ["React", "Next.js", "Auth and data", "Local-first"],
+      evidence: [
+        { signal: "Prototype → multi-user product", detail: "Ideaforge validated the loop before Arbitask added auth, roles, and persistence.", projectId: "arbitask", source: "CASE STUDY" },
+        { signal: "Local-first creative tooling", detail: "Seeded 4K generation runs entirely in-browser.", projectId: "aurora-wallpaper-generator", source: "CASE STUDY" },
+      ],
+    },
+    {
+      name: "Reusable tooling and enablement",
+      claim: "Packages repeatable design work so other people can adapt it instead of starting from zero.",
+      methods: ["Open source", "Workflow design", "Documentation"],
+      evidence: [
+        { signal: "Installable skill collection", detail: "Community-facing tools for audits, research, benchmarking, and writing.", projectId: "claude-skills-repo", source: "CASE STUDY" },
+        { signal: "AI/UX articles", detail: "Public writing on research judgment and collaborative prompting.", href: "https://www.linkedin.com/in/kaustavr19/recent-activity/articles/", source: "PUBLIC" },
+      ],
+    },
+  ],
+};
+
 /* ──────────────────────────────────────────────────────────
    DESKTOP ICONS — unchanged
    ────────────────────────────────────────────────────────── */
