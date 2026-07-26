@@ -1,8 +1,14 @@
 "use client";
 
-import { useRef, useState, useCallback } from "react";
+import { createContext, useContext, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useA11y } from "@/lib/a11y";
+import { playClick } from "@/lib/sound";
+
+/** Whether this window is the topmost, unobscured window. Apps can read this
+ *  to pause animation/tick loops while stacked behind another window. */
+export const WindowFocusContext = createContext(true);
+export const useWindowFocus = () => useContext(WindowFocusContext);
 
 export interface WindowProps {
   id: string;
@@ -10,6 +16,7 @@ export interface WindowProps {
   theme: "detroit" | "cyberpunk" | "gta" | "rdr2" | "tlou" | "minecraft" | "settings";
   isOpen: boolean;
   isMinimized: boolean;
+  isFocused?: boolean;
   zIndex: number;
   defaultPosition?: { x: number; y: number };
   defaultSize?: { width: number; height: number };
@@ -71,6 +78,7 @@ export default function Window({
   theme,
   isOpen,
   isMinimized,
+  isFocused = true,
   zIndex,
   defaultPosition = { x: 80, y: 60 },
   defaultSize = { width: 760, height: 520 },
@@ -80,7 +88,8 @@ export default function Window({
   onFocus,
   children,
 }: WindowProps) {
-  const { motionReduced } = useA11y();
+  const { motionReduced, soundEffects } = useA11y();
+  const click = useCallback(() => { if (soundEffects) playClick(); }, [soundEffects]);
   const [pos, setPos] = useState(defaultPosition);
   const [size] = useState(defaultSize);
   const [isMaximized, setIsMaximized] = useState(defaultMaximized);
@@ -183,7 +192,7 @@ export default function Window({
             <div className="flex items-center gap-2">
               {/* Close */}
               <button
-                onClick={() => onClose(id)}
+                onClick={() => { click(); onClose(id); }}
                 className="relative flex items-center justify-center rounded-full transition-all duration-150"
                 style={{
                   width: 14, height: 14,
@@ -206,7 +215,7 @@ export default function Window({
 
               {/* Minimize */}
               <button
-                onClick={() => onMinimize(id)}
+                onClick={() => { click(); onMinimize(id); }}
                 className="relative flex items-center justify-center rounded-full transition-all duration-150"
                 style={{
                   width: 14, height: 14,
@@ -230,7 +239,7 @@ export default function Window({
 
               {/* Maximize / Restore */}
               <button
-                onClick={() => { onFocus(id); toggleMaximize(); }}
+                onClick={() => { click(); onFocus(id); toggleMaximize(); }}
                 className="relative flex items-center justify-center rounded-full transition-all duration-150"
                 style={{
                   width: 14, height: 14,
@@ -282,7 +291,9 @@ export default function Window({
           </div>
 
           {/* Content */}
-          <div className="flex-1 overflow-auto min-h-0">{children}</div>
+          <div className="flex-1 overflow-auto min-h-0">
+            <WindowFocusContext.Provider value={isFocused}>{children}</WindowFocusContext.Provider>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>

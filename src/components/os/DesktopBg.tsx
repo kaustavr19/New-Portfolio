@@ -673,6 +673,7 @@ export default function DesktopBg() {
        MAIN TICK
        ────────────────────────────────────────────────────────── */
     const tick = (ts: number) => {
+      if (document.hidden) return;
       raf = requestAnimationFrame(tick);
       if (ts - last < dt) return;
       last = ts;
@@ -887,8 +888,17 @@ export default function DesktopBg() {
     window.addEventListener("keydown", ensureAudio);
     raf = requestAnimationFrame(tick);
 
+    const onVisibility = () => {
+      if (!document.hidden) {
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(tick);
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+
     return () => {
       cancelAnimationFrame(raf);
+      document.removeEventListener("visibilitychange", onVisibility);
       window.removeEventListener("resize", resize);
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mouseleave", onMouseLeave);

@@ -84,10 +84,16 @@ export default function MouseTrail() {
       }
     };
 
-    rafRef.current = requestAnimationFrame(draw);
+    const startDraw = () => { rafRef.current = requestAnimationFrame(draw); };
+    const stopDraw  = () => cancelAnimationFrame(rafRef.current);
+    const onVisibility = () => (document.hidden ? stopDraw() : startDraw());
+
+    if (!document.hidden) startDraw();
+    document.addEventListener("visibilitychange", onVisibility);
 
     return () => {
-      cancelAnimationFrame(rafRef.current);
+      document.removeEventListener("visibilitychange", onVisibility);
+      stopDraw();
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("resize", resize);
     };

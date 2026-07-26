@@ -192,3 +192,20 @@ body {
   to   { opacity: 1; transform: scale(1); }
 }
 .window-open { animation: windowOpen 0.15s ease-out forwards; }
+
+/* Reading mode — printing isolates the document, everything else
+   (OS chrome, taskbar, scanlines) is hidden. */
+@media print {
+  body * { visibility: hidden; }
+  .reader-mode, .reader-mode * { visibility: visible; }
+  .reader-mode {
+    position: absolute;
+    inset: 0;
+    background: #fff !important;
+    color: #111 !important;
+  }
+  .reader-mode-chrome { display: none; }
+  .reader-mode-body { overflow: visible !important; padding: 0 !important; }
+  .reader-mode, .reader-mode * { color: #111 !important; background: transparent !important; }
+  .reader-mode a { color: #111 !important; }
+}

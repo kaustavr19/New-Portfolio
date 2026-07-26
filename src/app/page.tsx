@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { A11yProvider } from "@/lib/a11y";
 import { DeviantProvider } from "@/lib/deviant";
 import { ExperimentsProvider } from "@/lib/experiments";
+import { ReaderModeProvider } from "@/lib/reader-mode";
 import { useIsMobile } from "@/lib/use-is-mobile";
 import ExperimentLayer from "@/components/experiments/ExperimentLayer";
 
@@ -13,6 +14,7 @@ const Desktop = dynamic(() => import("@/components/os/Desktop"), { ssr: false })
 const MobileOS = dynamic(() => import("@/components/os/MobileOS"), { ssr: false });
 const DeviantOverlay = dynamic(() => import("@/components/os/DeviantOverlay"), { ssr: false });
 const AmbientAudio = dynamic(() => import("@/components/os/AmbientAudio"), { ssr: false });
+const ReaderMode = dynamic(() => import("@/components/os/ReaderMode"), { ssr: false });
 
 const BOOT_KEY = "kros_booted";
 
@@ -21,21 +23,21 @@ export default function Home() {
   const [booted, setBooted] = useState(false);
   const [checked, setChecked] = useState(false);
 
-  // Check session cache on mount — refreshes within the same session skip boot
+  // Returning visitors (any prior visit, not just this tab session) skip the boot replay
   useEffect(() => {
     try {
-      if (sessionStorage.getItem(BOOT_KEY) === "1") {
+      if (localStorage.getItem(BOOT_KEY) === "1") {
         setBooted(true);
       }
     } catch {
-      // sessionStorage unavailable (e.g. SSR / private mode) — show boot
+      // localStorage unavailable (e.g. SSR / private mode) — show boot
     }
     setChecked(true);
   }, []);
 
   const handleBootComplete = () => {
     try {
-      sessionStorage.setItem(BOOT_KEY, "1");
+      localStorage.setItem(BOOT_KEY, "1");
     } catch {
       // ignore
     }
@@ -54,20 +56,24 @@ export default function Home() {
     <A11yProvider>
       <ExperimentsProvider>
         <DeviantProvider>
-          <div className="fixed inset-0 overflow-hidden">
-            {isMobile ? (
-              <MobileOS />
-            ) : !booted ? (
-              <BootScreen onComplete={handleBootComplete} />
-            ) : (
-              <Desktop />
-            )}
-            <DeviantOverlay />
-            {/* WebGL experiments — render nothing unless a flag is on */}
-            <ExperimentLayer />
-            {/* Galactic ambient hum (gesture-gated, gain follows the a11y pref) */}
-            <AmbientAudio />
-          </div>
+          <ReaderModeProvider>
+            <div className="fixed inset-0 overflow-hidden">
+              {isMobile ? (
+                <MobileOS />
+              ) : !booted ? (
+                <BootScreen onComplete={handleBootComplete} />
+              ) : (
+                <Desktop />
+              )}
+              <DeviantOverlay />
+              {/* WebGL experiments — render nothing unless a flag is on */}
+              <ExperimentLayer />
+              {/* Galactic ambient hum (gesture-gated, gain follows the a11y pref) */}
+              <AmbientAudio />
+              {/* Site-wide plain-text reading view — About/Experience/Projects as one document */}
+              <ReaderMode />
+            </div>
+          </ReaderModeProvider>
         </DeviantProvider>
       </ExperimentsProvider>
     </A11yProvider>

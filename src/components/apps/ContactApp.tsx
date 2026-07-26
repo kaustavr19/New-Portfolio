@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { profile } from "@/data/content";
 import { useIsMobile } from "@/lib/use-is-mobile";
+import { useWindowFocus } from "@/components/os/Window";
 
 const MONO = "'Share Tech Mono', monospace";
 const GREEN  = "#00dd00";
@@ -109,11 +110,29 @@ export default function ContactApp() {
   const [honeypot, setHoneypot] = useState("");
   const [tick, setTick]       = useState(0);
   const sent = status === "sent";
+  const isFocused = useWindowFocus();
 
   useEffect(() => {
-    const id = setInterval(() => setTick((t) => t + 1), 80);
-    return () => clearInterval(id);
-  }, []);
+    if (!isFocused) return;
+    let id: ReturnType<typeof setInterval> | null = null;
+    const start = () => {
+      if (id === null) id = setInterval(() => setTick((t) => t + 1), 80);
+    };
+    const stop = () => {
+      if (id !== null) {
+        clearInterval(id);
+        id = null;
+      }
+    };
+    const onVisibility = () => (document.hidden ? stop() : start());
+
+    if (!document.hidden) start();
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibility);
+      stop();
+    };
+  }, [isFocused]);
 
   const canSend = message.trim() !== "" && EMAIL_RE.test(email.trim());
 
