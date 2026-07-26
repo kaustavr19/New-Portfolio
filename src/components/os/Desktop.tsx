@@ -8,7 +8,7 @@ import Taskbar from "./Taskbar";
 import KROSLogo from "./KROSLogo";
 import DesktopBg from "./DesktopBg";
 import MouseTrail from "./MouseTrail";
-import WelcomeNotification from "./WelcomeNotification";
+import PersonnelBrief from "./PersonnelBrief";
 import { useA11y } from "@/lib/a11y";
 import { useDeviant } from "@/lib/deviant";
 import { useExperiments } from "@/lib/experiments";
@@ -219,8 +219,9 @@ export default function Desktop() {
       {/* Experiment: GPU starfield — covers the 2D sky, sits below icons */}
       {starfieldWebgl && <StarfieldWebgl />}
 
-      {/* First-visit hook — only ever shows once, per localStorage */}
-      <WelcomeNotification />
+      {/* First-visit dossier — one clear orientation moment before the
+          visitor chooses a mission or explores the desktop freely. */}
+      <PersonnelBrief />
 
       {/* Centered logo wallpaper */}
       <div
