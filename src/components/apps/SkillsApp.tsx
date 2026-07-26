@@ -1,305 +1,343 @@
 "use client";
 
 import { useState } from "react";
-import { skills } from "@/data/content";
+import {
+  capabilityGroups,
+  type CapabilityEvidence,
+  type EvidenceLinkedCapability,
+} from "@/data/content";
+import { setHash } from "@/lib/deep-link";
 import { useIsMobile } from "@/lib/use-is-mobile";
 
 const RAJDHANI = "'Rajdhani', sans-serif";
 const MONO = "'Share Tech Mono', monospace";
 
-type Category = "intelligence" | "technical" | "cool" | "body";
+type Category = keyof typeof capabilityGroups;
 
-const categoryMeta: Record<Category, { label: string; stat: string; color: string; icon: string }> = {
-  intelligence: { label: "INTELLIGENCE", stat: "INT", color: "#00ffff", icon: "lightbulb" },
-  technical:    { label: "TECHNICAL",    stat: "TEC", color: "#f5e642", icon: "bolt" },
-  cool:         { label: "COOL",         stat: "COL", color: "#ff0090", icon: "face-grin" },
-  body:         { label: "BODY",         stat: "BOD", color: "#a855f7", icon: "trophy" },
+const categoryMeta: Record<Category, { label: string; stat: string; color: string; icon: string; summary: string }> = {
+  intelligence: {
+    label: "AI SYSTEMS",
+    stat: "AI",
+    color: "#00ffff",
+    icon: "lightbulb",
+    summary: "Designing intelligent systems people can understand, question, and overrule.",
+  },
+  technical: {
+    label: "PRODUCT SYSTEMS",
+    stat: "SYS",
+    color: "#f5e642",
+    icon: "bolt",
+    summary: "Turning complex products into coherent workflows, systems, and information.",
+  },
+  cool: {
+    label: "DELIVERY",
+    stat: "OPS",
+    color: "#ff0090",
+    icon: "trophy",
+    summary: "Researching, aligning, and shipping across specialist teams and constraints.",
+  },
+  body: {
+    label: "BUILD LAB",
+    stat: "BLD",
+    color: "#a855f7",
+    icon: "code-block",
+    summary: "Using code and reusable tooling to move ideas from claims to working proof.",
+  },
 };
 
-const CATEGORIES: Category[] = ["intelligence", "technical", "cool", "body"];
+const CATEGORIES = Object.keys(capabilityGroups) as Category[];
+
+function openProject(projectId: string) {
+  setHash("projects", projectId);
+  window.dispatchEvent(new CustomEvent("kros:open-app", { detail: "projects" }));
+}
 
 export default function SkillsApp() {
   const isMobile = useIsMobile();
   const [active, setActive] = useState<Category>("intelligence");
-
-  const activeSkills = skills[active];
+  const capabilities = capabilityGroups[active];
   const meta = categoryMeta[active];
-
-  /* ──────────────────────────────────────────────────────────
-     Mobile layout — horizontal tab strip + full-width tree.
-     ────────────────────────────────────────────────────────── */
-  if (isMobile) {
-    return (
-      <div className="h-full overflow-auto relative" style={{ background: "#0a0a14" }}>
-        {/* Grid bg */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(245,230,66,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(245,230,66,0.025) 1px, transparent 1px)",
-            backgroundSize: "40px 40px",
-          }}
-        />
-
-        {/* ── Tab strip ── */}
-        <div className="relative z-10" style={{ borderBottom: "1px solid #f5e64222" }}>
-          <div style={{ fontFamily: RAJDHANI, fontSize: 10, color: "#f5e64255", letterSpacing: "0.45em", padding: "16px 20px 8px" }}>
-            ATTRIBUTES
-          </div>
-          <div className="grid" style={{ gridTemplateColumns: "repeat(4, 1fr)" }}>
-            {CATEGORIES.map((cat) => {
-              const m = categoryMeta[cat];
-              const isActive = cat === active;
-              return (
-                <button
-                  key={cat}
-                  onClick={() => setActive(cat)}
-                  className="flex flex-col items-center justify-center transition-colors active:opacity-70"
-                  style={{
-                    padding: "10px 4px 12px",
-                    background: isActive ? `${m.color}0e` : "transparent",
-                    borderTop: "none",
-                    borderRight: "none",
-                    borderLeft: "none",
-                    borderBottom: isActive ? `2px solid ${m.color}` : "2px solid transparent",
-                    color: isActive ? m.color : "#4a4a5a",
-                    cursor: "pointer",
-                  }}
-                >
-                  <i className={`hn hn-${m.icon}`} style={{ fontSize: 18, marginBottom: 4 }} />
-                  <span style={{ fontFamily: RAJDHANI, fontSize: 14, fontWeight: 700, letterSpacing: "0.1em", lineHeight: 1 }}>
-                    {m.stat}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* ── Active category header ── */}
-        <div className="relative z-10 flex items-center gap-3" style={{ padding: "20px 20px 8px" }}>
-          <i className={`hn hn-${meta.icon}`} style={{ fontSize: 26, color: meta.color }} />
-          <div>
-            <div style={{ fontFamily: RAJDHANI, fontSize: 22, fontWeight: 700, color: meta.color, letterSpacing: "0.12em", textShadow: `0 0 14px ${meta.color}88`, lineHeight: 1 }}>
-              {meta.label}
-            </div>
-            <div style={{ fontFamily: MONO, fontSize: 9, color: `${meta.color}66`, letterSpacing: "0.25em", marginTop: 5 }}>
-              SKILL TREE — ACTIVE PERKS
-            </div>
-          </div>
-        </div>
-
-        {/* ── Skill nodes ── */}
-        <div className="relative z-10" style={{ padding: "12px 20px 24px", display: "flex", flexDirection: "column", gap: 20 }}>
-          {activeSkills.map((skill, i) => (
-            <div key={skill.name} className="flex items-center gap-3">
-              <div
-                style={{
-                  width: 34, height: 34, borderRadius: 4,
-                  border: `1px solid ${meta.color}66`,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontFamily: RAJDHANI, fontSize: 13, fontWeight: 700, color: meta.color,
-                  background: `${meta.color}0e`,
-                  flexShrink: 0,
-                }}
-              >
-                {String(i + 1).padStart(2, "0")}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex justify-between items-baseline" style={{ marginBottom: 6 }}>
-                  <span style={{ fontFamily: RAJDHANI, fontSize: 15, fontWeight: 600, color: "#e0e0e8", letterSpacing: "0.04em" }}>
-                    {skill.name}
-                  </span>
-                  <span style={{ fontFamily: RAJDHANI, fontSize: 14, fontWeight: 700, color: meta.color, flexShrink: 0, marginLeft: 8 }}>
-                    {skill.level}<span style={{ color: `${meta.color}55`, fontSize: 11 }}>/100</span>
-                  </span>
-                </div>
-                <div
-                  style={{
-                    height: 5, background: "#141428",
-                    border: `1px solid ${meta.color}22`,
-                    borderRadius: 3, overflow: "hidden", position: "relative",
-                  }}
-                >
-                  <div
-                    style={{
-                      height: "100%", width: `${skill.level}%`,
-                      background: `linear-gradient(90deg, ${meta.color}66, ${meta.color})`,
-                      boxShadow: `0 0 10px ${meta.color}66`,
-                    }}
-                  />
-                  {[20, 40, 60, 80].map((pct) => (
-                    <div key={pct} className="absolute top-0 bottom-0 w-px" style={{ left: `${pct}%`, background: "#0a0a14" }} />
-                  ))}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* ── Footer: STREET CRED + proverb ── */}
-        <div
-          className="relative z-10"
-          style={{
-            padding: "20px 20px 24px",
-            borderTop: "1px solid #f5e64222",
-            display: "flex",
-            flexDirection: "column",
-            gap: 14,
-          }}
-        >
-          <div className="flex items-baseline gap-3">
-            <div>
-              <div style={{ fontFamily: MONO, fontSize: 9, color: "#4a4a5a", letterSpacing: "0.25em" }}>STREET CRED</div>
-              <div style={{ fontFamily: RAJDHANI, fontSize: 22, fontWeight: 700, color: "#f5e642", textShadow: "0 0 12px #f5e64288", lineHeight: 1 }}>3+ YRS</div>
-            </div>
-            <div style={{ fontFamily: MONO, fontSize: 9, color: "#4a4a5a", letterSpacing: "0.1em" }}>IN THE FIELD</div>
-          </div>
-          <div>
-            <div style={{ fontFamily: RAJDHANI, fontSize: 13, fontStyle: "italic", color: "#f5e64255", letterSpacing: "0.08em", lineHeight: 1.4 }}>
-              &ldquo;The future belongs to those who design it.&rdquo;
-            </div>
-            <div style={{ fontFamily: MONO, fontSize: 8, color: "#f5e64233", letterSpacing: "0.2em", marginTop: 4 }}>
-              — NIGHT CITY PROVERB
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div
-      className="h-full flex relative overflow-hidden"
+      className={isMobile ? "h-full overflow-auto relative" : "h-full flex relative overflow-hidden"}
       style={{ background: "#0a0a14" }}
     >
-      {/* Grid bg */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          backgroundImage: "linear-gradient(rgba(245,230,66,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(245,230,66,0.025) 1px, transparent 1px)",
+          backgroundImage:
+            "linear-gradient(rgba(245,230,66,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(245,230,66,0.025) 1px, transparent 1px)",
           backgroundSize: "40px 40px",
         }}
       />
 
-      {/* Left — attribute nav */}
-      <div
-        className="flex-shrink-0 flex flex-col relative z-10"
-        style={{ width: 196, borderRight: "1px solid #f5e64222", paddingTop: 28, paddingBottom: 28 }}
+      <CapabilityNav active={active} onSelect={setActive} mobile={isMobile} />
+
+      <main
+        className="relative z-10 flex-1 overflow-auto"
+        style={{ padding: isMobile ? "22px 18px 30px" : "34px 36px 40px" }}
       >
-        <div style={{ fontFamily: RAJDHANI, fontSize: 11, color: "#f5e64255", letterSpacing: "0.5em", padding: "0 24px", marginBottom: 20 }}>
-          ATTRIBUTES
-        </div>
-
-        {CATEGORIES.map((cat) => {
-          const m = categoryMeta[cat];
-          const isActive = cat === active;
-          return (
-            <button
-              key={cat}
-              onClick={() => setActive(cat)}
-              className="flex items-center gap-3 text-left transition-all relative"
-              style={{
-                padding: "18px 24px",
-                background: isActive ? `${m.color}0e` : "transparent",
-                borderLeft: isActive ? `3px solid ${m.color}` : "3px solid transparent",
-              }}
-            >
-              <i className={`hn hn-${m.icon}`} style={{ fontSize: 18, color: isActive ? m.color : "#4a4a5a" }} />
-              <div>
-                <div style={{ fontFamily: RAJDHANI, fontSize: 18, fontWeight: 700, color: isActive ? m.color : "#4a4a5a", letterSpacing: "0.1em", lineHeight: 1 }}>
-                  {m.stat}
-                </div>
-                <div style={{ fontFamily: MONO, fontSize: 9, color: isActive ? "#a0a0b8" : "#3a3a4a", letterSpacing: "0.08em", marginTop: 2 }}>
-                  {m.label}
-                </div>
-              </div>
-              {isActive && (
-                <i className="hn hn-angle-right absolute right-3" style={{ color: m.color, fontSize: 10 }} />
-              )}
-            </button>
-          );
-        })}
-
-        <div className="mt-auto" style={{ borderTop: "1px solid #f5e64222", paddingTop: 24, paddingLeft: 24, paddingRight: 20, marginTop: 28 }}>
-          <div style={{ fontFamily: MONO, fontSize: 9, color: "#4a4a5a", letterSpacing: "0.2em", marginBottom: 4 }}>STREET CRED</div>
-          <div style={{ fontFamily: RAJDHANI, fontSize: 26, fontWeight: 700, color: "#f5e642", textShadow: "0 0 12px #f5e64288" }}>3+ YRS</div>
-          <div style={{ fontFamily: MONO, fontSize: 9, color: "#4a4a5a" }}>IN THE FIELD</div>
-        </div>
-      </div>
-
-      {/* Right — skill tree */}
-      <div className="flex-1 flex flex-col relative z-10 overflow-auto" style={{ padding: "40px 40px 40px 36px" }}>
-        {/* Header */}
-        <div className="flex items-center gap-4" style={{ marginBottom: 48 }}>
-          <i className={`hn hn-${meta.icon}`} style={{ fontSize: 36, color: meta.color }} />
+        <header
+          className={isMobile ? "mb-6" : "flex items-start justify-between gap-8 mb-8"}
+          style={{ borderBottom: `1px solid ${meta.color}22`, paddingBottom: 20 }}
+        >
           <div>
-            <div style={{ fontFamily: RAJDHANI, fontSize: 30, fontWeight: 700, color: meta.color, letterSpacing: "0.15em", textShadow: `0 0 16px ${meta.color}88`, lineHeight: 1 }}>
-              {meta.label}
-            </div>
-            <div style={{ fontFamily: MONO, fontSize: 10, color: `${meta.color}66`, letterSpacing: "0.3em", marginTop: 6 }}>
-              SKILL TREE — ACTIVE PERKS
-            </div>
-          </div>
-        </div>
-
-        {/* Skill nodes */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
-          {activeSkills.map((skill, i) => (
-            <div key={skill.name} className="flex items-center gap-4">
-              <div
+            <div className="flex items-center gap-3">
+              <i className={`hn hn-${meta.icon}`} style={{ fontSize: isMobile ? 24 : 30, color: meta.color }} />
+              <h1
                 style={{
-                  width: 40, height: 40, borderRadius: 4,
-                  border: `1px solid ${meta.color}66`,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontFamily: RAJDHANI, fontSize: 15, fontWeight: 700, color: meta.color,
-                  background: `${meta.color}0e`,
-                  flexShrink: 0,
+                  fontFamily: RAJDHANI,
+                  fontSize: isMobile ? 24 : 29,
+                  fontWeight: 700,
+                  color: meta.color,
+                  letterSpacing: "0.12em",
+                  textShadow: `0 0 16px ${meta.color}66`,
+                  lineHeight: 1,
+                  margin: 0,
                 }}
               >
-                {String(i + 1).padStart(2, "0")}
-              </div>
-              <div className="flex-1">
-                <div className="flex justify-between items-center" style={{ marginBottom: 8 }}>
-                  <span style={{ fontFamily: RAJDHANI, fontSize: 17, fontWeight: 600, color: "#e0e0e8", letterSpacing: "0.06em" }}>
-                    {skill.name}
-                  </span>
-                  <span style={{ fontFamily: RAJDHANI, fontSize: 16, fontWeight: 700, color: meta.color }}>
-                    {skill.level}<span style={{ color: `${meta.color}55`, fontSize: 12 }}>/100</span>
-                  </span>
-                </div>
-                <div
-                  style={{
-                    height: 6, background: "#141428",
-                    border: `1px solid ${meta.color}22`,
-                    borderRadius: 3, overflow: "hidden", position: "relative",
-                  }}
-                >
-                  <div
-                    style={{
-                      height: "100%", width: `${skill.level}%`,
-                      background: `linear-gradient(90deg, ${meta.color}66, ${meta.color})`,
-                      boxShadow: `0 0 10px ${meta.color}66`,
-                    }}
-                  />
-                  {[20, 40, 60, 80].map((pct) => (
-                    <div key={pct} className="absolute top-0 bottom-0 w-px" style={{ left: `${pct}%`, background: "#0a0a14" }} />
-                  ))}
-                </div>
-              </div>
+                {meta.label}
+              </h1>
             </div>
+            <p style={{ fontFamily: RAJDHANI, fontSize: 14, color: "#9b9bad", lineHeight: 1.45, margin: "10px 0 0", maxWidth: 520 }}>
+              {meta.summary}
+            </p>
+          </div>
+          <div
+            style={{
+              fontFamily: MONO,
+              fontSize: 8,
+              color: `${meta.color}88`,
+              letterSpacing: "0.2em",
+              marginTop: isMobile ? 12 : 2,
+              whiteSpace: "nowrap",
+            }}
+          >
+            EVIDENCE &gt; SELF-SCORES
+          </div>
+        </header>
+
+        <div className="flex flex-col" style={{ gap: 14 }}>
+          {capabilities.map((capability, index) => (
+            <CapabilityCard
+              key={capability.name}
+              capability={capability}
+              index={index}
+              color={meta.color}
+              mobile={isMobile}
+            />
           ))}
         </div>
 
-        <div className="mt-auto" style={{ borderTop: "1px solid #f5e64222", paddingTop: 24, marginTop: 48 }}>
-          <div style={{ fontFamily: RAJDHANI, fontSize: 14, fontStyle: "italic", color: "#f5e64255", letterSpacing: "0.1em" }}>
-            &ldquo;The future belongs to those who design it.&rdquo;
+        <footer
+          className={isMobile ? "" : "flex items-center justify-between"}
+          style={{ borderTop: "1px solid #f5e64218", marginTop: 26, paddingTop: 16 }}
+        >
+          <div style={{ fontFamily: MONO, fontSize: 8, color: "#555568", letterSpacing: "0.15em" }}>
+            CLAIM → METHOD → INSPECTABLE PROOF
           </div>
-          <div style={{ fontFamily: MONO, fontSize: 9, color: "#f5e64233", letterSpacing: "0.2em", marginTop: 4 }}>
-            — NIGHT CITY PROVERB
+          <div style={{ fontFamily: RAJDHANI, fontSize: 12, color: "#f5e64255", marginTop: isMobile ? 8 : 0 }}>
+            No arbitrary mastery percentages.
+          </div>
+        </footer>
+      </main>
+    </div>
+  );
+}
+
+function CapabilityNav({
+  active,
+  onSelect,
+  mobile,
+}: {
+  active: Category;
+  onSelect: (category: Category) => void;
+  mobile: boolean;
+}) {
+  if (mobile) {
+    return (
+      <nav className="relative z-10 grid grid-cols-4" style={{ borderBottom: "1px solid #f5e64222" }} aria-label="Capability groups">
+        {CATEGORIES.map((category) => {
+          const meta = categoryMeta[category];
+          const selected = category === active;
+          return (
+            <button
+              key={category}
+              type="button"
+              onClick={() => onSelect(category)}
+              className="flex flex-col items-center gap-1"
+              style={{
+                minHeight: 62,
+                padding: "11px 4px 9px",
+                color: selected ? meta.color : "#56566a",
+                background: selected ? `${meta.color}0c` : "transparent",
+                borderBottom: selected ? `2px solid ${meta.color}` : "2px solid transparent",
+              }}
+            >
+              <i className={`hn hn-${meta.icon}`} style={{ fontSize: 16 }} />
+              <span style={{ fontFamily: RAJDHANI, fontSize: 12, fontWeight: 700, letterSpacing: "0.08em" }}>{meta.stat}</span>
+            </button>
+          );
+        })}
+      </nav>
+    );
+  }
+
+  return (
+    <nav
+      className="relative z-10 flex-shrink-0 flex flex-col"
+      style={{ width: 188, borderRight: "1px solid #f5e64222", padding: "28px 0" }}
+      aria-label="Capability groups"
+    >
+      <div style={{ fontFamily: MONO, fontSize: 9, color: "#f5e64266", letterSpacing: "0.32em", padding: "0 22px", marginBottom: 18 }}>
+        CAPABILITIES
+      </div>
+      {CATEGORIES.map((category) => {
+        const meta = categoryMeta[category];
+        const selected = category === active;
+        return (
+          <button
+            key={category}
+            type="button"
+            onClick={() => onSelect(category)}
+            className="flex items-center gap-3 text-left transition-all"
+            style={{
+              padding: "16px 20px",
+              color: selected ? meta.color : "#555568",
+              background: selected ? `${meta.color}0c` : "transparent",
+              borderLeft: selected ? `3px solid ${meta.color}` : "3px solid transparent",
+            }}
+          >
+            <i className={`hn hn-${meta.icon}`} style={{ fontSize: 17 }} />
+            <span>
+              <span style={{ display: "block", fontFamily: RAJDHANI, fontSize: 16, fontWeight: 700, letterSpacing: "0.08em", lineHeight: 1 }}>
+                {meta.stat}
+              </span>
+              <span style={{ display: "block", fontFamily: MONO, fontSize: 8, color: selected ? "#aaaabc" : "#454558", letterSpacing: "0.07em", marginTop: 4 }}>
+                {meta.label}
+              </span>
+            </span>
+          </button>
+        );
+      })}
+
+      <div className="mt-auto" style={{ padding: "18px 22px 0", borderTop: "1px solid #f5e64218" }}>
+        <div style={{ fontFamily: MONO, fontSize: 8, color: "#555568", letterSpacing: "0.16em" }}>PROOF SOURCES</div>
+        <div style={{ fontFamily: RAJDHANI, fontSize: 13, color: "#aaaabc", lineHeight: 1.5, marginTop: 7 }}>
+          Case studies<br />Experience records<br />Public work
+        </div>
+      </div>
+    </nav>
+  );
+}
+
+function CapabilityCard({
+  capability,
+  index,
+  color,
+  mobile,
+}: {
+  capability: EvidenceLinkedCapability;
+  index: number;
+  color: string;
+  mobile: boolean;
+}) {
+  return (
+    <article
+      style={{
+        border: `1px solid ${color}25`,
+        background: "rgba(12,12,25,0.86)",
+        boxShadow: `inset 3px 0 0 ${color}`,
+        padding: mobile ? "16px" : "18px 20px",
+      }}
+    >
+      <div className={mobile ? "" : "grid"} style={mobile ? undefined : { gridTemplateColumns: "minmax(0, 1fr) minmax(230px, 0.9fr)", gap: 22 }}>
+        <div>
+          <div className="flex items-start gap-3">
+            <span style={{ fontFamily: MONO, fontSize: 9, color, opacity: 0.7, paddingTop: 3 }}>
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <div>
+              <h2 style={{ fontFamily: RAJDHANI, fontSize: 18, fontWeight: 700, color: "#f0f0f5", letterSpacing: "0.04em", margin: 0 }}>
+                {capability.name}
+              </h2>
+              <p style={{ fontFamily: RAJDHANI, fontSize: 14, color: "#aaaabc", lineHeight: 1.45, margin: "6px 0 0" }}>
+                {capability.claim}
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-1.5" style={{ marginTop: 13, marginLeft: 30 }}>
+            {capability.methods.map((method) => (
+              <span
+                key={method}
+                style={{
+                  padding: "3px 7px",
+                  border: `1px solid ${color}30`,
+                  color: `${color}cc`,
+                  fontFamily: MONO,
+                  fontSize: 8,
+                  letterSpacing: "0.06em",
+                }}
+              >
+                {method}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ marginTop: mobile ? 16 : 0 }}>
+          <div style={{ fontFamily: MONO, fontSize: 8, color: "#66667a", letterSpacing: "0.18em", marginBottom: 7 }}>
+            EVIDENCE LOG
+          </div>
+          <div className="flex flex-col gap-1.5">
+            {capability.evidence.map((item) => (
+              <EvidenceItem key={`${item.signal}-${item.detail}`} item={item} color={color} />
+            ))}
           </div>
         </div>
       </div>
-    </div>
+    </article>
   );
+}
+
+function EvidenceItem({ item, color }: { item: CapabilityEvidence; color: string }) {
+  const content = (
+    <>
+      <span className="flex items-center justify-between gap-3">
+        <span style={{ fontFamily: RAJDHANI, fontSize: 13, fontWeight: 700, color: "#e6e6ec" }}>{item.signal}</span>
+        <span style={{ fontFamily: MONO, fontSize: 7, color: `${color}aa`, letterSpacing: "0.1em", flexShrink: 0 }}>{item.source}</span>
+      </span>
+      <span style={{ display: "block", fontFamily: RAJDHANI, fontSize: 11, color: "#7f7f91", lineHeight: 1.35, marginTop: 2 }}>
+        {item.detail}
+      </span>
+    </>
+  );
+  const style = {
+    display: "block",
+    width: "100%",
+    padding: "8px 9px",
+    border: `1px solid ${color}18`,
+    background: `${color}06`,
+    textAlign: "left" as const,
+    textDecoration: "none",
+  };
+
+  if (item.projectId) {
+    return (
+      <button type="button" onClick={() => openProject(item.projectId!)} className="transition-all hover:brightness-125" style={style}>
+        {content}
+      </button>
+    );
+  }
+
+  if (item.href) {
+    return (
+      <a href={item.href} target="_blank" rel="noopener noreferrer" className="transition-all hover:brightness-125" style={style}>
+        {content}
+      </a>
+    );
+  }
+
+  return <div style={style}>{content}</div>;
 }
