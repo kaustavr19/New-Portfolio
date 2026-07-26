@@ -2,15 +2,24 @@
 
 import { useState, useEffect } from "react";
 import { profile } from "@/data/content";
+import { useA11y } from "@/lib/a11y";
 import { useIsMobile } from "@/lib/use-is-mobile";
 import { useWindowFocus } from "@/components/os/Window";
 
 const MONO = "'Share Tech Mono', monospace";
-const GREEN  = "#00dd00";
-const DIM    = "#007a00";
-const AMBER  = "#d4a500";
+const GREEN  = "#39e639";
+const DIM    = "#42a842";
+const AMBER  = "#f0bf3c";
 const BG     = "#030d03";
 const PANEL  = "#060f06";
+const CONTACT_INTENTS = ["PRODUCT ROLE", "PORTFOLIO REVIEW", "PROJECT COLLAB", "SPEAKING / WRITING"] as const;
+type ContactIntent = typeof CONTACT_INTENTS[number];
+const CONTACT_INTENT_LABELS: Record<ContactIntent, string> = {
+  "PRODUCT ROLE": "PRODUCT ROLE",
+  "PORTFOLIO REVIEW": "PORTFOLIO",
+  "PROJECT COLLAB": "COLLAB",
+  "SPEAKING / WRITING": "SPEAKING",
+};
 
 function Portrait({
   icon, label, sub, side,
@@ -59,8 +68,8 @@ function Portrait({
 
       {/* Name plate */}
       <div style={{ textAlign: "center" }}>
-        <div style={{ fontFamily: MONO, fontSize: 10, color: GREEN, letterSpacing: "0.12em" }}>{label}</div>
-        <div style={{ fontFamily: MONO, fontSize: 8,  color: DIM,   letterSpacing: "0.1em",  marginTop: 3 }}>{sub}</div>
+        <div style={{ fontFamily: MONO, fontSize: 12, color: GREEN, letterSpacing: "0.1em" }}>{label}</div>
+        <div style={{ fontFamily: MONO, fontSize: 10, color: DIM, letterSpacing: "0.08em", marginTop: 3 }}>{sub}</div>
       </div>
     </div>
   );
@@ -92,8 +101,8 @@ function MobilePortrait({ icon, label, sub }: { icon: string; label: string; sub
         ))}
       </div>
       <div style={{ textAlign: "center" }}>
-        <div style={{ fontFamily: MONO, fontSize: 10, color: GREEN, letterSpacing: "0.12em", whiteSpace: "nowrap" }}>{label}</div>
-        <div style={{ fontFamily: MONO, fontSize: 8,  color: DIM,   letterSpacing: "0.1em",  marginTop: 3 }}>{sub}</div>
+        <div style={{ fontFamily: MONO, fontSize: 12, color: GREEN, letterSpacing: "0.1em", whiteSpace: "nowrap" }}>{label}</div>
+        <div style={{ fontFamily: MONO, fontSize: 10, color: DIM, letterSpacing: "0.08em", marginTop: 3 }}>{sub}</div>
       </div>
     </div>
   );
@@ -101,19 +110,94 @@ function MobilePortrait({ icon, label, sub }: { icon: string; label: string; sub
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+function messagePlaceholder(intent: ContactIntent) {
+  const prompts: Record<ContactIntent, string> = {
+    "PRODUCT ROLE": "TEAM / ROLE / WHAT YOU ARE BUILDING...\n\n_",
+    "PORTFOLIO REVIEW": "WHAT WOULD YOU LIKE TO DISCUSS OR SEE IN MORE DETAIL?\n\n_",
+    "PROJECT COLLAB": "THE PROBLEM, CURRENT STAGE, AND WHERE DESIGN COULD HELP...\n\n_",
+    "SPEAKING / WRITING": "TOPIC, FORMAT, AUDIENCE, AND TIMELINE...\n\n_",
+  };
+  return prompts[intent];
+}
+
+function ContactBrief({
+  intent,
+  setIntent,
+  mobile = false,
+}: {
+  intent: ContactIntent;
+  setIntent: (intent: ContactIntent) => void;
+  mobile?: boolean;
+}) {
+  return (
+    <fieldset
+      style={{
+        marginBottom: mobile ? 18 : 8,
+        padding: mobile ? "14px" : "9px 10px",
+        border: `1px solid ${GREEN}2c`,
+        background: `${GREEN}08`,
+      }}
+    >
+      <legend className="sr-only">Reason for contacting</legend>
+      <div className={mobile ? "" : "flex items-start justify-between gap-5"}>
+        <div>
+          <div style={{ fontFamily: MONO, fontSize: 11, color: AMBER, letterSpacing: "0.16em" }}>
+            CHANNEL OPEN
+          </div>
+          <div style={{ fontFamily: MONO, fontSize: mobile ? 14 : 12, color: GREEN, lineHeight: 1.45, marginTop: 5 }}>
+            Enterprise AI · B2B products · design systems · selected collaborations
+          </div>
+        </div>
+        <div style={{ fontFamily: MONO, fontSize: 11, color: DIM, lineHeight: 1.45, marginTop: mobile ? 9 : 0, maxWidth: 175 }}>
+          A role, rough brief, or difficult workflow is enough to start.
+        </div>
+      </div>
+      <div className="flex flex-wrap gap-1.5" style={{ marginTop: mobile ? 12 : 9 }}>
+        {CONTACT_INTENTS.map((option) => {
+          const selected = option === intent;
+          return (
+            <button
+              key={option}
+              type="button"
+              onClick={() => setIntent(option)}
+              aria-pressed={selected}
+              className="contact-control"
+              style={{
+                minHeight: 32,
+                padding: mobile ? "6px 9px" : "5px 8px",
+                border: `1px solid ${selected ? GREEN : `${GREEN}30`}`,
+                background: selected ? `${GREEN}18` : "transparent",
+                color: selected ? GREEN : DIM,
+                fontFamily: MONO,
+                fontSize: 10,
+                letterSpacing: "0.08em",
+              }}
+            >
+              {mobile ? option : CONTACT_INTENT_LABELS[option]}
+            </button>
+          );
+        })}
+      </div>
+    </fieldset>
+  );
+}
+
 export default function ContactApp() {
   const isMobile = useIsMobile();
+  const { motionReduced, highContrast } = useA11y();
   const [status, setStatus]   = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [name, setName]       = useState("");
   const [email, setEmail]     = useState("");
   const [message, setMessage] = useState("");
+  const [intent, setIntent] = useState<ContactIntent>("PRODUCT ROLE");
+  const [emailTouched, setEmailTouched] = useState(false);
   const [honeypot, setHoneypot] = useState("");
   const [tick, setTick]       = useState(0);
   const sent = status === "sent";
   const isFocused = useWindowFocus();
 
   useEffect(() => {
-    if (!isFocused) return;
+    if (!isFocused || motionReduced) return;
     let id: ReturnType<typeof setInterval> | null = null;
     const start = () => {
       if (id === null) id = setInterval(() => setTick((t) => t + 1), 80);
@@ -132,9 +216,10 @@ export default function ContactApp() {
       document.removeEventListener("visibilitychange", onVisibility);
       stop();
     };
-  }, [isFocused]);
+  }, [isFocused, motionReduced]);
 
   const canSend = message.trim() !== "" && EMAIL_RE.test(email.trim());
+  const emailInvalid = emailTouched && !EMAIL_RE.test(email.trim());
 
   const handleSend = async () => {
     if (!canSend || status === "sending") return;
@@ -143,7 +228,7 @@ export default function ContactApp() {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, message, honeypot }),
+        body: JSON.stringify({ name, email, message, intent, honeypot }),
       });
       setStatus(res.ok ? "sent" : "error");
     } catch {
@@ -156,6 +241,8 @@ export default function ContactApp() {
     setName("");
     setEmail("");
     setMessage("");
+    setIntent("PRODUCT ROLE");
+    setEmailTouched(false);
   };
 
   // Animated waveform heights
@@ -183,6 +270,7 @@ export default function ContactApp() {
             backgroundImage:
               "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 4px)",
             zIndex: 20,
+            opacity: highContrast ? 0 : 1,
           }}
         />
 
@@ -198,11 +286,11 @@ export default function ContactApp() {
             gap: 10,
           }}
         >
-          <span style={{ fontFamily: MONO, fontSize: 10, color: DIM, letterSpacing: "0.3em" }}>
+          <span style={{ fontFamily: MONO, fontSize: 12, color: DIM, letterSpacing: "0.18em" }}>
             <i className="hn hn-angle-left" /> CODEC <i className="hn hn-angle-right" />
           </span>
           <div style={{ flex: 1, height: 1, background: `${GREEN}18` }} />
-          <span style={{ fontFamily: MONO, fontSize: 11, color: AMBER, letterSpacing: "0.06em" }}>
+          <span style={{ fontFamily: MONO, fontSize: 13, color: AMBER, letterSpacing: "0.05em" }}>
             140.85
           </span>
           <div className="flex items-end gap-0.5" style={{ height: 12 }}>
@@ -227,7 +315,7 @@ export default function ContactApp() {
           {/* Status link line */}
           <div className="flex-1 flex flex-col items-center" style={{ gap: 4 }}>
             <div className="w-full" style={{ height: 1, background: `${GREEN}33` }} />
-            <div style={{ fontFamily: MONO, fontSize: 8, color: DIM, letterSpacing: "0.3em" }}>
+            <div style={{ fontFamily: MONO, fontSize: 10, color: DIM, letterSpacing: "0.2em" }}>
               {sent ? "RELAYED" : "OPEN"}
             </div>
             <div className="w-full" style={{ height: 1, background: `${GREEN}33` }} />
@@ -240,28 +328,41 @@ export default function ContactApp() {
         </div>
 
         {/* ── Form / Sent state ── */}
-        <div className="flex flex-col" style={{ padding: "18px 16px 12px" }}>
+        <form
+          className="flex flex-col"
+          style={{ padding: "18px 16px 12px" }}
+          onSubmit={(event) => {
+            event.preventDefault();
+            handleSend();
+          }}
+          noValidate
+        >
           {!sent ? (
             <>
+              <ContactBrief intent={intent} setIntent={setIntent} mobile />
+
               {/* Callsign */}
               <div style={{ marginBottom: 14 }}>
-                <div style={{ fontFamily: MONO, fontSize: 8, color: DIM, letterSpacing: "0.35em", marginBottom: 6 }}>
-                  CALLSIGN
+                <div style={{ fontFamily: MONO, fontSize: 12, color: DIM, letterSpacing: "0.14em", marginBottom: 7 }}>
+                  CALLSIGN · OPTIONAL
                 </div>
                 <input
+                  id="contact-name"
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="ENTER CODENAME..."
+                  autoComplete="name"
+                  aria-label="Callsign or name, optional"
+                  className="contact-control"
                   style={{
                     width: "100%",
                     background: "#020902",
                     border: `1px solid ${GREEN}33`,
                     color: GREEN,
                     fontFamily: MONO,
-                    fontSize: 14,
-                    padding: "10px 12px",
-                    outline: "none",
+                    fontSize: 16,
+                    padding: "12px 13px",
                     letterSpacing: "0.04em",
                   }}
                 />
@@ -269,26 +370,36 @@ export default function ContactApp() {
 
               {/* Reply channel */}
               <div style={{ marginBottom: 14 }}>
-                <div style={{ fontFamily: MONO, fontSize: 8, color: DIM, letterSpacing: "0.35em", marginBottom: 6 }}>
-                  REPLY CHANNEL
+                <div style={{ fontFamily: MONO, fontSize: 12, color: DIM, letterSpacing: "0.14em", marginBottom: 7 }}>
+                  REPLY CHANNEL · REQUIRED
                 </div>
                 <input
+                  id="contact-email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  onBlur={() => setEmailTouched(true)}
                   placeholder="YOUR.CALLBACK@FREQ.COM"
+                  autoComplete="email"
+                  required
+                  aria-label="Reply email, required"
+                  aria-invalid={emailInvalid}
+                  aria-describedby="contact-email-help"
+                  className="contact-control"
                   style={{
                     width: "100%",
                     background: "#020902",
-                    border: `1px solid ${GREEN}33`,
+                    border: `1px solid ${emailInvalid ? AMBER : `${GREEN}55`}`,
                     color: GREEN,
                     fontFamily: MONO,
-                    fontSize: 14,
-                    padding: "10px 12px",
-                    outline: "none",
+                    fontSize: 16,
+                    padding: "12px 13px",
                     letterSpacing: "0.04em",
                   }}
                 />
+                <div id="contact-email-help" style={{ fontFamily: MONO, fontSize: 11, color: emailInvalid ? AMBER : DIM, lineHeight: 1.4, marginTop: 6 }}>
+                  {emailInvalid ? "ENTER A VALID REPLY ADDRESS." : "Used only to reply to this message."}
+                </div>
               </div>
 
               {/* Honeypot — hidden from sighted users and screen readers, catches naive bots */}
@@ -304,23 +415,26 @@ export default function ContactApp() {
 
               {/* Transmission */}
               <div style={{ marginBottom: 14 }}>
-                <div style={{ fontFamily: MONO, fontSize: 8, color: DIM, letterSpacing: "0.35em", marginBottom: 6 }}>
-                  TRANSMISSION
+                <div style={{ fontFamily: MONO, fontSize: 12, color: DIM, letterSpacing: "0.14em", marginBottom: 7 }}>
+                  TRANSMISSION · REQUIRED
                 </div>
                 <textarea
+                  id="contact-message"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  placeholder={"BEGIN TRANSMISSION...\n\n_"}
+                  placeholder={messagePlaceholder(intent)}
                   rows={6}
+                  required
+                  aria-label="Message, required"
+                  className="contact-control"
                   style={{
                     width: "100%",
                     background: "#020902",
                     border: `1px solid ${GREEN}33`,
                     color: GREEN,
                     fontFamily: MONO,
-                    fontSize: 14,
-                    padding: "10px 12px",
-                    outline: "none",
+                    fontSize: 16,
+                    padding: "12px 13px",
                     resize: "vertical",
                     lineHeight: 1.65,
                     letterSpacing: "0.02em",
@@ -331,20 +445,22 @@ export default function ContactApp() {
 
               {/* Transmit button */}
               {status === "error" && (
-                <div style={{ fontFamily: MONO, fontSize: 10, color: AMBER, letterSpacing: "0.1em", marginBottom: 10 }}>
+                <div role="alert" style={{ fontFamily: MONO, fontSize: 12, color: AMBER, letterSpacing: "0.06em", marginBottom: 10 }}>
                   ⚠ TRANSMISSION FAILED — TRY AGAIN OR EMAIL DIRECTLY
                 </div>
               )}
               <button
-                onClick={handleSend}
+                type="submit"
                 disabled={!canSend || status === "sending"}
+                className="contact-control"
+                aria-describedby={!canSend ? "contact-send-help" : undefined}
                 style={{
                   background: canSend ? `${GREEN}18` : "transparent",
                   border: `1px solid ${canSend ? GREEN + "99" : DIM + "66"}`,
                   color: canSend ? GREEN : DIM,
                   fontFamily: MONO,
-                  fontSize: 12,
-                  padding: "12px 8px",
+                  fontSize: 14,
+                  padding: "13px 10px",
                   cursor: canSend && status !== "sending" ? "pointer" : "not-allowed",
                   letterSpacing: "0.25em",
                   transition: "all 0.2s",
@@ -359,9 +475,14 @@ export default function ContactApp() {
                   <><i className="hn hn-play" style={{ opacity: 0.4 }} />{"  AWAITING INPUT..."}</>
                 )}
               </button>
+              {!canSend && (
+                <div id="contact-send-help" style={{ fontFamily: MONO, fontSize: 11, color: DIM, lineHeight: 1.4, marginTop: 7, textAlign: "center" }}>
+                  Add a valid reply email and a message to transmit.
+                </div>
+              )}
             </>
           ) : (
-            <div className="flex flex-col items-center justify-center" style={{ gap: 18, textAlign: "center", padding: "32px 0" }}>
+            <div role="status" aria-live="polite" className="flex flex-col items-center justify-center" style={{ gap: 18, textAlign: "center", padding: "32px 0" }}>
               <div style={{ fontFamily: MONO, fontSize: 10, color: AMBER, letterSpacing: "0.3em" }}>
                 ── TRANSMISSION COMPLETE ──
               </div>
@@ -372,14 +493,16 @@ export default function ContactApp() {
                 <span style={{ color: DIM }}>KR-19 WILL RESPOND.</span>
               </div>
               <button
+                type="button"
                 onClick={resetForm}
+                className="contact-control"
                 style={{
                   marginTop: 4,
                   background: "transparent",
                   border: `1px solid ${GREEN}44`,
                   color: DIM,
                   fontFamily: MONO,
-                  fontSize: 10,
+                  fontSize: 12,
                   padding: "8px 20px",
                   cursor: "pointer",
                   letterSpacing: "0.2em",
@@ -389,7 +512,7 @@ export default function ContactApp() {
               </button>
             </div>
           )}
-        </div>
+        </form>
 
         {/* ── Waveform + direct links ── */}
         <div className="mt-auto" style={{ flexShrink: 0, background: "#020902", borderTop: `1px solid ${GREEN}22` }}>
@@ -418,7 +541,8 @@ export default function ContactApp() {
           >
             <a
               href={`mailto:${profile.social.email}`}
-              style={{ fontFamily: MONO, fontSize: 10, color: DIM, letterSpacing: "0.08em", textDecoration: "none" }}
+              className="contact-control"
+              style={{ fontFamily: MONO, fontSize: 12, color: DIM, letterSpacing: "0.04em", textDecoration: "none", padding: "4px" }}
             >
               <i className="hn hn-envelope" /> {profile.social.email}
             </a>
@@ -426,7 +550,8 @@ export default function ContactApp() {
               href={profile.social.linkedin}
               target="_blank"
               rel="noopener noreferrer"
-              style={{ fontFamily: MONO, fontSize: 10, color: DIM, letterSpacing: "0.08em", textDecoration: "none" }}
+              className="contact-control"
+              style={{ fontFamily: MONO, fontSize: 12, color: DIM, letterSpacing: "0.04em", textDecoration: "none", padding: "4px" }}
             >
               <i className="hn hn-external-link" /> LINKEDIN
             </a>
@@ -447,6 +572,7 @@ export default function ContactApp() {
         style={{
           backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 4px)",
           zIndex: 20,
+          opacity: highContrast ? 0 : 1,
         }}
       />
 
@@ -462,9 +588,9 @@ export default function ContactApp() {
           gap: 12,
         }}
       >
-        <span style={{ fontFamily: MONO, fontSize: 10, color: DIM, letterSpacing: "0.35em" }}><i className="hn hn-angle-left" /> CODEC <i className="hn hn-angle-right" /></span>
+        <span style={{ fontFamily: MONO, fontSize: 12, color: DIM, letterSpacing: "0.2em" }}><i className="hn hn-angle-left" /> CODEC <i className="hn hn-angle-right" /></span>
         <div style={{ flex: 1, height: 1, background: `${GREEN}18` }} />
-        <span style={{ fontFamily: MONO, fontSize: 13, color: AMBER, letterSpacing: "0.08em" }}>
+        <span style={{ fontFamily: MONO, fontSize: 14, color: AMBER, letterSpacing: "0.06em" }}>
           FREQ: 140.85 MHz
         </span>
         <div style={{ flex: 1, height: 1, background: `${GREEN}18` }} />
@@ -474,7 +600,7 @@ export default function ContactApp() {
             <div key={i} style={{ width: 4, height: h, background: GREEN, opacity: 0.8 }} />
           ))}
         </div>
-        <span style={{ fontFamily: MONO, fontSize: 8, color: DIM, letterSpacing: "0.18em" }}>STRONG</span>
+        <span style={{ fontFamily: MONO, fontSize: 10, color: DIM, letterSpacing: "0.12em" }}>STRONG</span>
       </div>
 
       {/* ── MAIN: Portraits + Form ── */}
@@ -483,58 +609,78 @@ export default function ContactApp() {
         <Portrait icon="robot" label="KR·19" sub="RECV" side="left" />
 
         {/* Center form */}
-        <div
-          className="flex-1 flex flex-col overflow-hidden"
-          style={{ padding: "18px 18px 14px" }}
+        <form
+          className="flex-1 flex flex-col overflow-auto"
+          style={{ padding: "12px 16px 10px" }}
+          onSubmit={(event) => {
+            event.preventDefault();
+            handleSend();
+          }}
+          noValidate
         >
           {!sent ? (
             <>
+              <ContactBrief intent={intent} setIntent={setIntent} />
+
               {/* Callsign */}
-              <div style={{ marginBottom: 12 }}>
-                <div style={{ fontFamily: MONO, fontSize: 8, color: DIM, letterSpacing: "0.35em", marginBottom: 5 }}>
-                  CALLSIGN
+              <div style={{ marginBottom: 8 }}>
+                <div style={{ fontFamily: MONO, fontSize: 12, color: DIM, letterSpacing: "0.14em", marginBottom: 6 }}>
+                  CALLSIGN · OPTIONAL
                 </div>
                 <input
+                  id="contact-name"
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="ENTER CODENAME..."
+                  autoComplete="name"
+                  aria-label="Callsign or name, optional"
+                  className="contact-control"
                   style={{
                     width: "100%",
                     background: "#020902",
                     border: `1px solid ${GREEN}33`,
                     color: GREEN,
                     fontFamily: MONO,
-                    fontSize: 14,
-                    padding: "9px 12px",
-                    outline: "none",
+                    fontSize: 16,
+                    padding: "10px 12px",
                     letterSpacing: "0.04em",
                   }}
                 />
               </div>
 
               {/* Reply channel */}
-              <div style={{ marginBottom: 12 }}>
-                <div style={{ fontFamily: MONO, fontSize: 8, color: DIM, letterSpacing: "0.35em", marginBottom: 5 }}>
-                  REPLY CHANNEL
+              <div style={{ marginBottom: 8 }}>
+                <div style={{ fontFamily: MONO, fontSize: 12, color: DIM, letterSpacing: "0.14em", marginBottom: 6 }}>
+                  REPLY CHANNEL · REQUIRED
                 </div>
                 <input
+                  id="contact-email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  onBlur={() => setEmailTouched(true)}
                   placeholder="YOUR.CALLBACK@FREQ.COM"
+                  autoComplete="email"
+                  required
+                  aria-label="Reply email, required"
+                  aria-invalid={emailInvalid}
+                  aria-describedby="contact-email-help"
+                  className="contact-control"
                   style={{
                     width: "100%",
                     background: "#020902",
-                    border: `1px solid ${GREEN}33`,
+                    border: `1px solid ${emailInvalid ? AMBER : `${GREEN}55`}`,
                     color: GREEN,
                     fontFamily: MONO,
-                    fontSize: 14,
-                    padding: "9px 12px",
-                    outline: "none",
+                    fontSize: 16,
+                    padding: "10px 12px",
                     letterSpacing: "0.04em",
                   }}
                 />
+                <div id="contact-email-help" style={{ fontFamily: MONO, fontSize: 11, color: emailInvalid ? AMBER : DIM, lineHeight: 1.4, marginTop: 5 }}>
+                  {emailInvalid ? "ENTER A VALID REPLY ADDRESS." : "Used only to reply to this message."}
+                </div>
               </div>
 
               {/* Honeypot — hidden from sighted users and screen readers, catches naive bots */}
@@ -549,14 +695,18 @@ export default function ContactApp() {
               />
 
               {/* Transmission textarea */}
-              <div className="flex flex-col flex-1" style={{ marginBottom: 12 }}>
-                <div style={{ fontFamily: MONO, fontSize: 8, color: DIM, letterSpacing: "0.35em", marginBottom: 5 }}>
-                  TRANSMISSION
+              <div className="flex flex-col flex-1" style={{ marginBottom: 8 }}>
+                <div style={{ fontFamily: MONO, fontSize: 12, color: DIM, letterSpacing: "0.14em", marginBottom: 6 }}>
+                  TRANSMISSION · REQUIRED
                 </div>
                 <textarea
+                  id="contact-message"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  placeholder={"BEGIN TRANSMISSION...\n\n_"}
+                  placeholder={messagePlaceholder(intent)}
+                  required
+                  aria-label="Message, required"
+                  className="contact-control"
                   style={{
                     flex: 1,
                     width: "100%",
@@ -564,9 +714,8 @@ export default function ContactApp() {
                     border: `1px solid ${GREEN}33`,
                     color: GREEN,
                     fontFamily: MONO,
-                    fontSize: 14,
+                    fontSize: 16,
                     padding: "10px 12px",
-                    outline: "none",
                     resize: "none",
                     lineHeight: 1.7,
                     letterSpacing: "0.02em",
@@ -576,20 +725,22 @@ export default function ContactApp() {
 
               {/* Transmit button */}
               {status === "error" && (
-                <div style={{ fontFamily: MONO, fontSize: 9, color: AMBER, letterSpacing: "0.1em", marginBottom: 8 }}>
+                <div role="alert" style={{ fontFamily: MONO, fontSize: 12, color: AMBER, letterSpacing: "0.06em", marginBottom: 8 }}>
                   ⚠ TRANSMISSION FAILED — TRY AGAIN OR EMAIL DIRECTLY
                 </div>
               )}
               <button
-                onClick={handleSend}
+                type="submit"
                 disabled={!canSend || status === "sending"}
+                className="contact-control"
+                aria-describedby={!canSend ? "contact-send-help-desktop" : undefined}
                 style={{
                   background: canSend ? `${GREEN}18` : "transparent",
                   border: `1px solid ${canSend ? GREEN + "99" : DIM + "66"}`,
                   color: canSend ? GREEN : DIM,
                   fontFamily: MONO,
-                  fontSize: 11,
-                  padding: "9px 8px",
+                  fontSize: 14,
+                  padding: "10px",
                   cursor: canSend && status !== "sending" ? "pointer" : "not-allowed",
                   letterSpacing: "0.25em",
                   transition: "all 0.2s",
@@ -604,10 +755,15 @@ export default function ContactApp() {
                   <><i className="hn hn-play" style={{ opacity: 0.4 }} />{"  AWAITING INPUT..."}</>
                 )}
               </button>
+              {!canSend && (
+                <div id="contact-send-help-desktop" style={{ fontFamily: MONO, fontSize: 11, color: DIM, lineHeight: 1.4, marginTop: 6, textAlign: "center" }}>
+                  Add a valid reply email and a message to transmit.
+                </div>
+              )}
             </>
           ) : (
             /* Sent state */
-            <div className="flex-1 flex flex-col items-center justify-center" style={{ gap: 18, textAlign: "center" }}>
+            <div role="status" aria-live="polite" className="flex-1 flex flex-col items-center justify-center" style={{ gap: 18, textAlign: "center" }}>
               <div style={{ fontFamily: MONO, fontSize: 10, color: AMBER, letterSpacing: "0.3em" }}>
                 ── TRANSMISSION COMPLETE ──
               </div>
@@ -618,14 +774,16 @@ export default function ContactApp() {
                 <span style={{ color: DIM }}>KR-19 WILL RESPOND.</span>
               </div>
               <button
+                type="button"
                 onClick={resetForm}
+                className="contact-control"
                 style={{
                   marginTop: 8,
                   background: "transparent",
                   border: `1px solid ${GREEN}44`,
                   color: DIM,
                   fontFamily: MONO,
-                  fontSize: 9,
+                  fontSize: 12,
                   padding: "6px 18px",
                   cursor: "pointer",
                   letterSpacing: "0.2em",
@@ -635,7 +793,7 @@ export default function ContactApp() {
               </button>
             </div>
           )}
-        </div>
+        </form>
 
         {/* Right portrait — Caller */}
         <Portrait
@@ -675,7 +833,8 @@ export default function ContactApp() {
         >
           <a
             href={`mailto:${profile.social.email}`}
-            style={{ fontFamily: MONO, fontSize: 9, color: DIM, letterSpacing: "0.1em", textDecoration: "none" }}
+            className="contact-control"
+            style={{ fontFamily: MONO, fontSize: 12, color: DIM, letterSpacing: "0.04em", textDecoration: "none", padding: "4px" }}
           >
             <i className="hn hn-envelope" /> {profile.social.email}
           </a>
@@ -684,7 +843,8 @@ export default function ContactApp() {
             href={profile.social.linkedin}
             target="_blank"
             rel="noopener noreferrer"
-            style={{ fontFamily: MONO, fontSize: 9, color: DIM, letterSpacing: "0.1em", textDecoration: "none" }}
+            className="contact-control"
+            style={{ fontFamily: MONO, fontSize: 12, color: DIM, letterSpacing: "0.04em", textDecoration: "none", padding: "4px" }}
           >
             <i className="hn hn-external-link" /> LINKEDIN
           </a>

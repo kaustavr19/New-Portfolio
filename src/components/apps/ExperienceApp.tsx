@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { chapters, Mission } from "@/data/content";
 import { useIsMobile } from "@/lib/use-is-mobile";
+import ContactCTA from "@/components/os/ContactCTA";
 
 /* Serif swap: Cinzel had thin strokes that got spindly at body sizes;
    EB Garamond is the closer match to the actual RDR2 in-game journal
@@ -126,6 +127,15 @@ function DesktopLayout({
       {/* ── LOG panel ── */}
       <div style={{ padding: "20px 36px 36px" }}>
         <LogPanel mission={selected} />
+        <div style={{ marginTop: 20 }}>
+          <ContactCTA
+            accent={ACCENT}
+            tone="paper"
+            eyebrow="CONTINUE THE STORY"
+            title="See a role-shaped overlap?"
+            body="Send the team context or job description. A focused conversation is more useful than another generic application."
+          />
+        </div>
       </div>
     </div>
   );
@@ -196,6 +206,15 @@ function MobileLayout({
       {/* ── LOG panel ── */}
       <div style={{ padding: "16px 18px 28px" }}>
         <LogPanel mission={selected} mobile />
+        <div style={{ marginTop: 18 }}>
+          <ContactCTA
+            accent={ACCENT}
+            tone="paper"
+            eyebrow="CONTINUE THE STORY"
+            title="See a role-shaped overlap?"
+            body="Send the team context or job description and start with the part that matters."
+          />
+        </div>
       </div>
     </div>
   );

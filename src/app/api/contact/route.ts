@@ -12,10 +12,11 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "Malformed request." }, { status: 400 });
   }
 
-  const { name, email, message, honeypot } = body as {
+  const { name, email, message, intent, honeypot } = body as {
     name?: string;
     email?: string;
     message?: string;
+    intent?: string;
     honeypot?: string;
   };
 
@@ -40,8 +41,8 @@ export async function POST(req: Request) {
     from: "Portfolio Contact <onboarding@resend.dev>",
     to: profile.social.email,
     replyTo: email.trim(),
-    subject: `New transmission from ${callsign}`,
-    text: `Callsign: ${callsign}\nReply channel: ${email.trim()}\n\n${message.trim()}`,
+    subject: `${intent?.trim() ? `[${intent.trim()}] ` : ""}New transmission from ${callsign}`,
+    text: `Intent: ${intent?.trim() || "Not specified"}\nCallsign: ${callsign}\nReply channel: ${email.trim()}\n\n${message.trim()}`,
   });
 
   if (error) {

@@ -5,6 +5,7 @@ import { projects, type Project, type ProjectType, type Medal, type Objective, t
 import { useIsMobile } from "@/lib/use-is-mobile";
 import { parseHash, setHash } from "@/lib/deep-link";
 import { ReaderDossier } from "@/components/reader/blocks";
+import ContactCTA from "@/components/os/ContactCTA";
 
 // Deep-linked project, if the URL hash names one that actually exists — read
 // once at module scope so both initial-state hooks below can agree on it.
@@ -820,10 +821,17 @@ export default function ProjectsApp() {
                 ))}
               </div>
             </div>
+            <div style={{ marginTop: 14 }}>
+              <ContactCTA
+                accent={accent}
+                eyebrow="MISSION FOLLOW-UP"
+                title="Want the deeper walkthrough?"
+                body="For NDA-limited work, role discussions, or a similar product problem, open a direct channel and include what you would like to inspect."
+              />
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
 }
-
