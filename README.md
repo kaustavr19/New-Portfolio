@@ -8,13 +8,21 @@ Built by **Kaustav Roy**, Design Consultant at Fractal.
 
 ---
 
-## Preview
+## Start here
 
-> **Desktop (≥768px):** click the dirt block on the boot screen to start. Single-click any desktop icon to open an app. The green traffic light toggles between fullscreen and windowed mode.
+**[Launch KR//OS](https://kr-os-folio.vercel.app/)**
+
+The first-run personnel brief asks what brought you here and adapts the next step:
+
+- **Recruiter / hiring team** — opens a fast, readable evidence brief covering impact, experience, capabilities, projects, and contact paths.
+- **Founder / collaborator** — starts with the flagship case study and the decisions behind the work.
+- **Curious visitor** — enters the OS freely, with the Terminal and hidden system layers left to discover.
+
+The chosen route persists across visits, appears in the desktop Start menu and mobile home screen, and can be changed at any time.
+
+> **Desktop (≥768px):** click the dirt block on the boot screen to start. Single-click any desktop icon to open an app. The green traffic light toggles between fullscreen and windowed mode. Press `Ctrl/Cmd + K` for the Command Center, or `Alt + 1–7` to launch apps directly.
 >
 > **Mobile (<768px):** the desktop windowing shell is replaced by a phone OS — lock screen → home grid → full-screen apps. Drag a finger across the wallpaper to pop pixel cells.
-
-![KR//OS Desktop](public/preview.png)
 
 ---
 
@@ -22,25 +30,36 @@ Built by **Kaustav Roy**, Design Consultant at Fractal.
 
 | App | Game Theme | What it is |
 |-----|-----------|-------------|
-| `About.exe` | Detroit: Become Human | Android profile card — who I am, what I do |
+| `About.exe` | Detroit: Become Human | Android profile card, recruiter brief, proof points, and the human behind the work |
 | `Projects/` | GTA V | Mission dossier — case studies (work) and side projects, each with a full write-up |
-| `Skills.tree` | Cyberpunk 2077 | Attribute tree with colour-coded perk categories |
+| `Skills.tree` | Cyberpunk 2077 | Evidence-linked capabilities — every major skill points to projects, roles, outcomes, or credentials |
 | `Experience.log` | Red Dead Redemption 2 | Arthur's journal — handwritten paper aesthetic, career history |
-| `Contact.wav` | Metal Gear Solid | Codec radio screen — a form that actually sends email |
+| `Contact.wav` | Metal Gear Solid | Accessible Codec radio with intent-aware prompts for roles, reviews, collaborations, and speaking |
 | `Terminal` | Minecraft | A command line that answers real questions about my work, and hides a few things that aren't questions at all |
+| `Settings.cfg` | KR//OS | Accessibility, Deviant Mode, audio, and experimental visual controls |
 
-Every main-mission case study and side-project write-up in Projects is shareable — deep-link straight into a specific one (`#projects/whatever`) instead of just the homepage, and unfurl properly when you paste the link into Slack or LinkedIn.
+Every main-mission case study and side-project write-up in Projects is directly addressable — a hash link such as `#projects/whatever` opens the right dossier instead of dropping someone at the homepage. Shared links use the site-wide KR//OS social preview.
 
 ---
 
-## What's cooking
+## Recent evolution
 
-This is a living thing, not a finished artifact — it gets rebuilt in public, in the open, in small pieces. Near-term:
+The latest pass focused on making the experience work for people who arrive with a purpose, without sanding away the strange little OS that makes it memorable:
 
-- **Skills.tree and About.exe** are both due for a content refresh — some of it is a little stale relative to where things actually are right now.
-- **General content upkeep** — case studies, experience, awards — this stuff updates as the actual work does.
-- **An Articles app** is planned — a proper home for the writing/publications I currently just link out to.
-- Probably more after that. If you have an idea for what a portfolio-as-an-OS should have, I'm listening.
+- **Audience-aware onboarding** — hiring, building, and exploring routes with remembered recommendations.
+- **Recruiter brief** — a readable, printable view available from About and the first-run brief.
+- **Capabilities backed by evidence** — Skills now connects claims to concrete work and outcomes.
+- **Stronger conversion paths** — Projects, Experience, Skills, and Reader Mode end with a contextual path into Contact.
+- **A clearer Contact experience** — larger type, higher contrast, visible validation, semantic form controls, and inquiry intent carried into the email.
+- **Deeper OS behavior** — Command Center search, keyboard launch shortcuts, recently opened apps, wallpaper actions, minimize-all, close-all, system telemetry, sound, and reader controls.
+
+See [CHANGELOG.md](CHANGELOG.md) for the full record.
+
+### What's cooking
+
+- Ongoing case-study, experience, award, and publication upkeep as the work changes.
+- An Articles app for longer-form writing currently linked externally.
+- More OS-native interaction experiments, as long as they improve the journey rather than merely add chrome.
 
 ---
 
@@ -48,6 +67,8 @@ This is a living thing, not a finished artifact — it gets rebuilt in public, i
 
 A few things worth going looking for, rather than reading about:
 
+- **Command Center** — press `Ctrl/Cmd + K` and search apps, visitor routes, reader mode, or workspace actions. Recommendations change with the active visitor route.
+- **The personnel brief** — a first-run dossier that is useful to recruiters without forcing everyone else into recruiter mode. Reopen it from the Start menu or mobile route strip.
 - **Deviant Mode** — there's a toggle (About, and a mirror in the taskbar labeled `MACHINE` / `DEVIANT`) that doesn't just change a colour. It reframes the entire site — copy, chrome labels, the wallpaper palette, the logo itself — into a different voice. It's the same portfolio telling you a different version of the truth.
 - **Wallpaper switching** — right-click the desktop. There's more than one sky.
 - **The Terminal talks back** — it's not a fixed menu. Ask it things. It has real answers about my work, skills, and experience — and it also has a sense of humor about classic terminal culture, if you poke at it the way you'd poke at a real one. Tab-completion exists. Use it.
@@ -64,8 +85,9 @@ Accessibility isn't a checkbox I bolted on afterward — the a11y menu is a firs
 - **Reduce Motion** — kills wallpaper effects, particles, constellations, meteors, the mouse trail, and window animations. Auto-detects `prefers-reduced-motion` on first visit — I don't make you find the switch if your OS already told me. The boot animation skips entirely.
 - **Sound control** — every synthesized sound (boot chimes, pop sounds, UI blips, the ambient hum) is independently toggleable, so nothing plays that you didn't ask for.
 - **High Contrast** — brightens and bolds icon labels with a solid backing, for anyone who needs the desktop to stop being subtle.
-- **A plain-reader mode for case studies** — the "DECLASSIFY VIEW" toggle on any Projects dossier swaps the HUD-styled, GTA-menu-flavored layout for an ordinary, high-legibility article layout. The heist aesthetic is fun until it's the thing standing between someone and actually reading my work — so there's always an escape hatch.
-- All of the above persists in `localStorage`, so you only have to say what you need once.
+- **A site-wide reader mode** — About, capabilities, experience, projects, and contact paths become one printable, high-legibility document. The game-inspired UI is fun until it stands between someone and the evidence, so there is always an escape hatch.
+- **Accessible contact flow** — persistent labels, larger controls, visible focus, inline validation, status announcements, reduced-motion behavior, and higher contrast are built into the final conversion point.
+- Accessibility preferences persist in `localStorage`, so you only have to say what you need once.
 
 ---
 
@@ -81,9 +103,9 @@ Accessibility isn't a checkbox I bolted on afterward — the a11y menu is a firs
 - **Canvas** — Custom multi-layer pixel animation (`DesktopBg`)
 - **WebGL / GLSL** — Hand-written fragment shaders via a tiny dependency-free runner (`lib/webgl/shaderQuad.ts`, ~1.5kb) — powers the CRT overlay, synthwave boot backdrop, and the cosmic wallpaper (no Three.js)
 - **Audio** — Web Audio API synthesis (no audio files — square/sine oscillators for boot chimes and pop sounds)
-- **Email** — Resend, via a Next.js route handler — the Contact form actually sends mail, it isn't decorative
+- **Email** — Resend, via a Next.js route handler — the Contact form sends mail with the visitor's selected inquiry intent
 - **Icons** — [@hackernoon/pixel-icon-library](https://github.com/hackernoon/pixel-icon-library) (pixel-art icon font, CC 4.0)
-- **State** — React Context for global preferences (Accessibility, Deviant Mode) with `localStorage` persistence
+- **State** — React Context for global preferences plus external-store subscriptions for persisted audience routing
 - **Deep links** — hash-based routing (`#projects/<id>`), no router dependency — a small shared module reads/writes `location.hash` so any app window or specific case study is a shareable URL
 - **Social previews** — a dynamically generated Open Graph card (`next/og`), so links actually look like something when shared
 - **Fonts** — Press Start 2P, Share Tech Mono, Orbitron, Rajdhani, Bebas Neue, Cinzel, Special Elite (Google Fonts)
@@ -99,7 +121,7 @@ Accessibility isn't a checkbox I bolted on afterward — the a11y menu is a firs
 - **Per-chunk audio** — Web Audio synth pops climb in pitch as chunks load (220 Hz → 660 Hz), throttled every 8th chunk. A C-E-G-C arpeggio chime plays on completion.
 - **Synthwave WebGL backdrop (default on)** — behind the loader, a GLSL shader renders a receding neon grid + horizon glow + drifting stars. Toggleable in Settings → LABS (`bootWebgl`); falls back to the dirt-tiled background when off or when WebGL is unavailable.
 - **Skip** with `Space`, `Enter`, or `Escape`.
-- **Skip-on-refresh** — `sessionStorage` flag skips boot for the rest of the tab session; new tabs / incognito replay it.
+- **Returning visits** — desktop remembers a completed boot in `localStorage`; the mobile shell uses its session flag to avoid replaying the lock flow while switching layouts.
 - **Deviant-aware copy** — when Deviant Mode is on, the boot title becomes `KR//DEVIANT`, the CTA becomes `BREAK PROTOCOL`, and the status arc shifts to a Detroit voice ("Initializing programming…" → "DEVIANT.").
 
 </details>
@@ -140,12 +162,15 @@ An opt-in WebGL layer, built so every effect is **flag-gated and lazy-loaded** �
 <details>
 <summary><strong>Desktop OS shell</strong></summary>
 
-- Draggable, resizable windows with macOS-style traffic-light controls (close / minimise / maximise)
+- Draggable windows with macOS-style traffic-light controls (close / minimise / maximise)
 - **Pixel-card icons** — desktop icons sit on solid dark cards with accent-tinted 1px borders, accent-coloured drop-shadow glow, and 4-direction 1px black outlines on labels for readability against any background state
 - **Single-click to open** any desktop app
+- **Command Center** — `Ctrl/Cmd + K` searches apps, the active visitor route, reader mode, and system actions
+- **Keyboard launching** — `Alt + 1–7` opens the seven portfolio apps directly
+- **Workspace actions** — minimize or close every window from the Start menu and Command Center, with minimize-all also available from the desktop context menu
 - Pixelated mouse trail follows the cursor across the desktop
-- Taskbar with live clock, open-app indicators, `RESUME.PDF` download button, Deviant Mode toggle, and the Accessibility menu
-- A one-time welcome notification points first-time visitors toward Projects, then never shows again
+- A deliberately compact taskbar with the Start menu, open-app indicators, controls, ambient system telemetry, and a live clock
+- The Start menu carries recently opened state, the active visitor route, pinned apps, system actions, and reboot
 
 </details>
 
@@ -173,7 +198,7 @@ The actual content of Experience, Skills, Projects, and Contact stays unchanged 
 Below the 768px viewport breakpoint, the desktop windowing shell is replaced by a dedicated **phone-OS metaphor**. Same brand, same providers, same wallpaper — different shell and per-app layouts.
 
 - **Lock screen** — replaces the desktop boot. Live clock + date, KR//OS brand stack, pulsing `CLICK TO BOOT` CTA. One tap unlocks audio + reveals home.
-- **Home screen** — iOS-style status bar (live time, KR//OS mark, pixel signal/battery), 4×2 app icon grid with the same pixel-card treatment as desktop, frosted dock with `RESUME.PDF`, home indicator pill at the bottom.
+- **Home screen** — iOS-style status bar, remembered visitor-route strip, 4×2 app icon grid with the same pixel-card treatment as desktop, frosted dock with `RESUME.PDF`, and a home indicator.
 - **App view** — full-screen container with theme-accented top bar (back arrow + icon + title), tappable home indicator to return.
 - **Touch wallpaper** — `touchstart` / `touchmove` translate finger position into the same `mouseX/Y` the desktop pop logic reads; drag a finger across bright cells to pop them. Touches are suppressed while inside a full-screen app so phantom pops don't fire during scroll.
 - **Per-app mobile layouts** — every app gets a dedicated mobile branch via `useIsMobile()`:
@@ -195,8 +220,7 @@ Below the 768px viewport breakpoint, the desktop windowing shell is replaced by 
 
 ```
 public/
-├── Kaustav_Roy_CV.pdf       # Resume served from /Kaustav_Roy_CV.pdf (RESUME.PDF button in taskbar)
-└── preview.png
+└── Kaustav_Roy_CV.pdf       # Resume served from /Kaustav_Roy_CV.pdf
 src/
 ├── app/
 │   ├── layout.tsx           # Root layout + font imports + pixel-icon CSS + metadata + viewport-fit:cover
@@ -212,11 +236,14 @@ src/
 │   │   ├── AmbientAudio.tsx         # Synthesized galactic hum (gesture-gated, follows the ambience pref)
 │   │   ├── BootScreen.tsx           # Tap-to-enter splash + Minecraft chunk loader (Web Audio) — desktop only
 │   │   ├── Window.tsx               # Draggable window (motion-aware framer-motion)
-│   │   ├── Taskbar.tsx              # Bottom bar with clock + resume + Deviant toggle + A11Y menu
+│   │   ├── PersonnelBrief.tsx       # First-run dossier + audience route selection
+│   │   ├── CommandCenter.tsx        # Searchable app, route, reader, and workspace actions
+│   │   ├── ReaderMode.tsx           # Printable, high-legibility portfolio document
+│   │   ├── ContactCTA.tsx           # Shared end-of-journey conversion component
+│   │   ├── Taskbar.tsx              # Compact bar + Start menu + open apps + controls + telemetry
 │   │   ├── AccessibilityMenu.tsx    # Taskbar popover with a11y toggles
 │   │   ├── DeviantToggle.tsx        # Taskbar mirror of About's deviant switch
 │   │   ├── DeviantOverlay.tsx       # Global magenta wash when deviant is on
-│   │   ├── WelcomeNotification.tsx  # One-time first-visit hook pointing toward Projects
 │   │   ├── KROSLogo.tsx             # SVG logo (palette-drift-aware + deviant transformations)
 │   │   ├── MobileOS.tsx             # Phone shell state machine (lock → home → app)
 │   │   └── mobile/
@@ -233,9 +260,9 @@ src/
 │   └── apps/
 │       ├── AboutApp.tsx       # Resume-aligned; desktop 2-col + mobile stacked branches
 │       ├── ProjectsApp.tsx    # Desktop dossier + mobile accordion list; deep-link + NDA-gate aware
-│       ├── SkillsApp.tsx      # Desktop sidebar + mobile horizontal tab strip
+│       ├── SkillsApp.tsx      # Evidence-linked capabilities; desktop tree + mobile tab strip
 │       ├── ExperienceApp.tsx  # Desktop journal + mobile pill-row selector
-│       ├── ContactApp.tsx     # Desktop CODEC + mobile stacked CODEC — sends real email
+│       ├── ContactApp.tsx     # Accessible, intent-aware CODEC contact flow
 │       ├── TerminalApp.tsx    # Tuned padding/font/prompt on mobile
 │       └── SettingsApp.tsx    # A11y + Deviant prefs (desktop window + mobile app)
 ├── data/
@@ -247,7 +274,9 @@ src/
     ├── a11y.tsx             # Accessibility context, hook, localStorage persistence
     ├── deviant.tsx          # Deviant Mode context, hook, localStorage persistence
     ├── experiments.tsx      # WebGL effect flags — context + localStorage + ?fx= URL params
+    ├── audience.ts          # Visitor profiles, persistence, and route subscription
     ├── deep-link.ts         # Hash-based deep linking — read/write location.hash for shareable app/project URLs
+    ├── personnel-brief.ts   # Global event for reopening audience onboarding
     ├── terminal/engine.ts   # Terminal command parsing + free-text answer engine (pure logic, no React)
     ├── webgl/
     │   ├── shaderQuad.ts    # Tiny dependency-free fullscreen fragment-shader runner
@@ -274,8 +303,10 @@ The Contact form needs a `RESEND_API_KEY` in `.env.local` to actually send mail 
 
 | Key | Purpose |
 |---|---|
-| `kros_booted` (sessionStorage) | Skip boot animation on refresh within the session |
-| `kros_welcomed` | Set once the first-visit notification has been seen or dismissed |
+| `kros_booted` | Skip the completed desktop boot on returning visits; mobile also uses a session copy |
+| `kros_personnel_brief_v2` | Remember that the first-run personnel brief was dismissed |
+| `kros_audience` | Active visitor route: recruiter, collaborator, or explorer |
+| `kros_last_opened` | Recently opened app shown in the Start menu |
 | `kros_a11y` | `{motionReduced, soundEffects, ambience, highContrast}` preferences |
 | `kros_deviant` | `"1"` if Deviant Mode is on |
 | `kros_experiments` | `{crtShader, bootWebgl, starfieldWebgl}` WebGL effect flags (also settable via `?fx=`) |
@@ -285,7 +316,7 @@ The Contact form needs a `RESEND_API_KEY` in `.env.local` to actually send mail 
 <details>
 <summary><strong>Audio note</strong></summary>
 
-All sound is synthesised on the fly via Web Audio API oscillators — no audio assets in the repo. This includes the **Galactic Ambience** drone (low detuned oscillators + filtered noise through a slow LFO). The browser autoplay policy means audio only works after a user gesture, which is why the boot starts with a tap-to-enter splash. If a returning user skips boot via the `sessionStorage` flag, the first click anywhere unlocks audio. **Sound Effects** and **Galactic Ambience** in the Accessibility menu (or Settings) toggle each independently.
+All sound is synthesised on the fly via Web Audio API oscillators — no audio assets in the repo. This includes the **Galactic Ambience** drone (low detuned oscillators + filtered noise through a slow LFO). The browser autoplay policy means audio only works after a user gesture, which is why the boot starts with a tap-to-enter splash. If a returning visitor skips boot, the first click anywhere unlocks audio. **Sound Effects** and **Galactic Ambience** in the Accessibility menu (or Settings) toggle each independently.
 
 </details>
 

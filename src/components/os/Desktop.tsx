@@ -9,6 +9,7 @@ import KROSLogo from "./KROSLogo";
 import DesktopBg from "./DesktopBg";
 import MouseTrail from "./MouseTrail";
 import PersonnelBrief from "./PersonnelBrief";
+import CommandCenter from "./CommandCenter";
 import { useA11y } from "@/lib/a11y";
 import { useDeviant } from "@/lib/deviant";
 import { useExperiments } from "@/lib/experiments";
@@ -103,15 +104,15 @@ export default function Desktop() {
   const labelFor = (icon: typeof desktopIcons[number]) => (deviant && icon.deviantLabel) ? icon.deviantLabel : icon.label;
   const [windows, setWindows] = useState<Record<string, WindowState>>({});
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
-  const [recentAppId, setRecentAppId] = useState<string | null>(null);
-
-  useEffect(() => {
+  const [recentAppId, setRecentAppId] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
     try {
-      setRecentAppId(localStorage.getItem(RECENT_APP_KEY));
+      return localStorage.getItem(RECENT_APP_KEY);
     } catch {
-      // localStorage unavailable — Start menu just skips the recent row
+      return null;
     }
-  }, []);
+  });
+  const [commandCenterOpen, setCommandCenterOpen] = useState(false);
 
   const openWindow = useCallback((id: string) => {
     zCounter += 1;
@@ -193,6 +194,56 @@ export default function Desktop() {
     },
     [windows, minimizeWindow]
   );
+
+  const minimizeAll = useCallback(() => {
+    setWindows((prev) =>
+      Object.fromEntries(
+        Object.entries(prev).map(([id, state]) => [
+          id,
+          state.isOpen ? { ...state, isMinimized: true } : state,
+        ]),
+      ),
+    );
+  }, []);
+
+  const closeAll = useCallback(() => {
+    setWindows((prev) =>
+      Object.fromEntries(
+        Object.entries(prev).map(([id, state]) => [
+          id,
+          state.isOpen ? { ...state, isOpen: false } : state,
+        ]),
+      ),
+    );
+    setAppHash("");
+  }, []);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      const isTyping =
+        target?.tagName === "INPUT" ||
+        target?.tagName === "TEXTAREA" ||
+        target?.isContentEditable;
+
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setCommandCenterOpen((current) => !current);
+        return;
+      }
+      if (event.key === "Escape" && commandCenterOpen) {
+        setCommandCenterOpen(false);
+        return;
+      }
+      if (!isTyping && event.altKey && /^[1-7]$/.test(event.key)) {
+        event.preventDefault();
+        const icon = desktopIcons[Number(event.key) - 1];
+        if (icon) openWindow(icon.id);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [commandCenterOpen, openWindow]);
 
   const themeAccent: Record<string, string> = {
     detroit: "#4fc3f7",
@@ -410,6 +461,38 @@ export default function Desktop() {
           {/* Divider */}
           <div style={{ height: 1, background: "rgba(255,255,255,0.08)", margin: "4px 0" }} />
 
+          <button
+            className="w-full flex items-center gap-2 px-3 py-1.5 text-left hover:bg-white/5 transition-colors"
+            style={{
+              fontFamily: "'Share Tech Mono', monospace",
+              fontSize: 10,
+              color: "#4fc3f7",
+              letterSpacing: "0.05em",
+            }}
+            onClick={() => {
+              setCommandCenterOpen(true);
+              setContextMenu(null);
+            }}
+          >
+            <i className="hn hn-search" />
+            <span>Open Command Center</span>
+            <span style={{ marginLeft: "auto", color: "#566775", fontSize: 8 }}>CTRL K</span>
+          </button>
+
+          <button
+            className="w-full flex items-center gap-2 px-3 py-1.5 text-left hover:bg-white/5 transition-colors"
+            style={{
+              fontFamily: "'Share Tech Mono', monospace",
+              fontSize: 10,
+              color: "rgba(255,255,255,0.6)",
+              letterSpacing: "0.05em",
+            }}
+            onClick={() => { minimizeAll(); setContextMenu(null); }}
+          >
+            <i className="hn hn-minus" />
+            <span>Minimize All</span>
+          </button>
+
           {desktopIcons.map((icon) => (
             <button
               key={icon.id}
@@ -467,6 +550,17 @@ export default function Desktop() {
         onIconClick={openWindow}
         onTaskbarClick={handleTaskbarClick}
         recentAppId={recentAppId}
+        onOpenCommandCenter={() => setCommandCenterOpen(true)}
+        onMinimizeAll={minimizeAll}
+        onCloseAll={closeAll}
+      />
+
+      <CommandCenter
+        open={commandCenterOpen}
+        onClose={() => setCommandCenterOpen(false)}
+        onOpenApp={openWindow}
+        onMinimizeAll={minimizeAll}
+        onCloseAll={closeAll}
       />
 
       {/* Pixelated mouse trail — floats above everything */}

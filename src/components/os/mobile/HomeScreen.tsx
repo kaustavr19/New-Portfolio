@@ -3,6 +3,11 @@
 import { desktopIcons } from "@/data/content";
 import { useDeviant } from "@/lib/deviant";
 import { useA11y } from "@/lib/a11y";
+import {
+  audienceProfiles,
+  useAudience,
+} from "@/lib/audience";
+import { requestPersonnelBrief } from "@/lib/personnel-brief";
 import StatusBar from "./StatusBar";
 import HomeIndicator from "./HomeIndicator";
 
@@ -46,6 +51,8 @@ interface Props {
 export default function HomeScreen({ onOpenApp }: Props) {
   const { deviant } = useDeviant();
   const { highContrast } = useA11y();
+  const audience = useAudience();
+  const activeAudience = audienceProfiles.find((item) => item.id === audience);
 
   const labelFor = (icon: typeof desktopIcons[number]) =>
     (deviant && icon.deviantLabel) ? icon.deviantLabel : icon.label;
@@ -56,6 +63,36 @@ export default function HomeScreen({ onOpenApp }: Props) {
       style={{ position: "relative", background: "transparent" }}
     >
       <StatusBar />
+
+      <button
+        type="button"
+        onClick={requestPersonnelBrief}
+        className="mx-4 mt-2 flex items-center justify-between text-left active:scale-[0.99]"
+        style={{
+          padding: "9px 11px",
+          border: `1px solid ${activeAudience?.accent ?? "#4fc3f7"}33`,
+          borderRadius: 8,
+          background: "rgba(5,10,20,0.58)",
+          backdropFilter: "blur(8px)",
+        }}
+        aria-label={
+          activeAudience
+            ? `Change visitor route. Current route: ${activeAudience.label}`
+            : "Choose a visitor route"
+        }
+      >
+        <span>
+          <span style={{ display: "block", color: "#748895", fontFamily: MONO, fontSize: 8, letterSpacing: "0.14em" }}>
+            VISITOR ROUTE
+          </span>
+          <span style={{ display: "block", color: activeAudience?.accent ?? "#b5c4ce", fontFamily: MONO, fontSize: 10, letterSpacing: "0.1em", marginTop: 2 }}>
+            {activeAudience?.shortLabel ?? "CHOOSE YOUR PATH"}
+          </span>
+        </span>
+        <span style={{ color: "#8295a2", fontFamily: MONO, fontSize: 8, letterSpacing: "0.08em" }}>
+          {activeAudience ? "CHANGE" : "OPEN"} ›
+        </span>
+      </button>
 
       {/* App grid — flex-1, vertically centred */}
       <div className="flex-1 flex flex-col justify-center" style={{ padding: "12px 14px" }}>
