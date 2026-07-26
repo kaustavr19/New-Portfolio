@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { projects, type Project, type ProjectType, type Medal, type Objective, type ProjectBlock, type ProjectSection } from "@/data/content";
 import { useIsMobile } from "@/lib/use-is-mobile";
 import { parseHash, setHash } from "@/lib/deep-link";
@@ -569,6 +569,13 @@ export default function ProjectsApp() {
   const project = visible.find((p) => p.id === selectedId) ?? visible[0];
   const accent = ACCENT[tab];
 
+  // Reset the brief panel's scroll to the top on every new selection — otherwise
+  // switching missions keeps whatever scroll depth the previous one was left at.
+  const briefPanelRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    briefPanelRef.current?.scrollTo({ top: 0 });
+  }, [project.id]);
+
   // Shareable link — reflects the current tab/selection in the URL, and
   // re-syncs if a different project hash is pasted into an already-open tab.
   useEffect(() => {
@@ -756,7 +763,7 @@ export default function ProjectsApp() {
         </div>
 
         {/* Right — mission brief panel */}
-        <div className="flex-1 flex flex-col overflow-auto" style={{ padding: "32px 36px" }}>
+        <div ref={briefPanelRef} className="flex-1 flex flex-col overflow-auto" style={{ padding: "32px 36px" }}>
           {/* Header */}
           <div className="flex items-start gap-4" style={{ marginBottom: 28 }}>
             <Blip project={project} active />

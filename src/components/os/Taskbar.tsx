@@ -52,6 +52,7 @@ export default function Taskbar({ openWindows, onIconClick, onTaskbarClick, rece
     rdr2: "#c8a96e",
     tlou: "#7ab648",
     minecraft: "#5aaf26",
+    settings: "#b388ff",
   };
 
   return (
@@ -166,7 +167,7 @@ export default function Taskbar({ openWindows, onIconClick, onTaskbarClick, rece
               </div>
               <div className="flex items-center flex-wrap gap-2">
                 <DeviantToggle />
-                <AccessibilityMenu />
+                <AccessibilityMenu anchor="left" />
                 <a
                   href="/Kaustav_Roy_CV.pdf"
                   target="_blank"
