@@ -4,6 +4,9 @@ import { useState, useEffect } from "react";
 import { desktopIcons } from "@/data/content";
 import AccessibilityMenu from "./AccessibilityMenu";
 import DeviantToggle from "./DeviantToggle";
+import ReaderModeToggle from "./ReaderModeToggle";
+import SoundToggle from "./SoundToggle";
+import SystemStatus from "./SystemStatus";
 import KRMark from "./KRMark";
 import { useDeviant } from "@/lib/deviant";
 
@@ -19,7 +22,7 @@ const BOOT_SESSION_KEY = "kros_booted";
 
 function reboot() {
   try {
-    sessionStorage.removeItem(BOOT_SESSION_KEY);
+    localStorage.removeItem(BOOT_SESSION_KEY);
   } catch {
     // ignore
   }
@@ -166,6 +169,8 @@ export default function Taskbar({ openWindows, onIconClick, onTaskbarClick, rece
                 QUICK ACTIONS
               </div>
               <div className="flex items-center flex-wrap gap-2">
+                <SoundToggle />
+                <ReaderModeToggle />
                 <DeviantToggle />
                 <AccessibilityMenu anchor="left" />
                 <a
@@ -244,6 +249,12 @@ export default function Taskbar({ openWindows, onIconClick, onTaskbarClick, rece
           })}
       </div>
 
+      {/* Sound mute */}
+      <SoundToggle />
+
+      {/* Reading mode */}
+      <ReaderModeToggle />
+
       {/* Deviant mode mirror */}
       <DeviantToggle />
 
@@ -275,6 +286,12 @@ export default function Taskbar({ openWindows, onIconClick, onTaskbarClick, rece
 
       {/* Divider */}
       <div className="w-px h-5 flex-shrink-0" style={{ background: "rgba(255,255,255,0.07)" }} />
+
+      {/* System status — uptime, fake CPU/net sparklines, last commit */}
+      <SystemStatus />
+
+      {/* Divider */}
+      <div className="w-px h-5 flex-shrink-0 hidden md:block" style={{ background: "rgba(255,255,255,0.07)" }} />
 
       {/* Clock */}
       <div

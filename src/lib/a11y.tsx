@@ -22,7 +22,7 @@ type A11yCtx = A11yPrefs & {
 
 const DEFAULTS: A11yPrefs = {
   motionReduced: false,
-  soundEffects: true,
+  soundEffects: false,
   ambience: true,
   highContrast: false,
 };

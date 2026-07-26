@@ -13,6 +13,7 @@ import { useA11y } from "@/lib/a11y";
 import { useDeviant } from "@/lib/deviant";
 import { useExperiments } from "@/lib/experiments";
 import { parseHash, setAppHash } from "@/lib/deep-link";
+import { playCodecBeep } from "@/lib/sound";
 
 // Lazy — only downloads when the starfieldWebgl experiment is on.
 const StarfieldWebgl = dynamic(() => import("@/components/experiments/StarfieldWebgl"), { ssr: false });
@@ -96,7 +97,7 @@ let zCounter = 10;
 const RECENT_APP_KEY = "kros_last_opened";
 
 export default function Desktop() {
-  const { highContrast } = useA11y();
+  const { highContrast, soundEffects } = useA11y();
   const { deviant } = useDeviant();
   const { starfieldWebgl, setFlag } = useExperiments();
   const labelFor = (icon: typeof desktopIcons[number]) => (deviant && icon.deviantLabel) ? icon.deviantLabel : icon.label;
@@ -127,7 +128,8 @@ export default function Desktop() {
     // App-level only — ProjectsApp writes its own "/<projectId>" suffix once
     // it mounts, so this must not clobber a deep-linked project selection.
     setAppHash(id);
-  }, []);
+    if (soundEffects) playCodecBeep();
+  }, [soundEffects]);
 
   // Let the Terminal (or anything) open an app window via a global event.
   useEffect(() => {
@@ -379,29 +381,36 @@ export default function Desktop() {
       )}
 
       {/* Windows */}
-      {desktopIcons.map((icon) => {
-        const state = windows[icon.id];
-        if (!state?.isOpen) return null;
-        return (
-          <Window
-            key={icon.id}
-            id={icon.id}
-            title={(deviant && APP_TITLES_DEVIANT[icon.id]) || APP_TITLES[icon.id]}
-            theme={APP_THEMES[icon.id]}
-            isOpen={state.isOpen}
-            isMinimized={state.isMinimized}
-            zIndex={state.zIndex}
-            defaultPosition={DEFAULT_POSITIONS[icon.id]}
-            defaultSize={DEFAULT_SIZES[icon.id]}
-            defaultMaximized={icon.id !== "contact"}
-            onClose={closeWindow}
-            onMinimize={minimizeWindow}
-            onFocus={focusWindow}
-          >
-            {APP_CONTENT[icon.id]}
-          </Window>
-        );
-      })}
+      {(() => {
+        const openZ = Object.values(windows)
+          .filter((w) => w.isOpen && !w.isMinimized)
+          .map((w) => w.zIndex);
+        const maxZ = openZ.length ? Math.max(...openZ) : -Infinity;
+        return desktopIcons.map((icon) => {
+          const state = windows[icon.id];
+          if (!state?.isOpen) return null;
+          return (
+            <Window
+              key={icon.id}
+              id={icon.id}
+              title={(deviant && APP_TITLES_DEVIANT[icon.id]) || APP_TITLES[icon.id]}
+              theme={APP_THEMES[icon.id]}
+              isOpen={state.isOpen}
+              isMinimized={state.isMinimized}
+              isFocused={state.zIndex === maxZ}
+              zIndex={state.zIndex}
+              defaultPosition={DEFAULT_POSITIONS[icon.id]}
+              defaultSize={DEFAULT_SIZES[icon.id]}
+              defaultMaximized={icon.id !== "contact"}
+              onClose={closeWindow}
+              onMinimize={minimizeWindow}
+              onFocus={focusWindow}
+            >
+              {APP_CONTENT[icon.id]}
+            </Window>
+          );
+        });
+      })()}
 
       {/* Taskbar */}
       <Taskbar
