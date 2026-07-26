@@ -23,6 +23,7 @@ const THEME_ACCENT: Record<string, string> = {
   rdr2: "#c8a96e",
   tlou: "#7ab648",
   minecraft: "#5aaf26",
+  settings: "#b388ff",
 };
 
 /* Local app registry — separate instances from Desktop.tsx so the two

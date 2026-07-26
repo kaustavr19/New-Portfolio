@@ -15,7 +15,7 @@ type Toggle = {
   hint: string;
 };
 
-export default function AccessibilityMenu() {
+export default function AccessibilityMenu({ anchor = "right" }: { anchor?: "left" | "right" }) {
   const a11y = useA11y();
   const { deviant } = useDeviant();
   const ch = deviant ? osChromeDeviant : osChrome;
@@ -95,7 +95,7 @@ export default function AccessibilityMenu() {
       {open && (
         <div
           ref={popoverRef}
-          className="absolute right-0 mb-2"
+          className={`absolute mb-2 ${anchor === "left" ? "left-0" : "right-0"}`}
           style={{
             bottom: "100%",
             width: 280,

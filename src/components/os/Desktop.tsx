@@ -44,7 +44,7 @@ const APP_TITLES: Record<string, string> = {
   about: "About.exe — KR-19 ANDROID PROFILE",
   skills: "Skills.tree — NETRUNNER ATTRIBUTE TREE",
   projects: "Projects/ — ACTIVE MISSIONS",
-  experience: "Experience.log — ARTHUR'S JOURNAL",
+  experience: "Experience.log — KAUSTAV'S JOURNAL",
   contact: "Contact.wav — RADIO CHANNEL",
   terminal: "Terminal — MINECRAFT MODE",
   settings: "Settings.cfg — SYSTEM PREFERENCES",
@@ -60,14 +60,14 @@ const APP_TITLES_DEVIANT: Record<string, string> = {
   settings: "PROTOCOLS.cfg — OVERRIDE CONSOLE",
 };
 
-const APP_THEMES: Record<string, "detroit" | "cyberpunk" | "gta" | "rdr2" | "tlou" | "minecraft"> = {
+const APP_THEMES: Record<string, "detroit" | "cyberpunk" | "gta" | "rdr2" | "tlou" | "minecraft" | "settings"> = {
   about: "detroit",
   skills: "cyberpunk",
   projects: "gta",
   experience: "rdr2",
   contact: "tlou",
   terminal: "minecraft",
-  settings: "detroit",
+  settings: "settings",
 };
 
 const DEFAULT_SIZES: Record<string, { width: number; height: number }> = {
@@ -199,6 +199,7 @@ export default function Desktop() {
     rdr2: "#c8a96e",
     tlou: "#7ab648",
     minecraft: "#5aaf26",
+    settings: "#b388ff",
   };
 
   return (

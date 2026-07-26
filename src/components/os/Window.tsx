@@ -7,7 +7,7 @@ import { useA11y } from "@/lib/a11y";
 export interface WindowProps {
   id: string;
   title: string;
-  theme: "detroit" | "cyberpunk" | "gta" | "rdr2" | "tlou" | "minecraft";
+  theme: "detroit" | "cyberpunk" | "gta" | "rdr2" | "tlou" | "minecraft" | "settings";
   isOpen: boolean;
   isMinimized: boolean;
   zIndex: number;
@@ -56,6 +56,12 @@ const themeStyles: Record<string, { titleBar: string; border: string; accent: st
     border: "border-2 border-[#666]",
     accent: "#5aaf26",
     titleFont: "'Press Start 2P', monospace",
+  },
+  settings: {
+    titleBar: "bg-[#0f0d17] border-b border-[#b388ff33]",
+    border: "border border-[#b388ff44]",
+    accent: "#b388ff",
+    titleFont: "'Share Tech Mono', monospace",
   },
 };
 

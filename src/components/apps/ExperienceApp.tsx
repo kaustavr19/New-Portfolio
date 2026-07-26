@@ -83,7 +83,7 @@ function DesktopLayout({
       {/* Header */}
       <div style={{ padding: "28px 36px 8px" }}>
         <div style={{ fontFamily: MONO, fontSize: 12, color: INK_SOFT, letterSpacing: "0.35em" }}>
-          ARTHUR&apos;S JOURNAL
+          KAUSTAV&apos;S JOURNAL
         </div>
         <div style={{ fontFamily: SERIF, fontSize: 32, color: INK, fontWeight: 700, letterSpacing: "0.01em", marginTop: 4, lineHeight: 1.1 }}>
           Career Progression
@@ -155,7 +155,7 @@ function MobileLayout({
       {/* Header */}
       <div style={{ padding: "18px 18px 6px" }}>
         <div style={{ fontFamily: MONO, fontSize: 11, color: INK_SOFT, letterSpacing: "0.3em" }}>
-          ARTHUR&apos;S JOURNAL
+          KAUSTAV&apos;S JOURNAL
         </div>
         <div style={{ fontFamily: SERIF, fontSize: 26, color: INK, fontWeight: 700, letterSpacing: "0.01em", marginTop: 4, lineHeight: 1.1 }}>
           Career Progression
