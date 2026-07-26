@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import LockScreen from "./mobile/LockScreen";
 import HomeScreen from "./mobile/HomeScreen";
 import AppView from "./mobile/AppView";
-import WelcomeNotification from "./WelcomeNotification";
+import PersonnelBrief from "./PersonnelBrief";
 import { useExperiments } from "@/lib/experiments";
 import { desktopIcons } from "@/data/content";
 import { parseHash, setAppHash } from "@/lib/deep-link";
@@ -136,9 +136,9 @@ export default function MobileOS() {
       {starfieldWebgl && <StarfieldWebgl />}
       <MouseTrail />
 
-      {/* First-visit hook — waits until past the lock screen, only ever
-          shows once per localStorage */}
-      {view !== "lock" && <WelcomeNotification />}
+      {/* First-visit dossier waits until the phone has been unlocked so it
+          never competes with the mobile lock-screen gesture. */}
+      {view !== "lock" && <PersonnelBrief />}
 
       {/* Active view — sits above the wallpaper */}
       <div className="absolute inset-0" style={{ zIndex: 10 }}>
