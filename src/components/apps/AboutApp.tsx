@@ -13,6 +13,7 @@ import {
   publications,
 } from "@/data/content";
 import { useDeviant, mergeDeviant } from "@/lib/deviant";
+import { requestPersonnelBrief } from "@/lib/personnel-brief";
 import { useIsMobile } from "@/lib/use-is-mobile";
 
 const ORBITRON = "'Orbitron', monospace";
@@ -262,6 +263,8 @@ export default function AboutApp() {
               {P.bio}
             </p>
           </Section>
+
+          <RecruiterBriefCard accent={SECTION_ACCENT} text={SECTION_TEXT} />
 
           {/* Capability bars */}
           <Section title={H.capability} accent={SECTION_ACCENT_DIM} faint={SECTION_ACCENT_FAINT}>
@@ -548,6 +551,8 @@ export default function AboutApp() {
           </p>
         </Section>
 
+        <RecruiterBriefCard accent={SECTION_ACCENT} text={SECTION_TEXT} />
+
         {/* Capability bars */}
         <Section title={H.capability} accent={SECTION_ACCENT_DIM} faint={SECTION_ACCENT_FAINT}>
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -687,5 +692,42 @@ function AwardGroup({ label, items, accent, text }: { label: string; items: { ti
         ))}
       </div>
     </div>
+  );
+}
+
+function RecruiterBriefCard({ accent, text }: { accent: string; text: string }) {
+  return (
+    <section
+      style={{
+        marginBottom: 32,
+        padding: "16px 18px",
+        border: `1px solid ${accent}44`,
+        background: `${accent}0a`,
+        boxShadow: `inset 3px 0 0 ${accent}`,
+      }}
+    >
+      <div style={{ fontFamily: MONO, fontSize: 9, color: accent, letterSpacing: "0.24em" }}>
+        RECRUITER BRIEF
+      </div>
+      <p style={{ fontFamily: BODY, fontSize: 14, color: "#aebbc4", lineHeight: 1.5, margin: "8px 0 14px" }}>
+        A concise overview of role fit, proof points, and the strongest work to review first.
+      </p>
+      <button
+        type="button"
+        onClick={requestPersonnelBrief}
+        className="flex items-center gap-2 px-3 py-2 transition-all hover:brightness-125 active:opacity-70"
+        style={{
+          fontFamily: ORBITRON,
+          fontSize: 9,
+          color: text,
+          letterSpacing: "0.16em",
+          border: `1px solid ${accent}77`,
+          background: `${accent}0c`,
+        }}
+      >
+        <i className="hn hn-angle-right" style={{ fontSize: 11 }} />
+        OPEN PERSONNEL BRIEF
+      </button>
+    </section>
   );
 }

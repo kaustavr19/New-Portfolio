@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { profile } from "@/data/content";
 import { useA11y } from "@/lib/a11y";
 import { setHash } from "@/lib/deep-link";
+import { PERSONNEL_BRIEF_EVENT } from "@/lib/personnel-brief";
 import { useReaderMode } from "@/lib/reader-mode";
 import KRMark from "./KRMark";
 
@@ -47,6 +48,12 @@ export default function PersonnelBrief() {
 
     const timer = window.setTimeout(() => setVisible(true), REVEAL_DELAY_MS);
     return () => window.clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    const reopen = () => setVisible(true);
+    window.addEventListener(PERSONNEL_BRIEF_EVENT, reopen);
+    return () => window.removeEventListener(PERSONNEL_BRIEF_EVENT, reopen);
   }, []);
 
   useEffect(() => {

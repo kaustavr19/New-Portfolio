@@ -297,6 +297,54 @@ export default function Desktop() {
             </button>
           );
         })}
+
+        <a
+          href="/Kaustav_Roy_CV.pdf"
+          target="_blank"
+          rel="noopener noreferrer"
+          download
+          className="flex flex-col items-center gap-2 w-[88px] group"
+          style={{ outline: "none", textDecoration: "none" }}
+          title="Download Resume (PDF)"
+        >
+          <div
+            className="flex items-center justify-center transition-all duration-150 group-hover:scale-110 group-hover:brightness-125"
+            style={{
+              width: 56,
+              height: 56,
+              background: "rgba(10, 16, 32, 0.62)",
+              border: "1px solid rgba(245,230,66,0.4)",
+              borderRadius: 8,
+              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.05), 0 2px 10px rgba(0,0,0,0.55)",
+            }}
+          >
+            <i
+              className="hn hn-download"
+              style={{
+                fontSize: 26,
+                color: "#f5e642",
+                filter: "drop-shadow(0 0 5px rgba(245,230,66,0.55)) drop-shadow(0 1px 1px rgba(0,0,0,0.6))",
+              }}
+            />
+          </div>
+          <span
+            style={{
+              fontSize: highContrast ? 11 : 10,
+              color: highContrast ? "#ffffff" : "#e2df9a",
+              fontFamily: "'Share Tech Mono', monospace",
+              letterSpacing: "0.03em",
+              textAlign: "center",
+              lineHeight: 1.3,
+              textShadow: "1px 1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000, 0 0 6px rgba(245,230,66,0.4)",
+              background: highContrast ? "rgba(0, 0, 0, 0.85)" : "transparent",
+              padding: highContrast ? "2px 6px" : 0,
+              borderRadius: highContrast ? 3 : 0,
+              fontWeight: highContrast ? 700 : 400,
+            }}
+          >
+            RESUME.PDF
+          </span>
+        </a>
       </div>
 
       {/* KR//OS watermark */}

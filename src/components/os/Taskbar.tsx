@@ -2,12 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { desktopIcons } from "@/data/content";
-import AccessibilityMenu from "./AccessibilityMenu";
-import DeviantToggle from "./DeviantToggle";
-import ReaderModeToggle from "./ReaderModeToggle";
-import SoundToggle from "./SoundToggle";
-import SystemStatus from "./SystemStatus";
+import ControlCenter from "./ControlCenter";
 import KRMark from "./KRMark";
+import SystemStatus from "./SystemStatus";
 import { useDeviant } from "@/lib/deviant";
 
 interface TaskbarProps {
@@ -163,41 +160,6 @@ export default function Taskbar({ openWindows, onIconClick, onTaskbarClick, rece
 
             <div className="h-px" style={{ background: "rgba(255,255,255,0.08)" }} />
 
-            {/* Quick actions */}
-            <div>
-              <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 10, color: "rgba(255,255,255,0.55)", letterSpacing: "0.2em", marginBottom: 10 }}>
-                QUICK ACTIONS
-              </div>
-              <div className="flex items-center flex-wrap gap-2">
-                <SoundToggle />
-                <ReaderModeToggle />
-                <DeviantToggle />
-                <AccessibilityMenu anchor="left" />
-                <a
-                  href="/Kaustav_Roy_CV.pdf"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  download
-                  className="flex items-center gap-2 px-3 py-1 transition-all hover:bg-white/5 flex-shrink-0 group"
-                  style={{
-                    fontFamily: "'Share Tech Mono', monospace",
-                    fontSize: 11,
-                    color: "#a0a0b8",
-                    letterSpacing: "0.1em",
-                    border: "1px solid rgba(255,255,255,0.08)",
-                    borderRadius: 2,
-                    textDecoration: "none",
-                  }}
-                  title="Download Resume (PDF)"
-                >
-                  <i className="hn hn-download" style={{ fontSize: 12, color: "#f5e642" }} />
-                  <span className="group-hover:text-white transition-colors">RESUME.PDF</span>
-                </a>
-              </div>
-            </div>
-
-            <div className="h-px" style={{ background: "rgba(255,255,255,0.08)" }} />
-
             {/* Footer — version + reboot */}
             <div className="flex items-center justify-between">
               <span style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 10, color: "#6a6a7e" }}>
@@ -249,48 +211,11 @@ export default function Taskbar({ openWindows, onIconClick, onTaskbarClick, rece
           })}
       </div>
 
-      {/* Sound mute */}
-      <SoundToggle />
+      <ControlCenter />
 
-      {/* Reading mode */}
-      <ReaderModeToggle />
-
-      {/* Deviant mode mirror */}
-      <DeviantToggle />
-
-      {/* Accessibility menu */}
-      <AccessibilityMenu />
-
-      {/* Resume download */}
-      <a
-        href="/Kaustav_Roy_CV.pdf"
-        target="_blank"
-        rel="noopener noreferrer"
-        download
-        className="flex items-center gap-2 px-3 py-1 transition-all hover:bg-white/5 flex-shrink-0 group"
-        style={{
-          fontFamily: "'Share Tech Mono', monospace",
-          fontSize: 11,
-          color: "#a0a0b8",
-          letterSpacing: "0.1em",
-          border: "1px solid rgba(255,255,255,0.08)",
-          borderRadius: 2,
-          textDecoration: "none",
-          marginRight: 12,
-        }}
-        title="Download Resume (PDF)"
-      >
-        <i className="hn hn-download" style={{ fontSize: 12, color: "#f5e642" }} />
-        <span className="hidden md:inline group-hover:text-white transition-colors">RESUME.PDF</span>
-      </a>
-
-      {/* Divider */}
-      <div className="w-px h-5 flex-shrink-0" style={{ background: "rgba(255,255,255,0.07)" }} />
-
-      {/* System status — uptime, fake CPU/net sparklines, last commit */}
+      {/* Ambient system telemetry lives in the taskbar. */}
       <SystemStatus />
 
-      {/* Divider */}
       <div className="w-px h-5 flex-shrink-0 hidden md:block" style={{ background: "rgba(255,255,255,0.07)" }} />
 
       {/* Clock */}
