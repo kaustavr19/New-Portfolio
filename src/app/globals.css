@@ -209,3 +209,16 @@ body {
   .reader-mode, .reader-mode * { color: #111 !important; background: transparent !important; }
   .reader-mode a { color: #111 !important; }
 }
+
+/* Contact CODEC: preserve the terminal aesthetic without suppressing the
+   browser's essential keyboard-focus and placeholder affordances. */
+.contact-control:focus-visible {
+  outline: 2px solid #f0bf3c !important;
+  outline-offset: 2px;
+  border-color: #f0bf3c !important;
+}
+
+.contact-control::placeholder {
+  color: #71b671;
+  opacity: 0.9;
+}

@@ -182,6 +182,39 @@ function ReaderProjects() {
   );
 }
 
+function ReaderContact() {
+  return (
+    <section style={{ borderTop: "1px solid #ffffff24", paddingTop: 36 }}>
+      <div style={{ fontFamily: MONO, fontSize: 11, color: "#7ab648", letterSpacing: "0.2em" }}>
+        NEXT STEP
+      </div>
+      <h2 style={{ fontFamily: READER_SANS, fontSize: 30, color: "#fff", margin: "9px 0 8px" }}>
+        Seen enough to start a conversation?
+      </h2>
+      <p style={{ fontFamily: READER_SANS, fontSize: 17, color: "#bdbdc8", lineHeight: 1.6, maxWidth: 620 }}>
+        Send a role, product brief, or difficult workflow. A little context is enough.
+      </p>
+      <div className="flex flex-wrap gap-3" style={{ marginTop: 18 }}>
+        <a
+          href={`mailto:${profile.social.email}?subject=Portfolio conversation`}
+          style={{ fontFamily: MONO, fontSize: 11, color: "#0a0a0a", background: "#7ab648", padding: "10px 14px", textDecoration: "none", letterSpacing: "0.1em" }}
+        >
+          EMAIL KAUSTAV
+        </a>
+        <a
+          href="/Kaustav_Roy_CV.pdf"
+          target="_blank"
+          rel="noopener noreferrer"
+          download
+          style={{ fontFamily: MONO, fontSize: 11, color: "#e8e8e8", border: "1px solid #ffffff44", padding: "10px 14px", textDecoration: "none", letterSpacing: "0.1em" }}
+        >
+          DOWNLOAD RESUME
+        </a>
+      </div>
+    </section>
+  );
+}
+
 export default function ReaderMode() {
   const { open, setOpen } = useReaderMode();
 
@@ -251,6 +284,7 @@ export default function ReaderMode() {
           <ReaderAbout />
           <ReaderExperience />
           <ReaderProjects />
+          <ReaderContact />
         </div>
       </div>
     </div>

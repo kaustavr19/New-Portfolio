@@ -8,6 +8,7 @@ import {
 } from "@/data/content";
 import { setHash } from "@/lib/deep-link";
 import { useIsMobile } from "@/lib/use-is-mobile";
+import ContactCTA from "@/components/os/ContactCTA";
 
 const RAJDHANI = "'Rajdhani', sans-serif";
 const MONO = "'Share Tech Mono', monospace";
@@ -130,17 +131,14 @@ export default function SkillsApp() {
           ))}
         </div>
 
-        <footer
-          className={isMobile ? "" : "flex items-center justify-between"}
-          style={{ borderTop: "1px solid #f5e64218", marginTop: 26, paddingTop: 16 }}
-        >
-          <div style={{ fontFamily: MONO, fontSize: 8, color: "#555568", letterSpacing: "0.15em" }}>
-            CLAIM → METHOD → INSPECTABLE PROOF
-          </div>
-          <div style={{ fontFamily: RAJDHANI, fontSize: 12, color: "#f5e64255", marginTop: isMobile ? 8 : 0 }}>
-            No arbitrary mastery percentages.
-          </div>
-        </footer>
+        <div style={{ marginTop: 26 }}>
+          <ContactCTA
+            accent={meta.color}
+            eyebrow="CAPABILITY MATCH"
+            title="Need this combination on your team?"
+            body="Share the role, product, or difficult workflow. The fastest starting point is a little context—not a polished brief."
+          />
+        </div>
       </main>
     </div>
   );
