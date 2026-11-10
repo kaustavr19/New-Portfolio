@@ -1,5 +1,5 @@
-"use client";
-
+/* No "use client": these are hook-free, so the same blocks render in the
+   OS (client) and in the server-rendered /work pages. */
 import type { ProjectBlock, ProjectSection } from "@/data/content";
 
 const MONO = "'Share Tech Mono', monospace";

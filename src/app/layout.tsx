@@ -7,8 +7,9 @@ const DESCRIPTION =
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://kr-os-folio.vercel.app"),
-  title: "Kaustav Roy — KR//OS",
+  title: { default: "Kaustav Roy — KR//OS", template: "%s · Kaustav Roy" },
   description: DESCRIPTION,
+  authors: [{ name: "Kaustav Roy", url: "https://kr-os-folio.vercel.app" }],
   openGraph: {
     title: "Kaustav Roy — KR//OS",
     description: DESCRIPTION,

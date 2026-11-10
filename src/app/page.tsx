@@ -1,81 +1,65 @@
-"use client";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { profile } from "@/data/content";
+import { caseStudies, jsonLd, personJsonLd, SITE_NAME, SITE_URL } from "@/lib/site";
+import OSRoot from "@/components/os/OSRoot";
 
-import { useEffect, useState } from "react";
-import dynamic from "next/dynamic";
-import { A11yProvider } from "@/lib/a11y";
-import { DeviantProvider } from "@/lib/deviant";
-import { ExperimentsProvider } from "@/lib/experiments";
-import { ReaderModeProvider } from "@/lib/reader-mode";
-import { useIsMobile } from "@/lib/use-is-mobile";
-import ExperimentLayer from "@/components/experiments/ExperimentLayer";
+/* Server component. The OS shell (OSRoot) is client-only, so on its own
+   the server HTML is just a <title>. This adds the same content as a real,
+   linked document: crawlers and link unfurlers can read it, and screen-
+   reader / keyboard users get a direct route to the readable pages.
+   It's visually hidden (not display:none) and mirrors what the OS shows. */
 
-const BootScreen = dynamic(() => import("@/components/os/BootScreen"), { ssr: false });
-const Desktop = dynamic(() => import("@/components/os/Desktop"), { ssr: false });
-const MobileOS = dynamic(() => import("@/components/os/MobileOS"), { ssr: false });
-const DeviantOverlay = dynamic(() => import("@/components/os/DeviantOverlay"), { ssr: false });
-const AmbientAudio = dynamic(() => import("@/components/os/AmbientAudio"), { ssr: false });
-const ReaderMode = dynamic(() => import("@/components/os/ReaderMode"), { ssr: false });
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
-const BOOT_KEY = "kros_booted";
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: SITE_NAME,
+  url: SITE_URL,
+  author: { "@id": `${SITE_URL}/#person` },
+};
 
 export default function Home() {
-  const isMobile = useIsMobile();
-  const [booted, setBooted] = useState(false);
-  const [checked, setChecked] = useState(false);
-
-  // Returning visitors (any prior visit, not just this tab session) skip the boot replay
-  useEffect(() => {
-    try {
-      if (localStorage.getItem(BOOT_KEY) === "1") {
-        setBooted(true);
-      }
-    } catch {
-      // localStorage unavailable (e.g. SSR / private mode) — show boot
-    }
-    setChecked(true);
-  }, []);
-
-  const handleBootComplete = () => {
-    try {
-      localStorage.setItem(BOOT_KEY, "1");
-    } catch {
-      // ignore
-    }
-    setBooted(true);
-  };
-
-  if (!checked) return null;
-
-  /* Mobile flow: MobileOS owns its own lock screen (the boot-replacement
-     on phones). We deliberately skip the desktop BootScreen on mobile so
-     phone users get one tap to home, not a 3s chunk loader animation.
-
-     Desktop flow: BootScreen plays the chunk loader before handing off
-     to the Desktop shell, same as before. */
   return (
-    <A11yProvider>
-      <ExperimentsProvider>
-        <DeviantProvider>
-          <ReaderModeProvider>
-            <div className="fixed inset-0 overflow-hidden">
-              {isMobile ? (
-                <MobileOS />
-              ) : !booted ? (
-                <BootScreen onComplete={handleBootComplete} />
-              ) : (
-                <Desktop />
-              )}
-              <DeviantOverlay />
-              {/* WebGL experiments — render nothing unless a flag is on */}
-              <ExperimentLayer />
-              {/* Galactic ambient hum (gesture-gated, gain follows the a11y pref) */}
-              <AmbientAudio />
-              {/* Site-wide plain-text reading view — About/Experience/Projects as one document */}
-              <ReaderMode />
-            </div>
-          </ReaderModeProvider>
-        </DeviantProvider>
-      </ExperimentsProvider>
-    </A11yProvider>
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd([personJsonLd, websiteJsonLd]) }} />
+
+      {/* First tab stop: becomes visible on keyboard focus */}
+      <Link
+        href="/work"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:px-4 focus:py-2"
+        style={{ zIndex: 10000, background: "#4fc3f7", color: "#0a0a0a", fontFamily: "'Share Tech Mono', monospace", fontSize: 12 }}
+      >
+        Skip to readable portfolio
+      </Link>
+
+      <div className="sr-only">
+        <h1>
+          {profile.name} — {profile.designation}, {profile.tagline}
+        </h1>
+        <p>{profile.bio}</p>
+        <nav aria-label="Readable portfolio">
+          <h2>Case studies</h2>
+          <ul>
+            {caseStudies.map((p) => (
+              <li key={p.id}>
+                <Link href={`/work/${p.id}`}>{p.name}</Link> — {p.tagline}
+              </li>
+            ))}
+          </ul>
+          <ul>
+            <li><Link href="/work">All work</Link></li>
+            <li><Link href="/about">About, experience &amp; capabilities</Link></li>
+            <li><a href="/Kaustav_Roy_CV.pdf">Resume (PDF)</a></li>
+            <li><a href={profile.social.linkedin}>LinkedIn</a></li>
+          </ul>
+        </nav>
+      </div>
+
+      <OSRoot />
+    </>
   );
 }

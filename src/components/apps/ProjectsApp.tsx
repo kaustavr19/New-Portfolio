@@ -6,6 +6,7 @@ import { useIsMobile } from "@/lib/use-is-mobile";
 import { parseHash, setHash } from "@/lib/deep-link";
 import { ReaderDossier } from "@/components/reader/blocks";
 import ContactCTA from "@/components/os/ContactCTA";
+import { isGated } from "@/lib/site";
 
 // Deep-linked project, if the URL hash names one that actually exists — read
 // once at module scope so both initial-state hooks below can agree on it.
@@ -621,7 +622,7 @@ export default function ProjectsApp() {
                       <p style={{ fontFamily: SANS, fontSize: 15, color: "#cfcfcf", lineHeight: 1.55 }}>{p.description}</p>
                     </Section>
                     {(() => {
-                      const gated = p.status === "IN PROGRESS" && !!p.classified;
+                      const gated = isGated(p);
                       const rest = (
                         <div className="flex flex-col gap-5">
                           {p.objectives && p.objectives.length > 0 && (
@@ -752,7 +753,7 @@ export default function ProjectsApp() {
           </div>
 
           {(() => {
-            const gated = project.status === "IN PROGRESS" && !!project.classified;
+            const gated = isGated(project);
             const rest = (
               <>
                 {/* Objectives */}
