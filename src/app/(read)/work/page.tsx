@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { READER_SANS } from "@/components/reader/blocks";
-import { caseStudies, sideProjects } from "@/lib/site";
+import { SITE_URL, caseStudies, jsonLd, sideProjects } from "@/lib/site";
 
 const MONO = "'Share Tech Mono', monospace";
 
@@ -9,7 +9,24 @@ export const metadata: Metadata = {
   title: "Work — Case studies in AI & enterprise UX",
   description:
     "Case studies by Kaustav Roy: AI-assisted insurance underwriting, agentic-AI workbench realignment, the Cogentiq design language system, and Eugenie.ai's industrial digital-twin platform.",
-  alternates: { canonical: "/work" },
+  alternates: { canonical: "/work", types: { "text/markdown": "/work.md" } },
+};
+
+const collectionJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  name: "Work — Kaustav Roy",
+  url: `${SITE_URL}/work`,
+  author: { "@id": `${SITE_URL}/#person` },
+  mainEntity: {
+    "@type": "ItemList",
+    itemListElement: caseStudies.map((p, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      url: `${SITE_URL}/work/${p.id}`,
+      name: p.name,
+    })),
+  },
 };
 
 const label: React.CSSProperties = {
@@ -26,6 +43,7 @@ const label: React.CSSProperties = {
 export default function WorkIndex() {
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(collectionJsonLd) }} />
       <header className="flex flex-col gap-3">
         <div style={{ fontFamily: MONO, fontSize: 11, color: "#a4c639", letterSpacing: "0.2em" }}>KAUSTAV ROY · WORK</div>
         <h1 style={{ fontFamily: READER_SANS, fontWeight: 700, fontSize: 36, color: "#fff", lineHeight: 1.15 }}>

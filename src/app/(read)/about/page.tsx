@@ -11,14 +11,14 @@ import {
   publications,
 } from "@/data/content";
 import { READER_SANS } from "@/components/reader/blocks";
-import { getCaseStudy, jsonLd, personJsonLd } from "@/lib/site";
+import { SITE_URL, getCaseStudy, jsonLd, personJsonLd, quickFacts } from "@/lib/site";
 
 const MONO = "'Share Tech Mono', monospace";
 
 export const metadata: Metadata = {
   title: "About — Design Consultant, AI & enterprise UX",
   description: profile.bio,
-  alternates: { canonical: "/about" },
+  alternates: { canonical: "/about", types: { "text/markdown": "/about.md" } },
   openGraph: {
     title: "About Kaustav Roy — Design × AI × Enterprise UX",
     description: profile.bioShort,
@@ -45,10 +45,18 @@ const meta: React.CSSProperties = { fontFamily: MONO, fontSize: 11, color: "#fff
 
 const allCapabilities = Object.values(capabilityGroups).flat();
 
+const profilePageJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ProfilePage",
+  url: `${SITE_URL}/about`,
+  name: `About ${profile.name}`,
+  mainEntity: personJsonLd,
+};
+
 export default function AboutPage() {
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(personJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(profilePageJsonLd) }} />
 
       <header className="flex flex-col gap-3">
         <div style={{ fontFamily: MONO, fontSize: 11, color: "#4fc3f7", letterSpacing: "0.2em" }}>{profile.tagline.toUpperCase()}</div>
@@ -62,6 +70,15 @@ export default function AboutPage() {
           <Link href="/" style={{ color: "#4fc3f7" }}>enter KR//OS</Link> for the interactive version.
         </p>
       </header>
+
+      <section aria-labelledby="quick-facts">
+        <h2 id="quick-facts" style={h2}>QUICK FACTS</h2>
+        <ul style={{ ...body, paddingLeft: 20 }}>
+          {quickFacts.map((f) => (
+            <li key={f}>{f}</li>
+          ))}
+        </ul>
+      </section>
 
       <section>
         <h2 style={h2}>CAPABILITIES — WITH EVIDENCE</h2>

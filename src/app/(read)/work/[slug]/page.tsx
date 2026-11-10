@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: PageProps<"/work/[slug]">): P
     title,
     description: p.description,
     keywords: p.tags,
-    alternates: { canonical: `/work/${p.id}` },
+    alternates: { canonical: `/work/${p.id}`, types: { "text/markdown": `/work/${p.id}.md` } },
     openGraph: {
       title: `${p.name} — Kaustav Roy`,
       description: p.description,
