@@ -15,6 +15,7 @@ import {
 import { useDeviant, mergeDeviant } from "@/lib/deviant";
 import { useReaderMode } from "@/lib/reader-mode";
 import { ReaderDossier, READER_SANS } from "@/components/reader/blocks";
+import { isGated } from "@/lib/site";
 
 const MONO = "'Share Tech Mono', monospace";
 
@@ -175,7 +176,13 @@ function ReaderProjects() {
           <p style={{ fontFamily: READER_SANS, fontSize: 16, color: "#cfcfcf", lineHeight: 1.7, maxWidth: 680 }}>
             {p.description}
           </p>
-          {p.dossier && p.dossier.length > 0 && <ReaderDossier sections={p.dossier} />}
+          {isGated(p) ? (
+            <p style={{ fontFamily: MONO, fontSize: 12, color: "#ffffff99", lineHeight: 1.6, border: "1px dashed #ffffff33", padding: "12px 16px", maxWidth: 680 }}>
+              {p.classified}
+            </p>
+          ) : (
+            p.dossier && p.dossier.length > 0 && <ReaderDossier sections={p.dossier} />
+          )}
         </div>
       ))}
     </section>
