@@ -11,7 +11,7 @@ import OSRoot from "@/components/os/OSRoot";
    It's visually hidden (not display:none) and mirrors what the OS shows. */
 
 export const metadata: Metadata = {
-  alternates: { canonical: "/" },
+  alternates: { canonical: "/", types: { "text/markdown": "/index.md" } },
 };
 
 const websiteJsonLd = {
