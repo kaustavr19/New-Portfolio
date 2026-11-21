@@ -5,9 +5,14 @@ import { desktopIcons, profile } from "@/data/content";
 import { useA11y } from "@/lib/a11y";
 import { parseHash, setAppHash } from "@/lib/deep-link";
 import InkBrief from "./InkBrief";
-import { INK_APPS, CITY, LIVE_PROJECT, LONGFORM_COUNT, cityDate, cityTime } from "./data";
+import { INK_APPS, CITY, CURRENT, cityDate, cityTime } from "./data";
 import { useClock } from "./useClock";
-import { Icon } from "./ui";
+import { Icon, SegBar } from "./ui";
+import KrosMark from "./KrosMark";
+import InkWallpaper from "./InkWallpaper";
+import { ExperienceTile, WorkMap } from "./widgets";
+import { useWeather } from "./useWeather";
+import WeatherGlyph from "./WeatherGlyph";
 import { INK_APP_COMPONENTS } from "./apps";
 
 /* InkOS phone shell: lock → home → app. Shares the kros_booted session
@@ -37,6 +42,8 @@ function StatusBar() {
 
 function LockScreen({ onUnlock }: { onUnlock: () => void }) {
   const now = useClock();
+  const w = useWeather();
+  const cur = CURRENT.project;
   const t = now ? cityTime(now) : null;
   const { motionReduced } = useA11y();
   const startY = useRef<number | null>(null);
@@ -51,19 +58,31 @@ function LockScreen({ onUnlock }: { onUnlock: () => void }) {
       }}
     >
       <h1 className="sr-only">KR//OS — {profile.name}</h1>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 18 }}>
+        <KrosMark size={18} />
+        <span className="ink-dot-900" style={{ fontSize: 16 }}>KR//OS</span>
+      </div>
       <div className="ink-dot-900" style={{ fontSize: "min(38vw, 160px)", lineHeight: 0.82, letterSpacing: "-.02em" }} aria-label={t ? `${CITY} time ${t.h}:${t.m}` : undefined}>
         {t ? t.h : "--"}
         <br />
         {t ? t.m : "--"}
         <span className={`ink-red ${motionReduced ? "" : "ink-blinker"}`}>.</span>
       </div>
-      <div className="ink-label" style={{ fontSize: 12, marginTop: 18 }}>{now ? cityDate(now) : ""} · {CITY}</div>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 18 }}>
+        <span className="ink-label" style={{ fontSize: 12 }}>{now ? cityDate(now) : ""} · {CITY}</span>
+        {w && (
+          <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <WeatherGlyph kind={w.kind} isDay={w.isDay} size={14} />
+            <span className="ink-label" style={{ fontSize: 12, color: "var(--ink-fg)" }}>{w.temp}°</span>
+          </span>
+        )}
+      </div>
 
-      {LIVE_PROJECT && (
+      {cur && (
         <button
           type="button"
           onClick={() => {
-            window.history.replaceState(null, "", `#projects/${LIVE_PROJECT!.id}`);
+            window.history.replaceState(null, "", `#projects/${cur.id}`);
             onUnlock();
           }}
           className="ink-card"
@@ -72,12 +91,13 @@ function LockScreen({ onUnlock }: { onUnlock: () => void }) {
           <span aria-hidden style={{ width: 3, borderRadius: 3, background: "var(--ink-red)", boxShadow: "0 0 10px var(--ink-red)" }} />
           <span style={{ flex: 1 }}>
             <span style={{ display: "flex", justifyContent: "space-between" }}>
-              <span className="ink-label">Transmission</span>
-              <span className="ink-meta">now</span>
+              <span className="ink-label ink-live">Currently</span>
+              <span className="ink-meta">{cur.completion}%</span>
             </span>
-            <span style={{ display: "block", fontSize: 14, marginTop: 6, lineHeight: 1.45 }}>
-              Shipped: <b style={{ fontWeight: 600 }}>{LIVE_PROJECT.name}</b>. Tap to open the mission.
+            <span style={{ display: "block", fontSize: 14, margin: "6px 0 10px", lineHeight: 1.45 }}>
+              Designing <b style={{ fontWeight: 600 }}>{cur.name}</b> at {CURRENT.company.charAt(0) + CURRENT.company.slice(1).toLowerCase()}
             </span>
+            <SegBar value={cur.completion} live segments={30} label="Mission progress" />
           </span>
         </button>
       )}
@@ -98,10 +118,14 @@ function LockScreen({ onUnlock }: { onUnlock: () => void }) {
 }
 
 function HomeScreen({ onOpen }: { onOpen: (id: string) => void }) {
+  const openAt = (id: string, sub?: string) => {
+    if (sub) window.history.replaceState(null, "", `#${id}/${sub}`);
+    onOpen(id);
+  };
   return (
     <div className="ink-scroll" style={{ flex: 1, padding: "10px 18px calc(env(safe-area-inset-bottom, 0px) + 26px)", display: "flex", flexDirection: "column", gap: 14 }}>
       <h1 className="sr-only">KR//OS home</h1>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)", gap: 12, alignItems: "start" }}>
         <button type="button" onClick={() => onOpen("about")} className="ink-card" style={{ gridColumn: "span 2", display: "flex", justifyContent: "space-between", alignItems: "flex-end", textAlign: "left", borderRadius: 26 }}>
           <span>
             <span className="ink-label">{profile.name}</span>
@@ -111,31 +135,12 @@ function HomeScreen({ onOpen }: { onOpen: (id: string) => void }) {
               <span style={{ color: "var(--ink-mute)" }}>AI · Enterprise UX</span>
             </span>
           </span>
-          <span className="ink-dot-900" style={{ fontSize: 46, lineHeight: 0.9 }}>KR<span className="ink-red">.</span></span>
+          <span style={{ color: "var(--ink-fg)" }}><KrosMark size={52} /></span>
         </button>
-        {LIVE_PROJECT && (
-          <button
-            type="button"
-            className="ink-card"
-            style={{ aspectRatio: "1", display: "flex", flexDirection: "column", justifyContent: "space-between", textAlign: "left", borderRadius: 26 }}
-            onClick={() => {
-              window.history.replaceState(null, "", `#projects/${LIVE_PROJECT!.id}`);
-              onOpen("projects");
-            }}
-          >
-            <span className="ink-label ink-live">Live</span>
-            <span>
-              <span style={{ display: "block", fontSize: 17, fontWeight: 600 }}>{LIVE_PROJECT.name}</span>
-              <span className="ink-meta">{LIVE_PROJECT.tagline}</span>
-            </span>
-          </button>
-        )}
-        <button type="button" onClick={() => onOpen("projects")} className="ink-card" style={{ aspectRatio: "1", borderRadius: "50%", display: "grid", placeItems: "center", textAlign: "center" }}>
-          <span>
-            <span className="ink-dot-900" style={{ display: "block", fontSize: 46, lineHeight: 0.9 }}>{String(LONGFORM_COUNT).padStart(2, "0")}</span>
-            <span className="ink-meta">missions</span>
-          </span>
-        </button>
+        <div style={{ minWidth: 0 }}>
+          <WorkMap onOpenApp={openAt} compact />
+        </div>
+        <ExperienceTile onOpenApp={openAt} round />
       </div>
 
       <nav aria-label="Apps" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "16px 0", marginTop: 4 }}>
@@ -143,7 +148,6 @@ function HomeScreen({ onOpen }: { onOpen: (id: string) => void }) {
           <button key={a.id} type="button" onClick={() => onOpen(a.id)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 7 }}>
             <span style={{ width: 58, height: 58, borderRadius: "50%", background: "var(--ink-raised)", border: "1px solid var(--ink-line)", display: "grid", placeItems: "center", position: "relative" }}>
               <Icon name={a.id} size={24} />
-              {a.id === "projects" && LIVE_PROJECT && <span aria-hidden style={{ position: "absolute", top: 2, right: 2, width: 10, height: 10, borderRadius: "50%", background: "var(--ink-red)", border: "2px solid #000" }} />}
             </span>
             <span style={{ fontSize: 11, color: "var(--ink-soft)" }}>{a.name}</span>
           </button>
@@ -213,7 +217,7 @@ export default function InkMobile() {
 
   return (
     <div className={`ink fixed inset-0 flex flex-col ${motionReduced ? "ink-motion-off" : ""}`} style={{ background: "#000" }}>
-      {view !== "app" && <div aria-hidden className="ink-dotgrid absolute inset-0" style={{ backgroundSize: "16px 16px", opacity: 0.8 }} />}
+      {view !== "app" && <InkWallpaper dim={view === "home" ? 0.5 : 0} />}
       <div style={{ position: "relative", flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
         <StatusBar />
         {view === "lock" && <LockScreen onUnlock={unlock} />}

@@ -8,6 +8,7 @@ import { THEMES, useTheme } from "@/lib/theme";
 import { INK_APPS, cityTime } from "./data";
 import { useClock } from "./useClock";
 import { SwitchRow } from "./ui";
+import KrosMark from "./KrosMark";
 
 /* Theme switch — a segmented control; used in the dock menu and Settings. */
 export function ThemePicker() {
@@ -52,7 +53,7 @@ function SystemMenu({ onClose, onOpenApp }: { onClose: () => void; onOpenApp: (i
       style={{ position: "absolute", bottom: "calc(100% + 12px)", left: 0, width: 340, padding: 20, display: "flex", flexDirection: "column", gap: 18, boxShadow: "0 20px 60px #000", animation: "ink-in .16s ease-out" }}
     >
       <div>
-        <div className="ink-dot-900" style={{ fontSize: 26 }}>KR//OS</div>
+        <div className="ink-dot-900" style={{ fontSize: 26, display: "flex", alignItems: "center", gap: 10 }}><KrosMark size={24} />KR//OS</div>
         <div className="ink-meta">Kaustav Roy · portfolio system</div>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -118,8 +119,10 @@ export default function InkDock({
           aria-haspopup="dialog"
           onClick={() => setMenu((m) => !m)}
           className="ink-dot-900"
-          style={{ fontSize: 16, padding: "8px 14px", borderRadius: "var(--r-pill)", background: menu ? "var(--ink-raised)" : "transparent" }}
+          aria-label="KR//OS system menu"
+          style={{ fontSize: 16, padding: "8px 14px", borderRadius: "var(--r-pill)", background: menu ? "var(--ink-raised)" : "transparent", display: "flex", alignItems: "center", gap: 8 }}
         >
+          <KrosMark size={16} />
           KR//OS
         </button>
         {menu && <SystemMenu onClose={() => setMenu(false)} onOpenApp={onOpenApp} />}

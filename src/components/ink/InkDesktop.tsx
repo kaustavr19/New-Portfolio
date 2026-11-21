@@ -8,9 +8,10 @@ import { playCodecBeep } from "@/lib/sound";
 import InkWindow, { type Rect } from "./InkWindow";
 import InkDock from "./InkDock";
 import InkBrief from "./InkBrief";
-import { INK_APPS, CITY, CURRENT, LIVE_PROJECT, LONGFORM_COUNT, cityDate, cityTime } from "./data";
-import { useClock } from "./useClock";
-import { Icon, SegBar } from "./ui";
+import { INK_APPS } from "./data";
+import { Icon } from "./ui";
+import InkWallpaper from "./InkWallpaper";
+import { ClockCard, CurrentlyCard, ExperienceTile, StatusTile, WorkMap, type OpenApp } from "./widgets";
 import { INK_APP_COMPONENTS } from "./apps";
 
 type Win = { open: boolean; minimized: boolean; z: number; order: number };
@@ -33,60 +34,16 @@ function useViewport() {
 }
 
 /* ── Widgets ── */
-function Widgets({ onOpenApp }: { onOpenApp: (id: string, sub?: string) => void }) {
-  const now = useClock();
-  const t = now ? cityTime(now) : null;
-  const { motionReduced } = useA11y();
+function Widgets({ onOpenApp }: { onOpenApp: OpenApp }) {
   return (
     <aside aria-label="Widgets" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-      <div className="ink-card">
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <span className="ink-label">{CITY}</span>
-          <span className="ink-label">{now ? cityDate(now) : ""}</span>
-        </div>
-        <div className="ink-dot-900" style={{ fontSize: 74, lineHeight: 0.9, marginTop: 14 }} aria-label={t ? `${CITY} time ${t.h}:${t.m}` : undefined}>
-          {t ? t.h : "--"}
-          <span className={`ink-red ${motionReduced ? "" : "ink-blinker"}`}>:</span>
-          {t ? t.m : "--"}
-        </div>
-      </div>
+      <ClockCard />
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-        <div className="ink-card">
-          <span className="ink-label">Status</span>
-          <div className="ink-dot-900" style={{ fontSize: 24, marginTop: 14 }}>{profile.status}</div>
-          <div className="ink-meta" style={{ marginTop: 6 }}>{profile.unit} · online</div>
-        </div>
-        <button type="button" className="ink-card" style={{ textAlign: "left" }} onClick={() => onOpenApp("projects")}>
-          <span className="ink-label">Missions</span>
-          <div className="ink-dot-900" style={{ fontSize: 44, lineHeight: 1, marginTop: 10 }}>{String(LONGFORM_COUNT).padStart(2, "0")}</div>
-          <div className="ink-meta" style={{ marginTop: 6 }}>long-form case studies</div>
-        </button>
+        <StatusTile />
+        <ExperienceTile onOpenApp={onOpenApp} />
       </div>
-      {LIVE_PROJECT && (
-        <button type="button" className="ink-card" style={{ textAlign: "left" }} onClick={() => onOpenApp("projects", LIVE_PROJECT!.id)}>
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <span className="ink-label ink-live">Live now</span>
-            <span className="ink-meta ink-blue">open →</span>
-          </div>
-          <div style={{ fontSize: 18, fontWeight: 600, marginTop: 12 }}>{LIVE_PROJECT.name}</div>
-          <div className="ink-meta" style={{ marginTop: 4 }}>{LIVE_PROJECT.tagline}</div>
-        </button>
-      )}
-      {CURRENT.project && (
-        <button type="button" className="ink-card" style={{ textAlign: "left" }} onClick={() => onOpenApp("projects", CURRENT.project!.id)}>
-          <span className="ink-label">Currently</span>
-          <div style={{ fontSize: 15, marginTop: 10, lineHeight: 1.5 }}>
-            {CURRENT.project.name} at <b style={{ fontWeight: 600 }}>{CURRENT.company.charAt(0) + CURRENT.company.slice(1).toLowerCase()}</b>
-          </div>
-          <div style={{ marginTop: 14 }}>
-            <SegBar value={CURRENT.project.completion} live label="Mission progress" />
-          </div>
-          <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}>
-            <span className="ink-meta">mission progress</span>
-            <span className="ink-meta">{CURRENT.project.completion}%</span>
-          </div>
-        </button>
-      )}
+      <WorkMap onOpenApp={onOpenApp} />
+      <CurrentlyCard onOpenApp={onOpenApp} />
     </aside>
   );
 }
@@ -103,6 +60,15 @@ export default function InkDesktop() {
   const right = vp.w >= 900 ? 200 : 24;
   const DOCK = 92;
   const bounds: Rect = { x: 16, y: 16, w: vp.w - 32, h: vp.h - 16 - DOCK };
+  /* The wallpaper monogram shares the dock's centre line (the screen's
+     centre), and is sized so it never reaches the widget column or the
+     icon rail, whichever is closer. */
+  const logoBox = useMemo(() => {
+    const cx = Math.round(vp.w / 2);
+    const room = Math.min(cx - left, vp.w - right - cx) - 24; // half-width available
+    const size = Math.round(Math.max(0, Math.min(room * 2 * 0.8, (vp.h - DOCK) * 0.56)));
+    return { cx, cy: Math.round((vp.h - DOCK) * 0.48), size };
+  }, [left, right, vp.w, vp.h]);
   const baseRect = useCallback(
     (order: number): Rect => {
       const off = (order % 4) * 26;
@@ -193,8 +159,8 @@ export default function InkDesktop() {
 
   return (
     <div className={`ink fixed inset-0 select-none ${motionReduced ? "ink-motion-off" : ""}`} style={{ background: "#000" }}>
-      <div aria-hidden className="ink-dotgrid absolute inset-0" />
-      <div aria-hidden className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 45% 40%, transparent 40%, #000 95%)" }} />
+      <InkWallpaper logo={logoBox} dim={visible.length ? 0.6 : 0} />
+      <div aria-hidden className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 45% 40%, transparent 55%, #000000cc 100%)" }} />
       <h1 className="sr-only">KR//OS — {profile.name}, {profile.designation}</h1>
 
       {showWidgets && (

@@ -7,6 +7,21 @@
 
 import { nexvalFigures } from "./nexval-figures";
 
+/* ── Career dates — every "years of …" figure is computed from these, so
+   nothing goes stale. Months are 1-based. Keep in step with chapters below. */
+export const CAREER_START = { year: 2022, month: 7 }; // Eugenie.ai internship
+export const FRACTAL_START = { year: 2024, month: 7 };
+
+/* Whole months between a start month and now (inclusive of the start month). */
+export function monthsSince(start: { year: number; month: number }, now: Date = new Date()): number {
+  return (now.getFullYear() - start.year) * 12 + (now.getMonth() + 1 - start.month);
+}
+
+/* "4.3" — years to one decimal. */
+export function yearsSince(start: { year: number; month: number }, now: Date = new Date()): string {
+  return (Math.max(0, monthsSince(start, now)) / 12).toFixed(1);
+}
+
 /* ── Profile ── */
 export const profile = {
   name: "Kaustav Roy",
@@ -15,7 +30,7 @@ export const profile = {
   tagline: "Design × AI × Enterprise UX",
   status: "ACTIVE",
   location: "Kolkata, IN",
-  tenure: "3.5 YRS @ FRACTAL",
+  tenure: `${yearsSince(FRACTAL_START)} YRS @ FRACTAL`,
   featured: "GOOGLE I/O 2024 FEATURED",
   bio: "I specialize in AI-powered enterprise platforms — human-in-the-loop decisioning, explainable AI, and workflows that complex domains can actually trust. Currently designing AI-driven insurance underwriting at Fractal Analytics. Prior: CPG intelligence (Cogentiq), agentic AI for BI, and industrial sustainability at Eugenie.ai.",
   bioShort:
@@ -43,7 +58,7 @@ export const stats = {
   company: "Fractal Analytics",
   location: "Kolkata, IN",
   speciality: "AI-Powered UX",
-  tenure: "3.5 yrs",
+  tenure: `${yearsSince(CAREER_START)} yrs`,
 };
 
 export const statsDeviant: Partial<typeof stats> = {
@@ -215,7 +230,7 @@ export const chapters: Chapter[] = [
     number: 2,
     title: "FRACTAL",
     period: "Jul 2024 – Present",
-    duration: "2 yrs",
+    duration: `${yearsSince(FRACTAL_START)} yrs`,
     status: "in_progress",
     missions: [
       {

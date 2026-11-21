@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { profile } from "@/data/content";
+import KrosMark from "@/components/ink/KrosMark";
 
 /* ──────────────────────────────────────────────────────────
    Server-rendered, indexable pages (/about, /work, /work/[slug]).
@@ -21,7 +22,8 @@ export default function ReadLayout({ children }: { children: React.ReactNode }) 
         style={{ padding: "14px clamp(16px, 4vw, 28px)", borderBottom: "1px solid var(--ink-line)" }}
       >
         <nav aria-label="Primary" className="flex items-center gap-5">
-          <Link href="/" className="ink-dot-900" style={{ fontSize: 18, textDecoration: "none" }}>
+          <Link href="/" className="ink-dot-900" style={{ fontSize: 18, textDecoration: "none", display: "flex", alignItems: "center", gap: 8 }}>
+            <KrosMark size={18} />
             KR//OS
           </Link>
           <Link href="/work" className="ink-label" style={{ color: "var(--ink-fg)", textDecoration: "none" }}>Work</Link>

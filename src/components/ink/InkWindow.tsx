@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useA11y } from "@/lib/a11y";
 import { playClick } from "@/lib/sound";
@@ -50,6 +50,13 @@ export default function InkWindow({
   const [maximized, setMaximized] = useState(false);
   const [dragging, setDragging] = useState(false);
   const offset = useRef({ x: 0, y: 0 });
+
+  // Opening a window sends a ripple through the wallpaper from its centre.
+  useEffect(() => {
+    if (!isOpen || isMinimized) return;
+    window.dispatchEvent(new CustomEvent("ink:ripple", { detail: { x: initial.x + initial.w / 2, y: initial.y + initial.h / 2 } }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, isMinimized]);
 
   const onDown = useCallback(
     (e: React.MouseEvent) => {
