@@ -114,7 +114,7 @@ export default function InkWindow({
             border: `1px solid ${isFocused ? "var(--ink-line-strong)" : "var(--ink-line)"}`,
             borderRadius: "var(--r-window)",
             overflow: "hidden",
-            boxShadow: "0 30px 80px #000",
+            boxShadow: "var(--ink-shadow)",
             transition: dragging
               ? "none"
               : "left .22s cubic-bezier(.25,0,.25,1), top .22s cubic-bezier(.25,0,.25,1), width .22s cubic-bezier(.25,0,.25,1), height .22s cubic-bezier(.25,0,.25,1)",

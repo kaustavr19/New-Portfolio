@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useA11y } from "@/lib/a11y";
+import { useInkScheme } from "@/lib/theme";
 import { KROS_MARK_BOX, KROS_MARK_PATH } from "./KrosMark";
 import { useWeather, type Weather } from "./useWeather";
 import { birdChirp, starTwinkle, thunder, uiThock } from "@/lib/ink-sound";
@@ -24,7 +25,11 @@ import { birdChirp, starTwinkle, thunder, uiThock } from "@/lib/ink-sound";
 
 const PITCH = 18;
 const BASE_R = 1;
-const BASE_A = 0.11;
+/* Dark: light dots on black. Light: ink dots on paper ("lit" = bigger + darker). */
+const SCHEME = {
+  dark: { rgb: "255,255,255", base: 0.11, gain: 0.85 },
+  light: { rgb: "17,17,17", base: 0.13, gain: 0.8 },
+} as const;
 
 export type LogoBox = { cx: number; cy: number; size: number } | null;
 
@@ -53,6 +58,7 @@ function kolkataIsDay(d = new Date()) {
 
 export default function InkWallpaper({ logo = null, dim = 0 }: { logo?: LogoBox; dim?: number }) {
   const ref = useRef<HTMLCanvasElement>(null);
+  const scheme = useInkScheme();
   const { motionReduced } = useA11y();
   const weather = useWeather();
   const dimRef = useRef(dim);
@@ -70,6 +76,7 @@ export default function InkWallpaper({ logo = null, dim = 0 }: { logo?: LogoBox;
     const ctx = cvs?.getContext("2d");
     if (!cvs || !ctx) return;
 
+    const { rgb, base: BASE_A, gain: GAIN } = SCHEME[scheme];
     let W = 0, H = 0, cols = 0, rows = 0, dpr = 1;
     let logoMask = new Float32Array(0);
     let stars = new Float32Array(0); // per-dot twinkle phase, 0 = not a star
@@ -109,7 +116,7 @@ export default function InkWallpaper({ logo = null, dim = 0 }: { logo?: LogoBox;
       base.height = cvs.height;
       const b = base.getContext("2d")!;
       b.setTransform(dpr, 0, 0, dpr, 0, 0);
-      b.fillStyle = `rgba(255,255,255,${BASE_A})`;
+      b.fillStyle = `rgba(${rgb},${BASE_A})`;
       for (let r = 0; r < rows; r++)
         for (let c = 0; c < cols; c++) {
           b.beginPath();
@@ -352,7 +359,7 @@ export default function InkWallpaper({ logo = null, dim = 0 }: { logo?: LogoBox;
         for (let c = 0; c < cols; c++) {
           const v = Math.min(1, I[r * cols + c] + flash);
           if (v < 0.015) continue;
-          ctx.fillStyle = `rgba(255,255,255,${Math.min(1, BASE_A + v * 0.85)})`;
+          ctx.fillStyle = `rgba(${rgb},${Math.min(1, BASE_A + v * GAIN)})`;
           ctx.beginPath();
           ctx.arc(c * PITCH + PITCH / 2, r * PITCH + PITCH / 2, BASE_R + v * 2.6, 0, Math.PI * 2);
           ctx.fill();
@@ -410,7 +417,7 @@ export default function InkWallpaper({ logo = null, dim = 0 }: { logo?: LogoBox;
       window.removeEventListener("ink:ripple", onRipple);
     };
     // logo geometry and motion preference rebuild the scene; weather/dim are read live via refs
-  }, [logo?.cx, logo?.cy, logo?.size, motionReduced]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [logo?.cx, logo?.cy, logo?.size, motionReduced, scheme]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Reduced motion: repaint the static frame once the weather arrives (sun vs moon).
   useEffect(() => {

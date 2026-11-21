@@ -7,6 +7,7 @@ import { useReaderMode } from "@/lib/reader-mode";
 import { THEMES, useTheme, type ThemeId } from "@/lib/theme";
 import { SectionHead, SwitchRow } from "../ui";
 import SoundLab from "../SoundLab";
+import InkModePicker from "../InkModePicker";
 
 /* A tiny swatch per theme so the choice is visual, not just a label. */
 const SWATCH: Record<ThemeId, string[]> = {
@@ -48,7 +49,7 @@ export default function InkSettings() {
                   style={{ textAlign: "left", padding: 16, borderRadius: 18, border: `1px solid ${on ? "var(--ink-fg)" : "var(--ink-line)"}`, background: on ? "var(--ink-raised)" : "transparent", display: "flex", flexDirection: "column", gap: 12 }}
                 >
                   <span aria-hidden style={{ display: "flex", gap: 4 }}>
-                    {SWATCH[t.id].map((c) => <span key={c} style={{ width: 22, height: 22, borderRadius: "50%", background: c, border: "1px solid #ffffff22" }} />)}
+                    {SWATCH[t.id].map((c) => <span key={c} style={{ width: 22, height: 22, borderRadius: "50%", background: c, border: "1px solid var(--ink-line-strong)" }} />)}
                   </span>
                   <span>
                     <span className="ink-dot-900" style={{ display: "block", fontSize: 20 }}>{t.label.toUpperCase()}</span>
@@ -60,6 +61,12 @@ export default function InkSettings() {
             })}
           </div>
           <p className="ink-meta" style={{ marginTop: 10 }}>Saved on this device. Terminal shortcuts: <code>ink</code>, <code>classic</code>, <code>deviant</code>.</p>
+        </section>
+
+        <section>
+          <SectionHead as="h3">Appearance</SectionHead>
+          <InkModePicker />
+          <p className="ink-meta" style={{ marginTop: 10 }}>Auto follows your device&apos;s light or dark setting. Applies to InkOS and the reading pages.</p>
         </section>
 
         <section>

@@ -69,7 +69,7 @@ export default async function CaseStudyPage({ params }: PageProps<"/work/[slug]"
           </Link>
         </header>
 
-        <p style={{ fontSize: 18, lineHeight: 1.75, color: "#dcdcdc" }}>{p.summary ?? p.description}</p>
+        <p style={{ fontSize: 18, lineHeight: 1.75, color: "var(--ink-strong)" }}>{p.summary ?? p.description}</p>
 
         {p.intel && p.intel.length > 0 && (
           <ul className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", listStyle: "none" }}>

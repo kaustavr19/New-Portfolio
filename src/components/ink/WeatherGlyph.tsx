@@ -27,7 +27,7 @@ export default function WeatherGlyph({ kind, isDay, size = 22 }: { kind: Weather
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden>
       {rows.flatMap((row, y) =>
         [...row].map((ch, x) => (
-          <circle key={`${x}-${y}`} cx={x * step + step / 2} cy={y * step + step / 2} r={ch === "#" ? step * 0.42 : step * 0.14} fill={ch === "#" ? "#f2f2f2" : "#ffffff26"} />
+          <circle key={`${x}-${y}`} cx={x * step + step / 2} cy={y * step + step / 2} r={ch === "#" ? step * 0.42 : step * 0.14} fill="currentColor" opacity={ch === "#" ? 1 : 0.18} />
         )),
       )}
     </svg>

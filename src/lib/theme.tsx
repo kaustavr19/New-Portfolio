@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
 
 /* ──────────────────────────────────────────────────────────
    OS theme — which shell the visitor sees.
@@ -63,6 +63,63 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   const setTheme = useCallback((t: ThemeId) => setThemeState(t), []);
   return <Ctx.Provider value={{ theme, setTheme, ready }}>{children}</Ctx.Provider>;
+}
+
+/* ── InkOS light / dark ──
+   "system" follows the visitor's OS; "light" / "dark" override it.
+   The choice lives on <html data-ink-mode>, which CSS reads; the
+   no-flash script in app/layout applies a saved choice before paint. */
+export type InkMode = "system" | "light" | "dark";
+export const INK_MODE_KEY = "kros_ink_mode";
+export const INK_MODES: { id: InkMode; label: string }[] = [
+  { id: "system", label: "Auto" },
+  { id: "light", label: "Light" },
+  { id: "dark", label: "Dark" },
+];
+const INK_MODE_EVENT = "kros:ink-mode";
+
+function readInkMode(): InkMode {
+  if (typeof document === "undefined") return "system";
+  const m = document.documentElement.dataset.inkMode;
+  return m === "light" || m === "dark" ? m : "system";
+}
+
+export function setInkMode(mode: InkMode) {
+  document.documentElement.dataset.inkMode = mode;
+  try {
+    localStorage.setItem(INK_MODE_KEY, mode);
+  } catch {
+    // ignore
+  }
+  window.dispatchEvent(new Event(INK_MODE_EVENT));
+}
+
+function subscribeScheme(cb: () => void) {
+  const mq = window.matchMedia("(prefers-color-scheme: light)");
+  mq.addEventListener("change", cb);
+  window.addEventListener(INK_MODE_EVENT, cb);
+  return () => {
+    mq.removeEventListener("change", cb);
+    window.removeEventListener(INK_MODE_EVENT, cb);
+  };
+}
+
+/* The chosen mode (Auto / Light / Dark). */
+export function useInkMode(): InkMode {
+  return useSyncExternalStore(subscribeScheme, readInkMode, () => "system");
+}
+
+/* What's actually showing — for canvas code that can't read CSS variables. */
+export function useInkScheme(): "light" | "dark" {
+  return useSyncExternalStore(
+    subscribeScheme,
+    () => {
+      const m = readInkMode();
+      if (m !== "system") return m;
+      return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+    },
+    () => "dark",
+  );
 }
 
 export function useTheme(): ThemeCtx {

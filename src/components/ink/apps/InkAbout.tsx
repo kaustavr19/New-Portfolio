@@ -23,7 +23,7 @@ function Avatar() {
           width: 124,
           height: 124,
           borderRadius: "50%",
-          background: "radial-gradient(circle at 50% 38%, #fff 0 22%, transparent 23%), radial-gradient(ellipse at 50% 100%, #fff 0 46%, transparent 47%)",
+          background: "radial-gradient(circle at 50% 38%, var(--ink-fg) 0 22%, transparent 23%), radial-gradient(ellipse at 50% 100%, var(--ink-fg) 0 46%, transparent 47%)",
           WebkitMask: "radial-gradient(circle, #000 1.1px, transparent 1.6px) 0 0/5px 5px",
           mask: "radial-gradient(circle, #000 1.1px, transparent 1.6px) 0 0/5px 5px",
         }}
@@ -72,7 +72,7 @@ export default function InkAbout() {
         <div className="ink-split-main" style={{ display: "flex", flexDirection: "column", gap: 30 }}>
           <section>
             <SectionHead as="h4">Biographical data</SectionHead>
-            <p style={{ fontSize: 16, lineHeight: 1.75, color: "#dcdcdc", maxWidth: 680 }}>{profile.bio}</p>
+            <p style={{ fontSize: 16, lineHeight: 1.75, color: "var(--ink-strong)", maxWidth: 680 }}>{profile.bio}</p>
           </section>
 
           <div className="ink-raised" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 18, flexWrap: "wrap" }}>

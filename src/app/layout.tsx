@@ -41,8 +41,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="h-full" data-theme="ink">
+    <html lang="en" className="h-full" data-theme="ink" data-ink-mode="system" suppressHydrationWarning>
       <head>
+        {/* Apply a saved InkOS light/dark override before first paint (no flash). */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var m=localStorage.getItem("kros_ink_mode");document.documentElement.dataset.inkMode=m==="light"||m==="dark"?m:"system"}catch(e){}`,
+          }}
+        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         {/* InkOS (default theme) — dot-matrix display, mono data, sans reading */}

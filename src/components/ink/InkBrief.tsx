@@ -75,7 +75,7 @@ export default function InkBrief() {
   };
 
   return (
-    <div className="ink fixed inset-0 flex items-center justify-center" style={{ zIndex: 9500, background: "#000000cc", padding: 20 }} onMouseDown={(e) => e.target === e.currentTarget && dismiss()}>
+    <div className="ink fixed inset-0 flex items-center justify-center" style={{ zIndex: 9500, background: "var(--ink-veil)", padding: 20 }} onMouseDown={(e) => e.target === e.currentTarget && dismiss()}>
       <div
         ref={ref}
         tabIndex={-1}
