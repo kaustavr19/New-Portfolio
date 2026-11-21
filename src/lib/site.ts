@@ -17,10 +17,22 @@ export function isGated(p: Pick<Project, "status" | "classified">): boolean {
 
 /* Main missions are the long-form case studies that get their own URL. */
 export const caseStudies = projects.filter((p) => p.type === "main");
+/* Outside engagements — their own section on /work, same long-form page. */
+export const consultingProjects = projects.filter((p) => p.type === "consulting");
 export const sideProjects = projects.filter((p) => p.type === "side");
 
+/* Everything with a /work/<id> page, in /work listing order. */
+export const longformProjects = [...caseStudies, ...consultingProjects];
+
 export function getCaseStudy(slug: string): Project | undefined {
-  return caseStudies.find((p) => p.id === slug);
+  return longformProjects.find((p) => p.id === slug);
+}
+
+/* Next page in the reading sequence: an explicit `next`, else list order. */
+export function nextCaseStudy(p: Project): Project | undefined {
+  if (p.next) return getCaseStudy(p.next);
+  const idx = longformProjects.findIndex((c) => c.id === p.id);
+  return longformProjects[(idx + 1) % longformProjects.length];
 }
 
 /* Deep link that opens the same case study inside the OS. */
@@ -86,6 +98,7 @@ export function caseStudyJsonLd(p: Project) {
     author: { "@id": `${SITE_URL}/#person`, "@type": "Person", name: profile.name, url: SITE_URL },
     publisher: { "@id": `${SITE_URL}/#person` },
     isPartOf: { "@type": "WebSite", name: SITE_NAME, url: SITE_URL },
+    ...(p.live ? { about: { "@type": "WebSite", url: p.live.href } } : {}),
   };
   const breadcrumbs = {
     "@context": "https://schema.org",

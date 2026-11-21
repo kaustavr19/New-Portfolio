@@ -5,6 +5,8 @@
    useContent() (lib/deviant) returns the right one at runtime.
    ────────────────────────────────────────────────────────── */
 
+import { nexvalFigures } from "./nexval-figures";
+
 /* ── Profile ── */
 export const profile = {
   name: "Kaustav Roy",
@@ -295,8 +297,26 @@ export const experience = chapters.flatMap((c) =>
    `completion` (0–100) + `medal` drive the MISSION PASSED card.
    `stars` doubles as the GTA "wanted level" / difficulty.
    ────────────────────────────────────────────────────────── */
-export type ProjectType = "main" | "side";
+/* "consulting" = outside engagements, shown in their own section on /work
+   and their own tab in the OS. Long-form, with a /work/<id> page, like "main". */
+export type ProjectType = "main" | "consulting" | "side";
 export type Medal = "gold" | "silver" | "bronze";
+
+/* A screenshot. `src` is a base path without extension: the optimiser
+   writes <src>.avif, <src>.webp and <src>.png side by side in /public.
+   width/height are the intrinsic pixel size, so the browser reserves space. */
+export type Figure = {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+  caption?: string;
+  /* Very tall captures: cap the displayed height (px) and fade out; the full image opens on click. */
+  peek?: number;
+};
+
+/* A list item is a plain sentence, or a bold lead-in followed by the rest. */
+export type ListItem = string | { lead: string; text: string };
 
 /* Block-based dossier — long-form case-study content rendered as
    GTA-V "heist" sections. Each block kind maps to one styled element. */
@@ -306,8 +326,11 @@ export type ProjectBlock =
   | { kind: "callout"; label: string; text: string }
   | { kind: "stats"; items: { value: string; label: string; sub?: string }[] }
   | { kind: "pillars"; items: { title: string; sub: string }[] }
-  | { kind: "list"; items: string[] }
-  | { kind: "findings"; items: { label: string; text: string }[] };
+  | { kind: "list"; items: ListItem[] }
+  | { kind: "findings"; items: { label: string; text: string }[] }
+  | { kind: "figures"; layout: "full" | "2up" | "3up"; items: Figure[]; caption?: string }
+  | { kind: "compare"; headers: [string, string]; rows: [string, string][] }
+  | { kind: "credits"; items: { name: string; role: string }[] };
 
 export type ProjectSection = { title: string; blocks: ProjectBlock[] };
 
@@ -333,6 +356,12 @@ export type Project = {
   debrief?: string;
   classified?: string;
   github?: string;
+  /* Longer opening paragraph for the detail page; `description` stays the card summary. */
+  summary?: string;
+  /* Public, shipped work — replaces the NDA banner with a link to the live site. */
+  live?: { href: string; label: string };
+  /* Which /work page the "next" link points to; defaults to list order. */
+  next?: string;
 };
 
 export const projects: Project[] = [
@@ -1057,6 +1086,262 @@ export const projects: Project[] = [
     ],
     classified:
       "Interface screens and client-specific detail withheld under NDA — full case study available on request.",
+  },
+
+  /* ── CONSULTING — outside engagements ── */
+  {
+    id: "nexval",
+    name: "Nexval",
+    tagline: "BPO first. AI as the amplifier.",
+    role: "Website redesign · Design Lead (strategy, research, IA, UX) · ~4 months, research to launch",
+    description:
+      "Repositioned and rebuilt the website for a US mortgage BPO and AI document-processing company, covering research, positioning, IA, personas, wireframes and build QA. 15 templates, no live page lost.",
+    status: "SHIPPED",
+    stars: 4,
+    tags: ["B2B Website", "Information Architecture", "Positioning", "Mortgage / Fintech", "Design Leadership"],
+    year: "~4 months",
+    type: "consulting",
+    completion: 100,
+    medal: "gold",
+    live: { href: "https://nexval.ai", label: "nexval.ai" },
+    next: "underwriting",
+    intel: [
+      { value: "11", label: "Sites benchmarked" },
+      { value: "15", label: "Pages & templates in the new IA" },
+      { value: "0", label: "Live pages removed" },
+      { value: "5", label: "Buyer personas" },
+    ],
+    summary:
+      "Nexval runs mortgage operations for US lenders, servicers and title companies, and builds AI products on top of that work. Its website said none of it clearly. The nav had five parallel pitches, the hero said nothing, and the conversion path was a single button. We rebuilt the site around one argument: an operations company first, with AI as the edge.",
+    dossier: [
+      {
+        title: "01 · THE STARTING POINT",
+        blocks: [
+          {
+            kind: "para",
+            text: "A benchmark against ten competitors put Nexval 9th of 11, averaging 3.9/10 against a leader at 8.7. The weakest axis was conversion, at 3/10: one \"Book a Demo\" button in the nav and nothing below the fold to support it.",
+          },
+          {
+            kind: "para",
+            text: "The homepage hero read \"Let's Gear Up for a Tech-powered Leap Forward.\" It didn't say who Nexval serves or what it does.",
+          },
+          { kind: "para", text: "A crawl of the live site found the structural problems:" },
+          {
+            kind: "list",
+            items: [
+              { lead: "Offerings, Products and Service", text: "were three top-level items that looked identical. A visitor couldn't tell whether they were browsing capabilities, buying software or hiring a team." },
+              { lead: "Resources returned a 404.", text: "31 blog posts, case studies and a newsroom were live, but only reachable from the footer." },
+              "A generalist \"AI idea-to-MVP\" offer sat under the same tab as the mortgage story, which diluted it.",
+            ],
+          },
+        ],
+      },
+      {
+        title: "02 · THE POSITIONING CALL",
+        blocks: [
+          {
+            kind: "para",
+            text: "Every competitor leads with \"AI\", so the word no longer sets anyone apart. Nexval's real advantage was scale and domain depth in mortgage operations.",
+          },
+          {
+            kind: "callout",
+            label: "DECISION",
+            text: "BPO is the noun and AI is the modifier. The hero names the operation, and automation shows up inside each service line instead of as a separate pitch next to it. The client confirmed the order: BPO and automation first, products second.",
+          },
+          {
+            kind: "figures",
+            layout: "full",
+            items: [
+              { ...nexvalFigures.hero, alt: "Nexval homepage hero: \"Run mortgage operations at scale without losing control\" with Book a Demo and three proof stats over a dark glass-tower image" },
+            ],
+          },
+        ],
+      },
+      {
+        title: "03 · INFORMATION ARCHITECTURE",
+        blocks: [
+          { kind: "callout", label: "CONSTRAINT", text: "Nothing live gets deleted, only regrouped." },
+          {
+            kind: "list",
+            items: [
+              { lead: "Offerings becomes a two-column mega-menu.", text: "Mortgage BPO Services on one side, Products & Tech Services on the other. The two are grouped, not ranked." },
+              { lead: "Four workflow lines stay on one page.", text: "Origination, Title & Closing, Servicing, and REO & Default are anchored sections. Each can be linked for a campaign, and none becomes a thin standalone page." },
+              { lead: "The generalist \"Service\" offer is kept but scoped", text: "to mortgage-tech startups, with its own CTA (\"Get a Quote\" instead of \"Book a Demo\")." },
+              { lead: "Resources becomes a dropdown with no hub page,", text: "which removes the 404 at the source." },
+              { lead: "Three archive templates for three kinds of content:", text: "an editorial grid for Blog and Newsroom, an evidence library for case studies, and an issue archive for the Zine." },
+              { lead: "A redirect map protects link equity", text: "that the SEO audit had already flagged as thin." },
+            ],
+          },
+          {
+            kind: "para",
+            text: "The first IA pass treated Products as internal tooling. It wasn't: the products are sold as standalone software. Correcting that changed the whole structure.",
+          },
+          {
+            kind: "figures",
+            layout: "full",
+            items: [
+              {
+                ...nexvalFigures.megamenu,
+                alt: "Wireframe of the Offerings & Products mega-menu open, splitting Mortgage BPO Services from Products and Tech Services",
+                caption: "Offerings & Products mega-menu, from the wireframe.",
+              },
+            ],
+          },
+          {
+            kind: "figures",
+            layout: "full",
+            items: [
+              { ...nexvalFigures.pillars, alt: "Tabbed workflow pillars: Origination, Title, Servicing, Property Preservation & REO, IT Services, each with a verified outcome signal" },
+            ],
+          },
+        ],
+      },
+      {
+        title: "04 · WHO IT'S FOR",
+        blocks: [
+          { kind: "para", text: "Mortgage software is bought by a committee, so the personas are organised by segment × buying role:" },
+          {
+            kind: "list",
+            items: [
+              { lead: "3 priority segments:", text: "Mortgage Servicers, Title & Settlement, Mid-Market Lenders" },
+              { lead: "2 cross-cutting roles:", text: "the Compliance/Risk officer (gatekeeper) and the Ops Analyst (researcher)" },
+              { lead: "Banks:", text: "a watchlist card only. There wasn't enough evidence for a full persona, and the card says so." },
+            ],
+          },
+          { kind: "para", text: "Each page's main proof is chosen to match the persona that page has to convince." },
+        ],
+      },
+      {
+        title: "05 · WIREFRAMES: FROM DIRECTIONS TO A CONNECTED PROTOTYPE",
+        blocks: [
+          { kind: "para", text: "The homepage was explored as four directions first:" },
+          {
+            kind: "list",
+            items: [
+              { lead: "Linear proof-stack (kept).", text: "Claim → proof → workflow → product → evidence → CTA, a single argument that runs down the page." },
+              { lead: "Segmented dispatcher (repurposed).", text: "It became a first-visit audience gateway: lender/servicer or mortgage-tech startup? The answer shifts emphasis, then the gateway dissolves into the shared hero." },
+              { lead: "Command center (rejected).", text: "Impressive but slow. It made a first-time buyer work before getting any value." },
+            ],
+          },
+          {
+            kind: "para",
+            text: "The full IA was then built as one connected greyscale prototype: 13 page experiences and 16 views, clickable end to end. Blog, newsroom, article and legal pages each share one renderer with modes, the same way the build would.",
+          },
+          {
+            kind: "figures",
+            layout: "full",
+            items: [
+              { ...nexvalFigures.wfIndex, alt: "Index of the connected greyscale prototype listing 13 page experiences, from homepage to legal" },
+            ],
+          },
+          {
+            kind: "callout",
+            label: "CONTENT RULES",
+            text: "Every block carries its rules with it: behaviour, motion, content, proof and authority. Copy is tagged Adapted (rewritten from the live site), Claim – verify (needs evidence and an owner), or Prototype (shows structure, doesn't promise the capability exists). No unverified number could reach production looking like a fact.",
+          },
+          {
+            kind: "figures",
+            layout: "2up",
+            caption: "Wireframe (left) and shipped homepage (right): the same proof-stack order, top to bottom.",
+            items: [
+              { ...nexvalFigures.wfHome, alt: "Homepage wireframe, full length: gateway, hero, trust, workflows, products, evidence, close" },
+              { ...nexvalFigures.liveHome, alt: "Shipped Nexval homepage, full length, in the same proof-stack order as the wireframe beside it" },
+            ],
+          },
+          {
+            kind: "figures",
+            layout: "full",
+            items: [
+              { ...nexvalFigures.wfCaseStudy, peek: 960, alt: "Case study wireframe structured as baseline, workflow change, outcomes, limits and sources" },
+            ],
+          },
+        ],
+      },
+      {
+        title: "06 · HANDOFF AS A SYSTEM",
+        blocks: [
+          {
+            kind: "para",
+            text: "UI production was led by Angshuman Rakshit. Design intent reached him as Jira-format stories: goal, persona, acceptance criteria and reference patterns for each page. The point was to remove guesswork, not to add process.",
+          },
+        ],
+      },
+      {
+        title: "07 · SHIP & QA",
+        blocks: [
+          {
+            kind: "para",
+            text: "Nexval's team built the site. We ran a full UI/UX QA audit against the locked IA and kept a regression baseline for re-checks. Two contrast trade-offs in the brand palette were reviewed and accepted on record by both teams, as decisions rather than defects.",
+          },
+          {
+            kind: "figures",
+            layout: "full",
+            items: [
+              { ...nexvalFigures.proofBand, alt: "Certification badges and a stat row: mortgage professionals, enterprise clients, document classification accuracy" },
+            ],
+          },
+          {
+            kind: "figures",
+            layout: "full",
+            items: [
+              { ...nexvalFigures.products, alt: "Product grid for ARC, DocuChief and PreservAI, each with a one-line value statement" },
+            ],
+          },
+          {
+            kind: "figures",
+            layout: "full",
+            items: [
+              { ...nexvalFigures.proofBlock, alt: "Case-study proof block: headline outcome stat, scope list and client quote" },
+            ],
+          },
+          {
+            kind: "figures",
+            layout: "full",
+            items: [
+              { ...nexvalFigures.closingCta, alt: "Closing CTA framed as a working session, not a sales pitch" },
+            ],
+          },
+          {
+            kind: "figures",
+            layout: "3up",
+            items: [
+              { ...nexvalFigures.mobileHero, alt: "Mobile homepage hero" },
+              { ...nexvalFigures.mobileOfferings, alt: "Mobile offerings page" },
+              { ...nexvalFigures.mobileMenu, alt: "Mobile navigation menu open" },
+            ],
+          },
+        ],
+      },
+      {
+        title: "08 · BEFORE → AFTER",
+        blocks: [
+          {
+            kind: "compare",
+            headers: ["The benchmark said", "What shipped"],
+            rows: [
+              ["Hero says nothing", "Hero names the operation, with three proof stats in the first viewport"],
+              ["No trust signals near the top", "Certification band and stat row straight after the hero"],
+              ["Five parallel nav pitches", "Five items: Offerings & Products, Services, Partner, Resources, AI Lab"],
+              ["Resources 404s", "Resources dropdown → Blog, Newsroom, Case Study, Zine"],
+              ["One CTA, nav only", "\"Book a Demo\" in the nav and hero, plus a closing working-session CTA"],
+              ["No quantified proof", "Case-study outcome blocks with a stat, scope and client quote"],
+            ],
+          },
+        ],
+      },
+      {
+        title: "CREDITS",
+        blocks: [
+          {
+            kind: "credits",
+            items: [
+              { name: "Kaustav Roy", role: "Design Lead (strategy, research, IA, personas, UX, QA)" },
+              { name: "Angshuman Rakshit", role: "UI Designer" },
+            ],
+          },
+        ],
+      },
+    ],
   },
 
   /* ── SIDE MISSIONS — personal projects ── */

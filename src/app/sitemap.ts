@@ -1,12 +1,12 @@
 import type { MetadataRoute } from "next";
-import { SITE_URL, caseStudies } from "@/lib/site";
+import { SITE_URL, longformProjects } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
   return [
     { url: SITE_URL, lastModified: now, changeFrequency: "monthly", priority: 1 },
     { url: `${SITE_URL}/work`, lastModified: now, changeFrequency: "monthly", priority: 0.9 },
-    ...caseStudies.map((p) => ({
+    ...longformProjects.map((p) => ({
       url: `${SITE_URL}/work/${p.id}`,
       lastModified: now,
       changeFrequency: "monthly" as const,
