@@ -11,8 +11,8 @@ export function generateStaticParams() {
   return longformProjects.map((p) => ({ slug: p.id }));
 }
 
-const ACCENT = "#a4c639";
-const BG = "#0a0a14";
+const ACCENT = "#ff3b30";
+const BG = "#000000";
 
 export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -45,8 +45,8 @@ export default async function Image({ params }: { params: Promise<{ slug: string
           padding: "64px 72px",
           background: BG,
           backgroundImage:
-            "linear-gradient(rgba(164,198,57,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(164,198,57,0.06) 1px, transparent 1px)",
-          backgroundSize: "40px 40px",
+            "radial-gradient(circle, rgba(255,255,255,0.14) 1.6px, transparent 1.6px)",
+          backgroundSize: "24px 24px",
         }}
       >
         <div style={{ display: "flex", fontFamily: "Share Tech Mono", fontSize: 24, color: ACCENT, letterSpacing: 6 }}>
@@ -57,14 +57,14 @@ export default async function Image({ params }: { params: Promise<{ slug: string
             {name.toUpperCase()}
           </div>
           {p?.tagline && (
-            <div style={{ display: "flex", fontFamily: "Share Tech Mono", fontSize: 30, color: "#c8c8d4", marginTop: 24 }}>
+            <div style={{ display: "flex", fontFamily: "Share Tech Mono", fontSize: 30, color: "#cfcfcf", marginTop: 24 }}>
               {p.tagline}
             </div>
           )}
         </div>
-        <div style={{ display: "flex", justifyContent: "space-between", fontFamily: "Share Tech Mono", fontSize: 22, color: "#6a6a80", letterSpacing: 4 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", fontFamily: "Share Tech Mono", fontSize: 22, color: "#8c8c8c", letterSpacing: 4 }}>
           <span>KAUSTAV ROY</span>
-          <span style={{ color: "#4fc3f7" }}>KR//OS</span>
+          <span style={{ color: "#7ab2ff" }}>KR//OS</span>
         </div>
       </div>
     ),

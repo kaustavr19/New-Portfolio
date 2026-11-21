@@ -29,6 +29,7 @@ export type TermAction =
   | { kind: "open"; app: string; projectId?: string }
   | { kind: "link"; url: string }
   | { kind: "toggleDeviant" }
+  | { kind: "setTheme"; theme: "ink" | "classic" }
   | { kind: "toggleWallpaper" }
   | { kind: "advancement"; title: string; desc: string };
 
@@ -83,6 +84,7 @@ function cmdHelp(): TermLine[] {
     "§e/resume§7 ....... download the CV",
     "§eopen <app>§7 .... launch an app window §8(about|projects|skills|…)",
     "§e/clear§7 ........ wipe the chat",
+    "§eink§7 / §eclassic§7 .. switch the OS theme",
     "§7—",
     "§bOr just ask me anything§7, e.g. §f\"does he know Figma?\"§7 or §f\"where does he work?\"",
   ].map(out);
@@ -382,6 +384,10 @@ export function runTerminal(raw: string): TermResult {
     }
     case "deviant":
       return { lines: ["§dToggling DEVIANT protocol…"].map(out), action: { kind: "toggleDeviant" } };
+    case "ink": case "inkos":
+      return { lines: ["§fSwitching to InkOS…"].map(out), action: { kind: "setTheme", theme: "ink" } };
+    case "classic":
+      return { lines: ["§fSwitching to the classic theme…"].map(out), action: { kind: "setTheme", theme: "classic" } };
     case "wallpaper": case "cosmic":
       return { lines: ["§bSwapping wallpaper…"].map(out), action: { kind: "toggleWallpaper" } };
     case "sudo": {
@@ -468,6 +474,6 @@ export function runTerminal(raw: string): TermResult {
 export const TERM_VERBS = [
   "help", "about", "skills", "projects", "experience", "education",
   "awards", "writing", "contact", "resume", "email", "linkedin", "medium",
-  "open", "clear", "deviant", "wallpaper", "sudo hire", "craft",
+  "open", "clear", "ink", "classic", "deviant", "wallpaper", "sudo hire", "craft",
   "cat", "sl", "vim", "rm",
 ];

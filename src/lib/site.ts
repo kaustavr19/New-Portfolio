@@ -46,7 +46,7 @@ export function osLink(p: Pick<Project, "id">): string {
    still makes sense quoted alone. Shown on /about and in llms.txt — keep in
    step with content.ts when roles change. */
 export const quickFacts: string[] = [
-  `${profile.name} is a ${profile.designation} at Fractal Analytics in Bengaluru, India, who designs AI-powered enterprise products.`,
+  `${profile.name} is a ${profile.designation} at Fractal Analytics, based in Kolkata, India, who designs AI-powered enterprise products.`,
   `${profile.name} specializes in design for AI, explainable AI (XAI), human-in-the-loop decision systems, enterprise UX, and design systems.`,
   `${profile.name} currently leads UX for an AI-assisted commercial insurance underwriting platform at Fractal, as its sole design owner since May 2026.`,
   `At Fractal, ${profile.name} led the design system architecture for the Cogentiq AI platform, used by 50+ designers, cutting design-to-development handoff time by about 40%.`,
@@ -69,12 +69,12 @@ export const personJsonLd = {
   hasOccupation: {
     "@type": "Occupation",
     name: profile.designation,
-    occupationLocation: { "@type": "City", name: "Bengaluru" },
+    occupationLocation: { "@type": "City", name: "Kolkata" },
     skills: "Design for AI, explainable AI, human-in-the-loop systems, enterprise UX, design systems",
   },
   award: [...awardsFractal, ...awardsExternal].map((a) => `${a.title} (${a.year})`),
   alumniOf: { "@type": "CollegeOrUniversity", name: "University of Engineering & Management, Kolkata" },
-  address: { "@type": "PostalAddress", addressLocality: "Bengaluru", addressCountry: "IN" },
+  address: { "@type": "PostalAddress", addressLocality: "Kolkata", addressCountry: "IN" },
   knowsAbout: [
     "Design for AI",
     "Explainable AI",

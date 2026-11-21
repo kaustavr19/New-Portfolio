@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from "react";
+import { createContext, useContext, ReactNode, useCallback } from "react";
+import { useTheme } from "@/lib/theme";
 
 /* ──────────────────────────────────────────────────────────
    Global "Deviant Mode" state — the holistic version of the
@@ -18,33 +19,16 @@ type DeviantCtx = {
   toggle: () => void;
 };
 
-const STORAGE_KEY = "kros_deviant";
 const Ctx = createContext<DeviantCtx | null>(null);
 
+/* Deviant is now one of the OS themes (see lib/theme). This provider
+   derives from it, so every existing useDeviant() caller keeps working:
+   turning deviant on switches to the "deviant" theme, off to "classic". */
 export function DeviantProvider({ children }: { children: ReactNode }) {
-  const [deviant, setDeviantState] = useState(false);
-  const [ready, setReady] = useState(false);
-
-  // Hydrate from localStorage
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw === "1") setDeviantState(true);
-    } catch {
-      // ignore
-    }
-    setReady(true);
-  }, []);
-
-  // Persist on change
-  useEffect(() => {
-    if (!ready) return;
-    try { localStorage.setItem(STORAGE_KEY, deviant ? "1" : "0"); } catch {}
-  }, [deviant, ready]);
-
-  const setDeviant = useCallback((v: boolean) => setDeviantState(v), []);
-  const toggle = useCallback(() => setDeviantState((d) => !d), []);
-
+  const { theme, setTheme } = useTheme();
+  const deviant = theme === "deviant";
+  const setDeviant = useCallback((v: boolean) => setTheme(v ? "deviant" : "classic"), [setTheme]);
+  const toggle = useCallback(() => setTheme(deviant ? "classic" : "deviant"), [deviant, setTheme]);
   return <Ctx.Provider value={{ deviant, setDeviant, toggle }}>{children}</Ctx.Provider>;
 }
 

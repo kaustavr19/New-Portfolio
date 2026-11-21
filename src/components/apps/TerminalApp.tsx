@@ -6,6 +6,7 @@ import { useDeviant } from "@/lib/deviant";
 import { useExperiments } from "@/lib/experiments";
 import { runTerminal, TERM_VERBS, type TermLine } from "@/lib/terminal/engine";
 import { setHash } from "@/lib/deep-link";
+import { useTheme } from "@/lib/theme";
 
 const TITLE = "'Press Start 2P', monospace";
 const BODY = "'VT323', monospace";
@@ -52,6 +53,7 @@ export default function TerminalApp() {
   const isMobile = useIsMobile();
   const { toggle: toggleDeviant } = useDeviant();
   const { starfieldWebgl, setFlag } = useExperiments();
+  const { setTheme } = useTheme();
 
   const [lines, setLines] = useState<TermLine[]>([
     { type: "system", text: "§6KR//OS §7Minecraft Terminal §8v2.0" },
@@ -112,6 +114,7 @@ export default function TerminalApp() {
     }
     if (a?.kind === "link") window.open(a.url, "_blank", "noopener,noreferrer");
     if (a?.kind === "toggleDeviant") toggleDeviant();
+    if (a?.kind === "setTheme") setTheme(a.theme);
     if (a?.kind === "toggleWallpaper") setFlag("starfieldWebgl", !starfieldWebgl);
     if (a?.kind === "advancement") setToast({ title: a.title, desc: a.desc });
 

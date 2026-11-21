@@ -10,10 +10,8 @@ import {
   awardsExternal,
   publications,
 } from "@/data/content";
-import { READER_SANS } from "@/components/reader/blocks";
+import { SectionHead } from "@/components/ink/ui";
 import { SITE_URL, getCaseStudy, jsonLd, personJsonLd, quickFacts } from "@/lib/site";
-
-const MONO = "'Share Tech Mono', monospace";
 
 export const metadata: Metadata = {
   title: "About — Design Consultant, AI & enterprise UX",
@@ -29,19 +27,6 @@ export const metadata: Metadata = {
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Kaustav Roy — KR//OS" }],
   },
 };
-
-const h2: React.CSSProperties = {
-  fontFamily: MONO,
-  fontWeight: 700,
-  fontSize: 12,
-  color: "#ffffffaa",
-  letterSpacing: "0.3em",
-  borderBottom: "1px solid #ffffff22",
-  paddingBottom: 10,
-  marginBottom: 20,
-};
-const body: React.CSSProperties = { fontFamily: READER_SANS, fontSize: 16, color: "#cfcfcf", lineHeight: 1.75 };
-const meta: React.CSSProperties = { fontFamily: MONO, fontSize: 11, color: "#ffffff66", letterSpacing: "0.06em" };
 
 const allCapabilities = Object.values(capabilityGroups).flat();
 
@@ -59,48 +44,51 @@ export default function AboutPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(profilePageJsonLd) }} />
 
       <header className="flex flex-col gap-3">
-        <div style={{ fontFamily: MONO, fontSize: 11, color: "#4fc3f7", letterSpacing: "0.2em" }}>{profile.tagline.toUpperCase()}</div>
-        <h1 style={{ fontFamily: READER_SANS, fontWeight: 700, fontSize: 38, color: "#fff" }}>{profile.name}</h1>
-        <p style={{ fontFamily: READER_SANS, fontSize: 19, color: "#ffffffcc" }}>
+        <span className="ink-label ink-live">{profile.tagline}</span>
+        <h1 className="ink-dot-900" style={{ fontSize: "clamp(40px, 9vw, 68px)", lineHeight: 0.95 }}>{profile.name.toUpperCase()}</h1>
+        <p style={{ fontSize: 19 }}>
           {profile.designation} at Fractal Analytics · {profile.location}
         </p>
-        <p style={{ ...body, fontSize: 18, color: "#dcdcdc" }}>{profile.bio}</p>
-        <p style={body}>
-          Start with the <Link href="/work" style={{ color: "#4fc3f7" }}>case studies</Link>, or{" "}
-          <Link href="/" style={{ color: "#4fc3f7" }}>enter KR//OS</Link> for the interactive version.
+        <p style={{ fontSize: 18, lineHeight: 1.75, color: "#dcdcdc" }}>{profile.bio}</p>
+        <p className="ink-body">
+          Start with the <Link href="/work" className="ink-blue">case studies</Link>, or{" "}
+          <Link href="/" className="ink-blue">enter KR//OS</Link> for the interactive version.
         </p>
       </header>
 
       <section aria-labelledby="quick-facts">
-        <h2 id="quick-facts" style={h2}>QUICK FACTS</h2>
-        <ul style={{ ...body, paddingLeft: 20 }}>
+        <div id="quick-facts"><SectionHead as="h2">Quick facts</SectionHead></div>
+        <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: 8 }}>
           {quickFacts.map((f) => (
-            <li key={f}>{f}</li>
+            <li key={f} className="ink-body" style={{ display: "flex", gap: 12 }}>
+              <span aria-hidden style={{ width: 5, height: 5, borderRadius: "50%", background: "var(--ink-fg)", marginTop: 11, flexShrink: 0 }} />
+              {f}
+            </li>
           ))}
         </ul>
       </section>
 
       <section>
-        <h2 style={h2}>CAPABILITIES — WITH EVIDENCE</h2>
-        <div className="flex flex-col gap-6">
+        <SectionHead as="h2">Capabilities — with evidence</SectionHead>
+        <div className="flex flex-col gap-4">
           {allCapabilities.map((c) => (
-            <div key={c.name}>
-              <h3 style={{ fontFamily: READER_SANS, fontWeight: 600, fontSize: 18, color: "#fff" }}>{c.name}</h3>
-              <p style={{ ...body, marginTop: 2 }}>{c.claim}</p>
-              <ul style={{ ...body, fontSize: 15, paddingLeft: 20, marginTop: 6 }}>
+            <div key={c.name} className="ink-card">
+              <h3 style={{ fontWeight: 600, fontSize: 18 }}>{c.name}</h3>
+              <p className="ink-body" style={{ marginTop: 4 }}>{c.claim}</p>
+              <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: 8, marginTop: 12 }}>
                 {c.evidence.map((e) => {
                   const cs = e.projectId ? getCaseStudy(e.projectId) : undefined;
                   const href = cs ? `/work/${cs.id}` : e.href;
                   return (
-                    <li key={e.signal}>
-                      <strong style={{ color: "#fff" }}>{e.signal}</strong> — {e.detail}
+                    <li key={e.signal} style={{ fontSize: 15, lineHeight: 1.6, color: "var(--ink-soft)" }}>
+                      <strong className="ink-dot" style={{ fontSize: 16, color: "var(--ink-fg)" }}>{e.signal}</strong> — {e.detail}
                       {href && (
                         <>
                           {" "}
                           {href.startsWith("/") ? (
-                            <Link href={href} style={{ color: "#4fc3f7" }}>({cs ? cs.name : "source"})</Link>
+                            <Link href={href} className="ink-blue">({cs ? cs.name : "source"})</Link>
                           ) : (
-                            <a href={href} target="_blank" rel="noopener noreferrer" style={{ color: "#4fc3f7" }}>(source)</a>
+                            <a href={href} target="_blank" rel="noopener noreferrer" className="ink-blue">(source)</a>
                           )}
                         </>
                       )}
@@ -114,24 +102,27 @@ export default function AboutPage() {
       </section>
 
       <section>
-        <h2 style={h2}>EXPERIENCE</h2>
+        <SectionHead as="h2">Experience</SectionHead>
         <div className="flex flex-col gap-8">
           {[...chapters].reverse().map((c) => (
-            <div key={c.id} className="flex flex-col gap-5">
-              <div>
-                <h3 style={{ fontFamily: READER_SANS, fontWeight: 700, fontSize: 20, color: "#fff" }}>{c.title}</h3>
-                <div style={{ ...meta, marginTop: 3 }}>{c.period} · {c.duration}</div>
+            <div key={c.id} className="flex flex-col gap-4">
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12, flexWrap: "wrap" }}>
+                <h3 className={`ink-dot-900 ${c.status === "in_progress" ? "ink-live" : ""}`} style={{ fontSize: 28 }}>{c.title}</h3>
+                <span className="ink-meta">{c.period} · {c.duration}</span>
               </div>
               {[...c.missions].reverse().map((m) => (
-                <div key={m.id} style={{ paddingLeft: 16, borderLeft: "2px solid #ffffff22" }}>
-                  <h4 style={{ fontFamily: READER_SANS, fontWeight: 600, fontSize: 17, color: "#fff" }}>{m.role}</h4>
-                  <div style={{ ...meta, marginTop: 3, marginBottom: 8 }}>{m.period} · {m.location}</div>
-                  <ul style={{ ...body, paddingLeft: 20 }}>
+                <div key={m.id} className="ink-card">
+                  <h4 style={{ fontWeight: 600, fontSize: 17 }}>{m.role}</h4>
+                  <div className="ink-meta" style={{ marginTop: 3, marginBottom: 10 }}>{m.period} · {m.location}</div>
+                  <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: 6 }}>
                     {m.objectives.map((o) => (
-                      <li key={o.text}>{o.text}</li>
+                      <li key={o.text} style={{ display: "flex", gap: 12, fontSize: 15, lineHeight: 1.55, color: "var(--ink-soft)" }}>
+                        <span aria-hidden style={{ width: 10, height: 10, borderRadius: 3, marginTop: 6, flexShrink: 0, background: o.done ? "var(--ink-fg)" : "transparent", border: o.done ? 0 : "1.5px solid var(--ink-dim)" }} />
+                        {o.text}
+                      </li>
                     ))}
                   </ul>
-                  {m.weapons.length > 0 && <div style={{ ...meta, color: "#ffffff77", marginTop: 8 }}>{m.weapons.join(" · ")}</div>}
+                  {m.weapons.length > 0 && <div className="ink-label" style={{ marginTop: 12 }}>{m.weapons.join(" · ")}</div>}
                 </div>
               ))}
             </div>
@@ -140,45 +131,47 @@ export default function AboutPage() {
       </section>
 
       <section>
-        <h2 style={h2}>EDUCATION</h2>
-        <p style={body}>
+        <SectionHead as="h2">Education</SectionHead>
+        <p className="ink-body">
           {education.degree} — {education.institution} ({education.period}), CGPA {education.cgpa}
         </p>
       </section>
 
       <section>
-        <h2 style={h2}>COMMENDATIONS</h2>
-        <ul style={{ ...body, paddingLeft: 20 }}>
+        <SectionHead as="h2">Commendations</SectionHead>
+        <ul style={{ listStyle: "none" }}>
           {[...awardsFractal, ...awardsExternal].map((a) => (
-            <li key={a.title}>
-              {a.title} ({a.year})
+            <li key={a.title} style={{ display: "flex", justifyContent: "space-between", gap: 16, padding: "10px 0", borderBottom: "1px solid var(--ink-line)" }}>
+              <span>{a.title}</span>
+              <span className="ink-dot" style={{ whiteSpace: "nowrap" }}>{a.year}</span>
             </li>
           ))}
         </ul>
       </section>
 
       <section>
-        <h2 style={h2}>WRITING</h2>
-        <ul style={{ ...body, paddingLeft: 20 }}>
+        <SectionHead as="h2">Writing</SectionHead>
+        <ul style={{ listStyle: "none" }}>
           {publications.map((p) => (
-            <li key={p.title}>
+            <li key={p.title} style={{ padding: "10px 0", borderBottom: "1px solid var(--ink-line)" }}>
               {p.href ? (
-                <a href={p.href} target="_blank" rel="noopener noreferrer" style={{ color: "#4fc3f7" }}>{p.title}</a>
+                <a href={p.href} target="_blank" rel="noopener noreferrer" className="ink-blue">{p.title} ↗</a>
               ) : (
                 p.title
-              )}{" "}
-              — {p.venue}
+              )}
+              <span className="ink-meta" style={{ display: "block" }}>{p.venue}</span>
             </li>
           ))}
         </ul>
       </section>
 
       <section>
-        <h2 style={h2}>CERTIFICATIONS</h2>
-        <ul style={{ ...body, paddingLeft: 20 }}>
+        <SectionHead as="h2">Certifications</SectionHead>
+        <ul style={{ listStyle: "none" }}>
           {certifications.map((c) => (
-            <li key={c.title}>
-              {c.title} — {c.org}
+            <li key={c.title} style={{ padding: "10px 0", borderBottom: "1px solid var(--ink-line)" }}>
+              {c.title}
+              <span className="ink-meta" style={{ display: "block" }}>{c.org}</span>
             </li>
           ))}
         </ul>
