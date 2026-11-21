@@ -1,14 +1,14 @@
 import { ImageResponse } from "next/og";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { caseStudies, getCaseStudy } from "@/lib/site";
+import { getCaseStudy, longformProjects } from "@/lib/site";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 export const alt = "Case study by Kaustav Roy";
 
 export function generateStaticParams() {
-  return caseStudies.map((p) => ({ slug: p.id }));
+  return longformProjects.map((p) => ({ slug: p.id }));
 }
 
 const ACCENT = "#a4c639";
@@ -17,6 +17,12 @@ const BG = "#0a0a14";
 export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const p = getCaseStudy(slug);
+
+  // Public work ships its own 1200×630 crop of the live site instead of the text card.
+  if (p?.type === "consulting") {
+    const og = await readFile(join(process.cwd(), "public", p.id, "og.png")).catch(() => null);
+    if (og) return new Response(new Uint8Array(og), { headers: { "Content-Type": "image/png" } });
+  }
   const fontsDir = join(process.cwd(), "src/app/opengraph-image-fonts");
   const [bebasNeue, shareTechMono] = await Promise.all([
     readFile(join(fontsDir, "BebasNeue-Regular.ttf")),
@@ -44,7 +50,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
         }}
       >
         <div style={{ display: "flex", fontFamily: "Share Tech Mono", fontSize: 24, color: ACCENT, letterSpacing: 6 }}>
-          {`CASE STUDY · ${p?.status ?? ""}`}
+          {`${p?.type === "consulting" ? "CONSULTING" : "CASE STUDY"} · ${p?.status ?? ""}`}
         </div>
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div style={{ display: "flex", fontFamily: "Bebas Neue", fontSize: nameSize, color: "#ffffff", lineHeight: 0.95, letterSpacing: 2 }}>

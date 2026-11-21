@@ -347,11 +347,14 @@ export function runTerminal(raw: string): TermResult {
       const target = arg.trim().replace(/\/+$/, "").toLowerCase();
       if (target === "projects" || target === "builds" || target === "missions") {
         const mains = projects.filter((p) => p.type === "main");
+        const contracts = projects.filter((p) => p.type === "consulting");
         const sides = projects.filter((p) => p.type === "side");
         return {
           lines: [
             "§6Main missions:",
             ...mains.map((p) => `§f  ${p.id}§8 — ${p.name}`),
+            "§6Contracts:",
+            ...contracts.map((p) => `§f  ${p.id}§8 — ${p.name}`),
             "§6Side missions:",
             ...sides.map((p) => `§f  ${p.id}§8 — ${p.name}`),
             "§8open one with §eopen <id>§8, e.g. §eopen underwriting",

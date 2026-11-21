@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ReaderDossier, READER_SANS } from "@/components/reader/blocks";
-import { caseStudies, caseStudyJsonLd, getCaseStudy, isGated, jsonLd, osLink } from "@/lib/site";
+import { caseStudyJsonLd, getCaseStudy, isGated, jsonLd, longformProjects, nextCaseStudy, osLink } from "@/lib/site";
 
 const MONO = "'Share Tech Mono', monospace";
 
@@ -10,21 +10,23 @@ const MONO = "'Share Tech Mono', monospace";
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return caseStudies.map((p) => ({ slug: p.id }));
+  return longformProjects.map((p) => ({ slug: p.id }));
 }
 
 export async function generateMetadata({ params }: PageProps<"/work/[slug]">): Promise<Metadata> {
   const { slug } = await params;
   const p = getCaseStudy(slug);
   if (!p) return {};
-  const title = `${p.name} — Case study`;
+  // Consulting entries read "Nexval · Kaustav Roy" via the root title template.
+  const title = p.type === "consulting" ? p.name : `${p.name} — Case study`;
+  const shareTitle = p.type === "consulting" ? `${p.name} · Kaustav Roy` : `${p.name} — Kaustav Roy`;
   return {
     title,
     description: p.description,
     keywords: p.tags,
     alternates: { canonical: `/work/${p.id}`, types: { "text/markdown": `/work/${p.id}.md` } },
     openGraph: {
-      title: `${p.name} — Kaustav Roy`,
+      title: shareTitle,
       description: p.description,
       type: "article",
       url: `/work/${p.id}`,
@@ -32,7 +34,7 @@ export async function generateMetadata({ params }: PageProps<"/work/[slug]">): P
     },
     twitter: {
       card: "summary_large_image",
-      title: `${p.name} — Kaustav Roy`,
+      title: shareTitle,
       description: p.description,
     },
   };
@@ -44,8 +46,8 @@ export default async function CaseStudyPage({ params }: PageProps<"/work/[slug]"
   if (!p) notFound();
 
   const gated = isGated(p);
-  const idx = caseStudies.findIndex((c) => c.id === p.id);
-  const next = caseStudies[(idx + 1) % caseStudies.length];
+  const next = nextCaseStudy(p);
+  const consulting = p.type === "consulting";
 
   return (
     <>
@@ -57,7 +59,7 @@ export default async function CaseStudyPage({ params }: PageProps<"/work/[slug]"
             ← ALL WORK
           </Link>
           <div style={{ fontFamily: MONO, fontSize: 11, color: "#a4c639", letterSpacing: "0.2em" }}>
-            CASE STUDY · {p.status}
+            {consulting ? "CONSULTING" : "CASE STUDY"} · {p.status}
           </div>
           <h1 style={{ fontFamily: READER_SANS, fontWeight: 700, fontSize: 36, lineHeight: 1.15, color: "#fff" }}>{p.name}</h1>
           <p style={{ fontFamily: READER_SANS, fontSize: 19, color: "#ffffffcc" }}>{p.tagline}</p>
@@ -82,7 +84,7 @@ export default async function CaseStudyPage({ params }: PageProps<"/work/[slug]"
           </Link>
         </header>
 
-        <p style={{ fontFamily: READER_SANS, fontSize: 18, color: "#dcdcdc", lineHeight: 1.75 }}>{p.description}</p>
+        <p style={{ fontFamily: READER_SANS, fontSize: 18, color: "#dcdcdc", lineHeight: 1.75 }}>{p.summary ?? p.description}</p>
 
         {p.intel && p.intel.length > 0 && (
           <ul className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", listStyle: "none" }}>
@@ -95,6 +97,24 @@ export default async function CaseStudyPage({ params }: PageProps<"/work/[slug]"
               </li>
             ))}
           </ul>
+        )}
+
+        {p.live && (
+          <a
+            href={p.live.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, border: "1px solid #a4c63966", padding: "16px 20px", textDecoration: "none" }}
+          >
+            <span>
+              <span style={{ display: "block", fontFamily: MONO, fontSize: 11, color: "#a4c639", letterSpacing: "0.2em", marginBottom: 4 }}>
+                <span aria-hidden>● </span>LIVE
+              </span>
+              <span style={{ fontFamily: READER_SANS, fontSize: 18, fontWeight: 600, color: "#fff" }}>{p.live.label}</span>
+              <span className="sr-only"> (opens in a new tab)</span>
+            </span>
+            <span aria-hidden style={{ fontFamily: MONO, fontSize: 18, color: "#a4c639" }}>↗</span>
+          </a>
         )}
 
         {gated ? (
@@ -125,7 +145,17 @@ export default async function CaseStudyPage({ params }: PageProps<"/work/[slug]"
               </section>
             )}
 
-            {p.dossier && p.dossier.length > 0 && <ReaderDossier sections={p.dossier} />}
+            {p.dossier && p.dossier.length > 0 && (
+              <section className="flex flex-col gap-6">
+                {/* Keeps heading order h1 → h2 → h3 when there's no OBJECTIVES h2 above the dossier */}
+                {!p.objectives?.length && (
+                  <h2 style={{ fontFamily: MONO, fontWeight: 700, fontSize: 12, color: "#ffffffaa", letterSpacing: "0.3em", borderBottom: "1px solid #ffffff22", paddingBottom: 10 }}>
+                    PROCESS
+                  </h2>
+                )}
+                <ReaderDossier sections={p.dossier} />
+              </section>
+            )}
 
             {p.debrief && (
               <section>

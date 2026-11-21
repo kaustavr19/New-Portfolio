@@ -11,7 +11,7 @@ import {
   type ProjectBlock,
   type ProjectSection,
 } from "@/data/content";
-import { SITE_URL, caseStudies, sideProjects, getCaseStudy, isGated, quickFacts } from "@/lib/site";
+import { SITE_URL, caseStudies, consultingProjects, longformProjects, sideProjects, getCaseStudy, isGated, quickFacts } from "@/lib/site";
 
 /* ──────────────────────────────────────────────────────────
    Markdown renderings of the portfolio, for AI agents and LLMs:
@@ -36,9 +36,18 @@ function block(b: ProjectBlock): string {
     case "pillars":
       return b.items.map((p) => `- **${p.title}** — ${p.sub}`).join("\n");
     case "list":
-      return b.items.map((it) => `- ${it}`).join("\n");
+      return b.items.map((it) => `- ${typeof it === "string" ? it : `**${it.lead}** ${it.text}`}`).join("\n");
     case "findings":
       return b.items.map((f) => `- **${f.label}.** ${f.text}`).join("\n");
+    case "figures":
+      return [
+        ...b.items.map((f) => `![${f.alt}](${url(`${f.src}.png`)})${f.caption ? `\n*${f.caption}*` : ""}`),
+        ...(b.caption ? [`*${b.caption}*`] : []),
+      ].join("\n\n");
+    case "compare":
+      return [`| ${b.headers[0]} | ${b.headers[1]} |`, "|---|---|", ...b.rows.map(([a, z]) => `| ${a} | ${z} |`)].join("\n");
+    case "credits":
+      return b.items.map((c) => `- **${c.name}** — ${c.role}`).join("\n");
   }
 }
 
@@ -61,7 +70,8 @@ export function caseStudyMd(p: Project, { heading = "#" }: { heading?: "#" | "##
   const meta = [`Status: ${p.status}`, p.year, p.role].filter(Boolean).join(" · ");
   out.push(meta);
   out.push(`Canonical: ${url(`/work/${p.id}`)}`);
-  out.push(p.description);
+  if (p.live) out.push(`Live: ${p.live.href}`);
+  out.push(p.summary ?? p.description);
 
   if (p.intel?.length) {
     out.push(p.intel.map((s) => `- **${s.value}** — ${s.label}`).join("\n"));
@@ -91,6 +101,11 @@ export function workIndexMd(): string {
     "Case studies in AI and enterprise UX, plus side projects.",
     "## Case studies",
     caseStudies.map((p) => `- [${p.name}](${url(`/work/${p.id}.md`)}): ${p.tagline} ${p.description}`).join("\n"),
+    "## Consulting",
+    "Outside engagements. Strategy through to shipped.",
+    consultingProjects
+      .map((p) => `- [${p.name}](${url(`/work/${p.id}.md`)}) (${p.status}, ${p.year}): ${p.tagline} ${p.description}`)
+      .join("\n"),
     "## Side projects",
     sideProjectsList(),
   ].join("\n\n");
@@ -168,7 +183,7 @@ export function homeMd(): string {
     `This is the plain-text view of ${url("/")}, an interactive OS-themed portfolio ("KR//OS"). The same content as readable pages:`,
     [
       `- [Work — case studies](${url("/work.md")})`,
-      ...caseStudies.map((p) => `  - [${p.name}](${url(`/work/${p.id}.md`)}): ${p.tagline}`),
+      ...longformProjects.map((p) => `  - [${p.name}](${url(`/work/${p.id}.md`)}): ${p.tagline}`),
       `- [About, experience & capabilities](${url("/about.md")})`,
       `- [Resume (PDF)](${url("/Kaustav_Roy_CV.pdf")})`,
     ].join("\n"),
@@ -199,6 +214,8 @@ export function llmsTxt(): string {
     quickFacts.map((f) => `- ${f}`).join("\n"),
     "## Case studies",
     caseStudies.map((p) => `- [${p.name}](${url(`/work/${p.id}.md`)}): ${p.description}`).join("\n"),
+    "## Consulting",
+    consultingProjects.map((p) => `- [${p.name}](${url(`/work/${p.id}.md`)}): ${p.description}`).join("\n"),
     "## Profile",
     [
       `- [About, experience & capabilities](${url("/about.md")}): bio, roles at Fractal and Eugenie.ai, evidence-linked capabilities, awards, education`,
@@ -220,6 +237,9 @@ export function llmsFullTxt(): string {
     "# Case studies",
     ...caseStudies.map((p) => caseStudyMd(p, { heading: "##" })),
     "---",
+    "# Consulting",
+    ...consultingProjects.map((p) => caseStudyMd(p, { heading: "##" })),
+    "---",
     "# Side projects",
     sideProjectsList(),
   ].join("\n\n");
@@ -238,7 +258,7 @@ export function markdownFor(path: string[]): string | null {
   return null;
 }
 
-export const markdownPaths: string[][] = [["index"], ["about"], ["work"], ...caseStudies.map((p) => ["work", p.id])];
+export const markdownPaths: string[][] = [["index"], ["about"], ["work"], ...longformProjects.map((p) => ["work", p.id])];
 
 /* The HTML page a markdown twin duplicates — sent as a canonical Link header
    so search engines index the page, not the .md copy. */

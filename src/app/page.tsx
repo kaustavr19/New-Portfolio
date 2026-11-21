@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { profile } from "@/data/content";
-import { caseStudies, jsonLd, personJsonLd, SITE_NAME, SITE_URL } from "@/lib/site";
+import { longformProjects, jsonLd, personJsonLd, SITE_NAME, SITE_URL } from "@/lib/site";
 import OSRoot from "@/components/os/OSRoot";
 
 /* Server component. The OS shell (OSRoot) is client-only, so on its own
@@ -44,7 +44,7 @@ export default function Home() {
         <nav aria-label="Readable portfolio">
           <h2>Case studies</h2>
           <ul>
-            {caseStudies.map((p) => (
+            {longformProjects.map((p) => (
               <li key={p.id}>
                 <Link href={`/work/${p.id}`}>{p.name}</Link> — {p.tagline}
               </li>

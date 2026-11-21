@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { projects, type Project, type ProjectType, type Medal, type Objective, type ProjectBlock, type ProjectSection } from "@/data/content";
+import { projects, type ListItem, type Project, type ProjectType, type Medal, type Objective, type ProjectBlock, type ProjectSection } from "@/data/content";
 import { useIsMobile } from "@/lib/use-is-mobile";
 import { parseHash, setHash } from "@/lib/deep-link";
-import { ReaderDossier } from "@/components/reader/blocks";
+import { CompareTable, Credits, Figures, ListItemText, ReaderDossier } from "@/components/reader/blocks";
 import ContactCTA from "@/components/os/ContactCTA";
 import { isGated } from "@/lib/site";
 
@@ -23,16 +23,26 @@ const MONO = "'Share Tech Mono', monospace";
 const SANS = "'Rajdhani', sans-serif";
 
 /* Per-category accent — GTA V codes identity by colour.
-   Main missions (work) = Franklin green. Side missions = Trevor orange. */
+   Main missions (work) = Franklin green. Contracts (consulting) = Michael blue.
+   Side missions = Trevor orange. */
 const ACCENT: Record<ProjectType, string> = {
   main: "#7cb342",
+  consulting: "#65b4d4",
   side: "#f3922b",
 };
 
-const TABS: { type: ProjectType; label: string }[] = [
-  { type: "main", label: "MAIN MISSIONS" },
-  { type: "side", label: "SIDE MISSIONS" },
+const TABS: { type: ProjectType; label: string; short: string }[] = [
+  { type: "main", label: "MAIN MISSIONS", short: "MAIN" },
+  { type: "consulting", label: "CONTRACTS", short: "CONTRACTS" },
+  { type: "side", label: "SIDE MISSIONS", short: "SIDE" },
 ];
+
+/* Rail header + "other missions" label per tab. */
+const RAIL_LABEL: Record<ProjectType, { kicker: string; other: string }> = {
+  main: { kicker: "STORY", other: "STORY" },
+  consulting: { kicker: "OUTSIDE ENGAGEMENTS", other: "CONTRACT" },
+  side: { kicker: "STRANGERS & FREAKS", other: "SIDE" },
+};
 
 const STATUS_COLOR: Record<string, string> = {
   "IN PROGRESS": "#febc2e",
@@ -68,7 +78,7 @@ function StarRating({ count, max = 5, color }: { count: number; max?: number; co
 /* List-rail blip — main missions get a letter marker, side a "?". */
 function Blip({ project, active }: { project: Project; active: boolean }) {
   const accent = ACCENT[project.type];
-  const isMain = project.type === "main";
+  const isMain = project.type !== "side";
   return (
     <div
       style={{
@@ -188,6 +198,44 @@ function RepoLink({ href, accent }: { href: string; accent: string }) {
   );
 }
 
+/* LIVE / READ CASE STUDY — links out of the OS: the shipped site, and the
+   indexable /work page for the same mission. */
+function OutLink({ href, label, accent, external }: { href: string; label: string; accent: string; external?: boolean }) {
+  return (
+    <a
+      href={href}
+      {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+      style={{
+        flexShrink: 0,
+        fontFamily: MONO,
+        fontSize: 9,
+        letterSpacing: "0.18em",
+        color: accent,
+        background: `${accent}14`,
+        border: `1px solid ${accent}66`,
+        padding: "5px 10px",
+        marginTop: 4,
+        whiteSpace: "nowrap",
+        textDecoration: "none",
+      }}
+    >
+      {label}
+    </a>
+  );
+}
+
+function ProjectLinks({ project, accent }: { project: Project; accent: string }) {
+  return (
+    <>
+      {project.live && <OutLink href={project.live.href} label={`● LIVE ↗`} accent={accent} external />}
+      {/* Consulting work is public: point back at its indexable /work page */}
+      {project.type === "consulting" && (
+        <OutLink href={`/work/${project.id}`} label="READ CASE STUDY →" accent={accent} />
+      )}
+    </>
+  );
+}
+
 /* FEATURED ribbon — marks the flagship mission. */
 function FeaturedTag({ accent }: { accent: string }) {
   return (
@@ -274,13 +322,15 @@ function Findings({ items, accent }: { items: { label: string; text: string }[];
 }
 
 /* Accent-marker bullet list — deliverables, iterations. */
-function BulletList({ items, accent }: { items: string[]; accent: string }) {
+function BulletList({ items, accent }: { items: ListItem[]; accent: string }) {
   return (
     <div className="flex flex-col gap-2">
       {items.map((it, i) => (
         <div key={i} className="flex items-start gap-3">
           <span style={{ color: accent, fontFamily: MONO, fontSize: 13, lineHeight: 1.5, flexShrink: 0 }}>▸</span>
-          <span style={{ fontFamily: SANS, fontSize: 15, color: "#cfcfcf", lineHeight: 1.5 }}>{it}</span>
+          <span style={{ fontFamily: SANS, fontSize: 15, color: "#cfcfcf", lineHeight: 1.5 }}>
+            <ListItemText item={it} />
+          </span>
         </div>
       ))}
     </div>
@@ -314,6 +364,12 @@ function Block({ block, accent }: { block: ProjectBlock; accent: string }) {
       return <BulletList items={block.items} accent={accent} />;
     case "findings":
       return <Findings items={block.items} accent={accent} />;
+    case "figures":
+      return <Figures block={block} captionColor="#ffffff66" />;
+    case "compare":
+      return <CompareTable block={block} font={SANS} accent={accent} />;
+    case "credits":
+      return <Credits block={block} font={SANS} />;
   }
 }
 
@@ -551,7 +607,7 @@ export default function ProjectsApp() {
               cursor: "pointer",
             }}
           >
-            {t.label}
+            {isMobile ? t.short : t.label}
             <span style={{ fontFamily: MONO, fontSize: 10, marginLeft: 8, color: on ? a : "#ffffff33" }}>
               {projects.filter((p) => p.type === t.type).length}
             </span>
@@ -602,6 +658,7 @@ export default function ProjectsApp() {
                         {p.tagline}
                       </div>
                       {p.github && <RepoLink href={p.github} accent={accent} />}
+                      <ProjectLinks project={p} accent={accent} />
                       {p.dossier && p.dossier.length > 0 && (
                         <DeclassifyToggle on={declassified} toggle={toggleDeclassified} accent={accent} />
                       )}
@@ -619,7 +676,7 @@ export default function ProjectsApp() {
                       </Section>
                     )}
                     <Section accent={accent} title="MISSION BRIEF">
-                      <p style={{ fontFamily: SANS, fontSize: 15, color: "#cfcfcf", lineHeight: 1.55 }}>{p.description}</p>
+                      <p style={{ fontFamily: SANS, fontSize: 15, color: "#cfcfcf", lineHeight: 1.55 }}>{p.summary ?? p.description}</p>
                     </Section>
                     {(() => {
                       const gated = isGated(p);
@@ -662,10 +719,10 @@ export default function ProjectsApp() {
         <div className="flex-shrink-0 flex flex-col overflow-auto" style={{ width: 220, borderRight: "1px solid #ffffff14" }}>
           <div style={{ padding: "18px 20px 14px", borderBottom: "1px solid #ffffff0d" }}>
             <div style={{ fontFamily: MONO, fontSize: 10, color: "#ffffff55", letterSpacing: "0.3em" }}>
-              {tab === "main" ? "STORY" : "STRANGERS & FREAKS"}
+              {RAIL_LABEL[tab].kicker}
             </div>
             <div style={{ fontFamily: BEBAS, fontSize: 20, color: accent, letterSpacing: "0.06em" }}>
-              {visible.length} MISSIONS
+              {visible.length} MISSION{visible.length === 1 ? "" : "S"}
             </div>
           </div>
 
@@ -711,6 +768,7 @@ export default function ProjectsApp() {
                 <div className="flex items-center gap-2">
                   {project.featured && <FeaturedTag accent={accent} />}
                   {project.github && <RepoLink href={project.github} accent={accent} />}
+                  <ProjectLinks project={project} accent={accent} />
                   {project.dossier && project.dossier.length > 0 && (
                     <DeclassifyToggle on={declassified} toggle={toggleDeclassified} accent={accent} />
                   )}
@@ -748,7 +806,7 @@ export default function ProjectsApp() {
           {/* Brief */}
           <div style={{ marginBottom: 28 }}>
             <Section accent={accent} title="MISSION BRIEF">
-              <p style={{ fontFamily: SANS, fontSize: 16, color: "#cfcfcf", lineHeight: 1.6 }}>{project.description}</p>
+              <p style={{ fontFamily: SANS, fontSize: 16, color: "#cfcfcf", lineHeight: 1.6 }}>{project.summary ?? project.description}</p>
             </Section>
           </div>
 
@@ -797,9 +855,10 @@ export default function ProjectsApp() {
 
           {/* Other missions in this strand */}
           <div className="mt-auto" style={{ paddingTop: 32 }}>
+            {visible.length > 1 && (
             <div style={{ background: "rgba(0,0,0,0.5)", border: "1px solid #ffffff14", padding: "18px 22px" }}>
               <div style={{ fontFamily: MONO, fontSize: 10, color: "#ffffff55", letterSpacing: "0.3em", marginBottom: 12 }}>
-                <span style={{ color: accent }}>//</span> OTHER {tab === "main" ? "STORY" : "SIDE"} MISSIONS
+                <span style={{ color: accent }}>//</span> OTHER {RAIL_LABEL[tab].other} MISSIONS
               </div>
               <div className="flex gap-2 flex-wrap">
                 {visible.filter((p) => p.id !== project.id).map((p) => (
@@ -822,7 +881,8 @@ export default function ProjectsApp() {
                 ))}
               </div>
             </div>
-            <div style={{ marginTop: 14 }}>
+            )}
+            <div style={{ marginTop: visible.length > 1 ? 14 : 0 }}>
               <ContactCTA
                 accent={accent}
                 eyebrow="MISSION FOLLOW-UP"
