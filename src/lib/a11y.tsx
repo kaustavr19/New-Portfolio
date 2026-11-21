@@ -11,7 +11,7 @@ import { createContext, useContext, useEffect, useState, ReactNode, useCallback 
 export type A11yPrefs = {
   motionReduced: boolean;
   soundEffects: boolean;   // pop sounds, boot chimes, UI blips
-  ambience: boolean;       // subtle galactic background hum
+  ambience: boolean;       // calm room tone + weather sounds
   highContrast: boolean;
 };
 

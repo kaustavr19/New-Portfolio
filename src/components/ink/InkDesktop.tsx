@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { desktopIcons, profile } from "@/data/content";
 import { useA11y } from "@/lib/a11y";
 import { parseHash, setAppHash } from "@/lib/deep-link";
-import { playCodecBeep } from "@/lib/sound";
+import { uiOpen } from "@/lib/ink-sound";
 import InkWindow, { type Rect } from "./InkWindow";
 import InkDock from "./InkDock";
 import InkBrief from "./InkBrief";
@@ -84,7 +84,7 @@ export default function InkDesktop() {
         [id]: { open: true, minimized: false, z: nextZ(prev), order: prev[id]?.open ? prev[id].order : nextOrder(prev) },
       }));
       setAppHash(id);
-      if (soundEffects) playCodecBeep();
+      if (soundEffects) uiOpen();
     },
     [soundEffects],
   );

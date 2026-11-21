@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useA11y } from "@/lib/a11y";
-import { playCodecBeep } from "@/lib/sound";
+import { uiReady } from "@/lib/ink-sound";
 import { KROS_MARK_BOX, KROS_MARK_PATH } from "./KrosMark";
 
 /* ──────────────────────────────────────────────────────────
@@ -106,7 +106,7 @@ export default function InkBoot({ onComplete }: { onComplete: () => void }) {
   }, [ready]);
 
   const enter = () => {
-    if (soundEffects) playCodecBeep();
+    if (soundEffects) uiReady();
     onComplete();
   };
 

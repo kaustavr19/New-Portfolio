@@ -6,6 +6,7 @@ import { requestPersonnelBrief } from "@/lib/personnel-brief";
 import { useReaderMode } from "@/lib/reader-mode";
 import { THEMES, useTheme, type ThemeId } from "@/lib/theme";
 import { SectionHead, SwitchRow } from "../ui";
+import SoundLab from "../SoundLab";
 
 /* A tiny swatch per theme so the choice is visual, not just a label. */
 const SWATCH: Record<ThemeId, string[]> = {
@@ -65,11 +66,13 @@ export default function InkSettings() {
           <SectionHead as="h3">Accessibility</SectionHead>
           <div style={{ display: "flex", flexDirection: "column" }}>
             <SwitchRow label="Reduce motion" hint="Stops the boot sweep, light-bar pulses and blinking dots" checked={a11y.motionReduced} onChange={() => a11y.toggle("motionReduced")} />
-            <SwitchRow label="Sound effects" hint="Clicks and the open-window chime" checked={a11y.soundEffects} onChange={() => a11y.toggle("soundEffects")} />
-            <SwitchRow label="Ambience" hint="A quiet background hum" checked={a11y.ambience} onChange={() => a11y.toggle("ambience")} />
+            <SwitchRow label="Sound effects" hint="Window blips, relay ticks on toggles, a soft thock on the desktop" checked={a11y.soundEffects} onChange={() => a11y.toggle("soundEffects")} />
+            <SwitchRow label="Ambience" hint="Calm room tone and pad, plus stars, birds and rain from the wallpaper" checked={a11y.ambience} onChange={() => a11y.toggle("ambience")} />
             <SwitchRow label="High contrast" hint="Brighter secondary text in the classic theme" checked={a11y.highContrast} onChange={() => a11y.toggle("highContrast")} />
           </div>
         </section>
+
+        <SoundLab />
 
         <section>
           <SectionHead as="h3">System</SectionHead>
