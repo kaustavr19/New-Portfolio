@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { A11yProvider } from "@/lib/a11y";
 import { DeviantProvider } from "@/lib/deviant";
+import { ThemeProvider, useTheme } from "@/lib/theme";
 import { ExperimentsProvider } from "@/lib/experiments";
 import { ReaderModeProvider } from "@/lib/reader-mode";
 import { useIsMobile } from "@/lib/use-is-mobile";
@@ -19,11 +20,37 @@ const MobileOS = dynamic(() => import("@/components/os/MobileOS"), { ssr: false 
 const DeviantOverlay = dynamic(() => import("@/components/os/DeviantOverlay"), { ssr: false });
 const AmbientAudio = dynamic(() => import("@/components/os/AmbientAudio"), { ssr: false });
 const ReaderMode = dynamic(() => import("@/components/os/ReaderMode"), { ssr: false });
+const InkBoot = dynamic(() => import("@/components/ink/InkBoot"), { ssr: false });
+const InkDesktop = dynamic(() => import("@/components/ink/InkDesktop"), { ssr: false });
+const InkMobile = dynamic(() => import("@/components/ink/InkMobile"), { ssr: false });
 
 const BOOT_KEY = "kros_booted";
 
-export default function OSRoot() {
+/* Picks the shell for the active theme. Ink is the default; classic and
+   deviant share the original game-themed shell. */
+function Shell({ booted, onBootComplete }: { booted: boolean; onBootComplete: () => void }) {
   const isMobile = useIsMobile();
+  const { theme, ready } = useTheme();
+  if (!ready) return null;
+  if (theme === "ink") {
+    return isMobile ? <InkMobile /> : !booted ? <InkBoot onComplete={onBootComplete} /> : <InkDesktop />;
+  }
+  return isMobile ? <MobileOS /> : !booted ? <BootScreen onComplete={onBootComplete} /> : <Desktop />;
+}
+
+/* WebGL effects belong to the classic look; Ink renders without them. */
+function ClassicOnlyLayers() {
+  const { theme } = useTheme();
+  if (theme === "ink") return null;
+  return (
+    <>
+      <DeviantOverlay />
+      <ExperimentLayer />
+    </>
+  );
+}
+
+export default function OSRoot() {
   const [booted, setBooted] = useState(false);
   const [checked, setChecked] = useState(false);
 
@@ -59,19 +86,13 @@ export default function OSRoot() {
   return (
     <A11yProvider>
       <ExperimentsProvider>
+        <ThemeProvider>
         <DeviantProvider>
           <ReaderModeProvider>
             <div className="fixed inset-0 overflow-hidden">
-              {isMobile ? (
-                <MobileOS />
-              ) : !booted ? (
-                <BootScreen onComplete={handleBootComplete} />
-              ) : (
-                <Desktop />
-              )}
-              <DeviantOverlay />
-              {/* WebGL experiments — render nothing unless a flag is on */}
-              <ExperimentLayer />
+              <Shell booted={booted} onBootComplete={handleBootComplete} />
+              {/* Deviant wash + WebGL experiments — classic themes only */}
+              <ClassicOnlyLayers />
               {/* Galactic ambient hum (gesture-gated, gain follows the a11y pref) */}
               <AmbientAudio />
               {/* Site-wide plain-text reading view — About/Experience/Projects as one document */}
@@ -79,6 +100,7 @@ export default function OSRoot() {
             </div>
           </ReaderModeProvider>
         </DeviantProvider>
+        </ThemeProvider>
       </ExperimentsProvider>
     </A11yProvider>
   );

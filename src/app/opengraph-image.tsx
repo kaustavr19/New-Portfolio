@@ -6,8 +6,8 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 export const alt = "Kaustav Roy — KR//OS";
 
-const ACCENT = "#4fc3f7";
-const BG = "#0a0a14";
+const ACCENT = "#f2f2f2";
+const BG = "#000000";
 
 /* Same static path data as KRMarkPaths (src/components/os/KRMark.tsx) —
    duplicated rather than imported because that component is hook-driven
@@ -45,8 +45,8 @@ export default async function OpengraphImage() {
           justifyContent: "center",
           background: BG,
           backgroundImage:
-            "linear-gradient(rgba(79,195,247,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(79,195,247,0.06) 1px, transparent 1px)",
-          backgroundSize: "40px 40px",
+            "radial-gradient(circle, rgba(255,255,255,0.14) 1.6px, transparent 1.6px)",
+          backgroundSize: "24px 24px",
         }}
       >
         <KRMonogram fill={ACCENT} />
@@ -80,7 +80,7 @@ export default async function OpengraphImage() {
             display: "flex",
             fontFamily: "Share Tech Mono",
             fontSize: 26,
-            color: "#9a9aae",
+            color: "#cfcfcf",
             letterSpacing: 2,
             marginTop: 20,
           }}
@@ -92,7 +92,7 @@ export default async function OpengraphImage() {
             display: "flex",
             fontFamily: "Share Tech Mono",
             fontSize: 16,
-            color: "#5a5a70",
+            color: "#8c8c8c",
             letterSpacing: 3,
             marginTop: 36,
           }}

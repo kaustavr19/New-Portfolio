@@ -14,7 +14,7 @@ export const profile = {
   designation: "Design Consultant",
   tagline: "Design × AI × Enterprise UX",
   status: "ACTIVE",
-  location: "Bengaluru, IN · Kolkata native",
+  location: "Kolkata, IN",
   tenure: "3.5 YRS @ FRACTAL",
   featured: "GOOGLE I/O 2024 FEATURED",
   bio: "I specialize in AI-powered enterprise platforms — human-in-the-loop decisioning, explainable AI, and workflows that complex domains can actually trust. Currently designing AI-driven insurance underwriting at Fractal Analytics. Prior: CPG intelligence (Cogentiq), agentic AI for BI, and industrial sustainability at Eugenie.ai.",
@@ -41,7 +41,7 @@ export const profileDeviant: Partial<typeof profile> = {
 export const stats = {
   role: "Design Consultant",
   company: "Fractal Analytics",
-  location: "Bengaluru, IN",
+  location: "Kolkata, IN",
   speciality: "AI-Powered UX",
   tenure: "3.5 yrs",
 };
@@ -313,6 +313,8 @@ export type Figure = {
   caption?: string;
   /* Very tall captures: cap the displayed height (px) and fade out; the full image opens on click. */
   peek?: number;
+  /* Greyscale wireframes: InkOS inverts these to white-on-black instead of halftoning them. */
+  tone?: "wireframe";
 };
 
 /* A list item is a plain sentence, or a bold lead-in followed by the rest. */
@@ -1182,6 +1184,7 @@ export const projects: Project[] = [
             items: [
               {
                 ...nexvalFigures.megamenu,
+                tone: "wireframe",
                 alt: "Wireframe of the Offerings & Products mega-menu open, splitting Mortgage BPO Services from Products and Tech Services",
                 caption: "Offerings & Products mega-menu, from the wireframe.",
               },
@@ -1231,7 +1234,7 @@ export const projects: Project[] = [
             kind: "figures",
             layout: "full",
             items: [
-              { ...nexvalFigures.wfIndex, alt: "Index of the connected greyscale prototype listing 13 page experiences, from homepage to legal" },
+              { ...nexvalFigures.wfIndex, tone: "wireframe", alt: "Index of the connected greyscale prototype listing 13 page experiences, from homepage to legal" },
             ],
           },
           {
@@ -1244,7 +1247,7 @@ export const projects: Project[] = [
             layout: "2up",
             caption: "Wireframe (left) and shipped homepage (right): the same proof-stack order, top to bottom.",
             items: [
-              { ...nexvalFigures.wfHome, alt: "Homepage wireframe, full length: gateway, hero, trust, workflows, products, evidence, close" },
+              { ...nexvalFigures.wfHome, tone: "wireframe", alt: "Homepage wireframe, full length: gateway, hero, trust, workflows, products, evidence, close" },
               { ...nexvalFigures.liveHome, alt: "Shipped Nexval homepage, full length, in the same proof-stack order as the wireframe beside it" },
             ],
           },
@@ -1252,7 +1255,7 @@ export const projects: Project[] = [
             kind: "figures",
             layout: "full",
             items: [
-              { ...nexvalFigures.wfCaseStudy, peek: 960, alt: "Case study wireframe structured as baseline, workflow change, outcomes, limits and sources" },
+              { ...nexvalFigures.wfCaseStudy, tone: "wireframe", peek: 960, alt: "Case study wireframe structured as baseline, workflow change, outcomes, limits and sources" },
             ],
           },
         ],

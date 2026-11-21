@@ -208,7 +208,7 @@ function contactLines(): string {
 export function llmsTxt(): string {
   return [
     `# ${profile.name}`,
-    `> ${profile.designation} at Fractal Analytics (Bengaluru, India) designing AI-powered enterprise products — explainable AI, human-in-the-loop decisioning, enterprise UX and design systems. Featured at Google I/O 2024.`,
+    `> ${profile.designation} at Fractal Analytics (based in Kolkata, India) designing AI-powered enterprise products — explainable AI, human-in-the-loop decisioning, enterprise UX and design systems. Featured at Google I/O 2024.`,
     `This site is an interactive, OS-themed portfolio. Every page also has a Markdown version (append \`.md\` to the URL, or send \`Accept: text/markdown\`). The complete portfolio as one document is at ${url("/llms-full.txt")}.`,
     "## Quick facts",
     quickFacts.map((f) => `- ${f}`).join("\n"),

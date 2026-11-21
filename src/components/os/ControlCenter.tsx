@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import AccessibilityMenu from "./AccessibilityMenu";
 import DeviantToggle from "./DeviantToggle";
+import ThemeSwitch from "./ThemeSwitch";
 import ReaderModeToggle from "./ReaderModeToggle";
 import SoundToggle from "./SoundToggle";
 
@@ -96,6 +97,10 @@ export default function ControlCenter() {
           <ControlSection title="VIEW & SOUND">
             <SoundToggle />
             <ReaderModeToggle />
+          </ControlSection>
+
+          <ControlSection title="THEME">
+            <ThemeSwitch />
           </ControlSection>
 
           <ControlSection title="SYSTEM" last>

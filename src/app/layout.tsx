@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "@hackernoon/pixel-icon-library/fonts/iconfont.css";
+import "@/components/ink/ink.css";
 
 const DESCRIPTION =
   "Portfolio of Kaustav Roy — Design Consultant specializing in AI-powered enterprise UX. An interactive OS-themed experience.";
@@ -40,10 +41,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="h-full">
+    <html lang="en" className="h-full" data-theme="ink">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* InkOS (default theme) — dot-matrix display, mono data, sans reading */}
+        <link href="https://fonts.googleapis.com/css2?family=Doto:wght@500;700;900&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
         {/* OS Shell */}
         <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet" />
         {/* Minecraft Terminal — Press Start 2P for titles, VT323 for readable body */}

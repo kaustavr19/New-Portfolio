@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { profile } from "@/data/content";
-import { READER_SANS } from "@/components/reader/blocks";
 
 /* ──────────────────────────────────────────────────────────
    Server-rendered, indexable pages (/about, /work, /work/[slug]).
@@ -8,86 +7,51 @@ import { READER_SANS } from "@/components/reader/blocks";
    link previews, and visitors arriving from Google see first —
    each one a click away from the full KR//OS experience.
 
-   Reuses the reading-mode class names so the global print styles
-   (globals.css @media print) apply here unchanged. The body is
-   overflow:hidden for the OS, so this wrapper owns the scrolling.
+   Styled in InkOS, the default theme. Reuses the reading-mode class
+   names so the global print styles (globals.css @media print) apply
+   unchanged. The body is overflow:hidden for the OS, so this wrapper
+   owns the scrolling.
    ────────────────────────────────────────────────────────── */
-
-const MONO = "'Share Tech Mono', monospace";
-
-const navLink: React.CSSProperties = {
-  fontFamily: MONO,
-  fontSize: 12,
-  letterSpacing: "0.16em",
-  color: "#ffffffaa",
-  textDecoration: "none",
-};
 
 export default function ReadLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="reader-mode fixed inset-0 flex flex-col" style={{ background: "#0a0a0a" }}>
+    <div className="ink reader-mode fixed inset-0 flex flex-col" style={{ background: "#000" }}>
       <header
         className="reader-mode-chrome flex items-center justify-between flex-shrink-0 gap-4"
-        style={{ padding: "14px 28px", borderBottom: "1px solid #ffffff1a" }}
+        style={{ padding: "14px clamp(16px, 4vw, 28px)", borderBottom: "1px solid var(--ink-line)" }}
       >
-        <nav aria-label="Primary" className="flex items-center gap-6">
-          <Link href="/" style={{ ...navLink, color: "#4fc3f7", letterSpacing: "0.2em" }}>
+        <nav aria-label="Primary" className="flex items-center gap-5">
+          <Link href="/" className="ink-dot-900" style={{ fontSize: 18, textDecoration: "none" }}>
             KR//OS
           </Link>
-          <Link href="/work" style={navLink}>WORK</Link>
-          <Link href="/about" style={navLink}>ABOUT</Link>
+          <Link href="/work" className="ink-label" style={{ color: "var(--ink-fg)", textDecoration: "none" }}>Work</Link>
+          <Link href="/about" className="ink-label" style={{ color: "var(--ink-fg)", textDecoration: "none" }}>About</Link>
         </nav>
-        <Link
-          href="/"
-          style={{
-            ...navLink,
-            fontSize: 11,
-            color: "#0a0a0a",
-            background: "#4fc3f7",
-            padding: "8px 14px",
-            whiteSpace: "nowrap",
-          }}
-        >
-          ENTER THE OS →
+        <Link href="/" className="ink-pill solid">
+          Enter the OS →
         </Link>
       </header>
 
-      <div className="reader-mode-body flex-1 overflow-auto" style={{ padding: "48px 28px 80px" }}>
-        <main className="flex flex-col gap-14" style={{ maxWidth: 720, margin: "0 auto" }}>
+      <div className="reader-mode-body flex-1 overflow-auto" style={{ padding: "48px clamp(16px, 4vw, 28px) 80px" }}>
+        <main className="ink-read flex flex-col gap-14" style={{ maxWidth: 760, margin: "0 auto" }}>
           {children}
 
-          <footer style={{ borderTop: "1px solid #ffffff24", paddingTop: 32 }}>
-            <div style={{ fontFamily: MONO, fontSize: 11, color: "#7ab648", letterSpacing: "0.2em" }}>
-              NEXT STEP
-            </div>
-            <h2 style={{ fontFamily: READER_SANS, fontSize: 26, color: "#fff", margin: "8px 0" }}>
-              Seen enough to start a conversation?
+          <footer className="ink-card" style={{ padding: 28, position: "relative", overflow: "hidden" }}>
+            <span aria-hidden className="ink-glyph" />
+            <span className="ink-label ink-live">Next step</span>
+            <h2 className="ink-dot-900" style={{ fontSize: 30, lineHeight: 1.05, margin: "12px 0 8px" }}>
+              SEEN ENOUGH TO START A CONVERSATION?
             </h2>
-            <p style={{ fontFamily: READER_SANS, fontSize: 16, color: "#bdbdc8", lineHeight: 1.6 }}>
-              Send a role, product brief, or difficult workflow. A little context is enough.
-            </p>
-            <div className="flex flex-wrap gap-3" style={{ marginTop: 16 }}>
-              <a
-                href={`mailto:${profile.social.email}?subject=Portfolio conversation`}
-                style={{ ...navLink, fontSize: 11, color: "#0a0a0a", background: "#7ab648", padding: "10px 14px" }}
-              >
-                EMAIL KAUSTAV
+            <p className="ink-body">Send a role, product brief, or difficult workflow. A little context is enough.</p>
+            <div className="flex flex-wrap gap-2" style={{ marginTop: 18 }}>
+              <a href={`mailto:${profile.social.email}?subject=Portfolio conversation`} className="ink-pill solid">
+                Email Kaustav
               </a>
-              <a
-                href="/Kaustav_Roy_CV.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ ...navLink, fontSize: 11, color: "#e8e8e8", border: "1px solid #ffffff44", padding: "10px 14px" }}
-              >
-                RESUME (PDF)
+              <a href="/Kaustav_Roy_CV.pdf" target="_blank" rel="noopener noreferrer" className="ink-pill action">
+                Resume (PDF) ↗
               </a>
-              <a
-                href={profile.social.linkedin}
-                target="_blank"
-                rel="noopener noreferrer me"
-                style={{ ...navLink, fontSize: 11, color: "#e8e8e8", border: "1px solid #ffffff44", padding: "10px 14px" }}
-              >
-                LINKEDIN
+              <a href={profile.social.linkedin} target="_blank" rel="noopener noreferrer me" className="ink-pill action">
+                LinkedIn ↗
               </a>
             </div>
           </footer>

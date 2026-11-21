@@ -1,6 +1,7 @@
 "use client";
 
 import { useA11y } from "@/lib/a11y";
+import ThemeSwitch from "@/components/os/ThemeSwitch";
 import { useDeviant } from "@/lib/deviant";
 import { useExperiments, type Experiments } from "@/lib/experiments";
 import { osChrome, osChromeDeviant } from "@/data/content";
@@ -101,6 +102,13 @@ export default function SettingsApp() {
           KR-19 · SYSTEM PREFERENCES
         </div>
       </div>
+
+      {/* ── Group: Theme ── */}
+      <Group title="THEME" accent={C.accentDim}>
+        <div style={{ padding: "6px 4px 12px" }}>
+          <ThemeSwitch accent={C.accent} block />
+        </div>
+      </Group>
 
       {/* ── Group: A11Y toggles ── */}
       <Group title={ch.a11yHeader} accent={C.accentDim}>
