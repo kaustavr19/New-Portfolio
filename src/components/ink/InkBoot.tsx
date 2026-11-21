@@ -3,19 +3,21 @@
 import { useEffect, useRef, useState } from "react";
 import { useA11y } from "@/lib/a11y";
 import { playCodecBeep } from "@/lib/sound";
+import { KROS_MARK_BOX, KROS_MARK_PATH } from "./KrosMark";
 
 /* ──────────────────────────────────────────────────────────
-   InkOS boot — the KR//OS mark is sampled from a tiny bitmap into
-   a dot grid and lit in a left→right sweep while a segmented bar
-   fills. At 100% the slashes turn red (system ready) and the
-   ENTER pill appears; that click is also the audio-unlock gesture.
-   Reduced motion: the mark is drawn fully formed, no sweep.
+   InkOS boot — the KR//OS monogram is rasterised into a dot grid and
+   lit in a sweep while a segmented bar fills. At 100% the mark pulses
+   red once (system ready) and the ENTER pill appears; that click is
+   also the audio-unlock gesture.
+   Reduced motion: the mark is drawn fully formed, no sweep or pulse.
    ────────────────────────────────────────────────────────── */
 
-const COLS = 76;
-const ROWS = 19;
-const PITCH = 10;
-const DURATION = 3600;
+const COLS = 40;
+const ROWS = 40;
+const PITCH = 9;
+const DURATION = 3400;
+const PULSE = 650;
 
 const STATUSES: [number, string][] = [
   [0, "Laying ink…"],
@@ -25,25 +27,29 @@ const STATUSES: [number, string][] = [
   [1, "Ready."],
 ];
 
-type Dot = { x: number; y: number; on: boolean; at: number; red: boolean };
+type Dot = { x: number; y: number; on: boolean; at: number };
 
 function sampleMark(): Dot[] {
+  const SS = 4; // supersample, then threshold per cell
   const off = document.createElement("canvas");
-  off.width = COLS;
-  off.height = ROWS;
+  off.width = COLS * SS;
+  off.height = ROWS * SS;
   const o = off.getContext("2d");
   if (!o) return [];
+  const pad = 2 * SS;
+  const s = (COLS * SS - pad * 2) / Math.max(KROS_MARK_BOX.w, KROS_MARK_BOX.h);
+  o.translate(pad - KROS_MARK_BOX.x * s, pad - KROS_MARK_BOX.y * s);
+  o.scale(s, s);
   o.fillStyle = "#fff";
-  o.textBaseline = "middle";
-  o.textAlign = "center";
-  o.font = "900 17px 'Space Mono', monospace";
-  o.fillText("KR//OS", COLS / 2, ROWS / 2 + 1);
-  const d = o.getImageData(0, 0, COLS, ROWS).data;
+  o.fill(new Path2D(KROS_MARK_PATH));
+  const d = o.getImageData(0, 0, COLS * SS, ROWS * SS).data;
   const dots: Dot[] = [];
   for (let y = 0; y < ROWS; y++)
     for (let x = 0; x < COLS; x++) {
-      const on = d[(y * COLS + x) * 4 + 3] > 110;
-      dots.push({ x, y, on, at: (x / COLS) * 0.75 + Math.random() * 0.2, red: on && x > COLS * 0.39 && x < COLS * 0.59 });
+      const cx = x * SS + SS / 2, cy = y * SS + SS / 2;
+      const on = d[(cy * COLS * SS + cx) * 4 + 3] > 120;
+      // Sweep from the lower left to the upper right, with a little noise.
+      dots.push({ x, y, on, at: ((x + (ROWS - y)) / (COLS + ROWS)) * 0.78 + Math.random() * 0.18 });
     }
   return dots;
 }
@@ -63,23 +69,24 @@ export default function InkBoot({ onComplete }: { onComplete: () => void }) {
     let dots: Dot[] = [];
     let start = 0;
 
-    const draw = (p: number) => {
+    const draw = (p: number, pulse = false) => {
       ctx.clearRect(0, 0, cvs.width, cvs.height);
       for (const d of dots) {
         const lit = d.on && p >= d.at;
         ctx.beginPath();
-        ctx.arc(d.x * PITCH + PITCH / 2, d.y * PITCH + PITCH / 2, lit ? 3.6 : 1.1, 0, Math.PI * 2);
-        ctx.fillStyle = lit ? (d.red && p >= 1 ? "#ff3b30" : "#f2f2f2") : "#ffffff1c";
+        ctx.arc(d.x * PITCH + PITCH / 2, d.y * PITCH + PITCH / 2, lit ? 3.3 : 1, 0, Math.PI * 2);
+        ctx.fillStyle = lit ? (pulse ? "#ff3b30" : "#f2f2f2") : "#ffffff1c";
         ctx.fill();
       }
     };
 
     const frame = (now: number) => {
       if (!start) start = now;
-      const p = Math.min((now - start) / DURATION, 1);
-      draw(p);
+      const el = now - start;
+      const p = Math.min(el / DURATION, 1);
+      draw(p, p >= 1 && el < DURATION + PULSE);
       setT(p);
-      if (p < 1) raf = requestAnimationFrame(frame);
+      if (el < DURATION + PULSE + 50) raf = requestAnimationFrame(frame);
     };
 
     document.fonts.ready.then(() => {
@@ -150,7 +157,10 @@ export default function InkBoot({ onComplete }: { onComplete: () => void }) {
       ))}
 
       <h1 className="sr-only">KR//OS — Kaustav Roy&apos;s portfolio</h1>
-      <canvas ref={canvasRef} width={COLS * PITCH} height={ROWS * PITCH} aria-hidden style={{ position: "relative", width: "min(760px, 86vw)", height: "auto" }} />
+      <div style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", gap: 18 }}>
+        <canvas ref={canvasRef} width={COLS * PITCH} height={ROWS * PITCH} aria-hidden style={{ width: "min(340px, 62vw)", height: "auto" }} />
+        <span aria-hidden className="ink-dot-900" style={{ fontSize: 34, letterSpacing: ".06em", opacity: ready ? 1 : 0.35, transition: "opacity .6s" }}>KR//OS</span>
+      </div>
 
       <div style={{ position: "relative", width: "min(420px, 80vw)", display: "flex", flexDirection: "column", gap: 10 }}>
         <div style={{ display: "flex", justifyContent: "space-between" }}>

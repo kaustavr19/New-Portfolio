@@ -17,11 +17,6 @@ export const INK_APPS = desktopIcons.map((ic, i) => ({
   }[ic.id] ?? ic.label,
 }));
 
-export const LONGFORM_COUNT = projects.filter((p) => p.type !== "side").length;
-
-/* The most recent shipped public engagement, for the "Live now" widget. */
-export const LIVE_PROJECT = projects.find((p) => p.live);
-
 /* The in-progress mission, for the "Currently" widget. */
 export const CURRENT = (() => {
   const chapter = chapters.find((c) => c.status === "in_progress");

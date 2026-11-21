@@ -173,3 +173,9 @@ html[data-theme="ink"] ::-webkit-scrollbar-thumb { background: #2a2a2a; }
   .ink-split > .ink-split-side { border-right: 0; border-bottom: 1px solid var(--ink-line); }
 }
 .ink-app-scroll { height: 100%; overflow-y: auto; overscroll-behavior: contain; }
+
+/* Work-map dots */
+.ink-workdot { transition: transform .15s; }
+.ink-workdot:hover, .ink-workdot:focus-visible { transform: scale(1.35); }
+.ink-workdot.live { animation: ink-blink 1.6s steps(2) infinite; }
+.ink-motion-off .ink-workdot.live { animation: none; }
