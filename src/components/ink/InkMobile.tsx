@@ -86,7 +86,7 @@ function LockScreen({ onUnlock }: { onUnlock: () => void }) {
             onUnlock();
           }}
           className="ink-card"
-          style={{ marginTop: "auto", display: "flex", gap: 12, textAlign: "left", background: "#111111ee" }}
+          style={{ marginTop: "auto", display: "flex", gap: 12, textAlign: "left", background: "var(--ink-dock)" }}
         >
           <span aria-hidden style={{ width: 3, borderRadius: 3, background: "var(--ink-red)", boxShadow: "0 0 10px var(--ink-red)" }} />
           <span style={{ flex: 1 }}>
@@ -153,14 +153,14 @@ function HomeScreen({ onOpen }: { onOpen: (id: string) => void }) {
           </button>
         ))}
         <a href="/Kaustav_Roy_CV.pdf" target="_blank" rel="noopener noreferrer" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 7, textDecoration: "none" }}>
-          <span style={{ width: 58, height: 58, borderRadius: "50%", border: "1px solid #7ab2ff66", display: "grid", placeItems: "center", color: "var(--ink-blue)" }}>
+          <span style={{ width: 58, height: 58, borderRadius: "50%", border: "1px solid var(--ink-blue-soft)", display: "grid", placeItems: "center", color: "var(--ink-blue)" }}>
             <Icon name="resume" size={24} />
           </span>
           <span className="ink-blue" style={{ fontSize: 11 }}>Resume</span>
         </a>
       </nav>
 
-      <button type="button" onClick={() => onOpen("terminal")} style={{ marginTop: "auto", display: "flex", alignItems: "center", gap: 10, padding: "14px 18px", borderRadius: 999, background: "#111", border: "1px solid var(--ink-line)" }}>
+      <button type="button" onClick={() => onOpen("terminal")} style={{ marginTop: "auto", display: "flex", alignItems: "center", gap: 10, padding: "14px 18px", borderRadius: 999, background: "var(--ink-raised)", border: "1px solid var(--ink-line)" }}>
         <Icon name="search" size={16} color="var(--ink-mute)" />
         <span className="ink-meta" style={{ fontSize: 12 }}>Ask KR-19 anything…</span>
         <span className="ink-label ink-blue" style={{ marginLeft: "auto" }}>Terminal →</span>
@@ -216,7 +216,7 @@ export default function InkMobile() {
   const Comp = app ? INK_APP_COMPONENTS[app] : null;
 
   return (
-    <div className={`ink fixed inset-0 flex flex-col ${motionReduced ? "ink-motion-off" : ""}`} style={{ background: "#000" }}>
+    <div className={`ink fixed inset-0 flex flex-col ${motionReduced ? "ink-motion-off" : ""}`} style={{ background: "var(--ink-bg)" }}>
       {view !== "app" && <InkWallpaper dim={view === "home" ? 0.5 : 0} />}
       <div style={{ position: "relative", flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
         <StatusBar />

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useA11y } from "@/lib/a11y";
-import { playClick } from "@/lib/sound";
+import { uiClose, uiTick } from "@/lib/ink-sound";
 import { WindowFocusContext } from "@/components/os/Window";
 
 /* InkOS window — rounded black panel, hairline border, three outline
@@ -43,9 +43,14 @@ export default function InkWindow({
   children: React.ReactNode;
 }) {
   const { motionReduced, soundEffects } = useA11y();
-  const click = useCallback(() => {
-    if (soundEffects) playClick();
-  }, [soundEffects]);
+  const click = useCallback(
+    (kind: "close" | "tick") => {
+      if (!soundEffects) return;
+      if (kind === "close") uiClose();
+      else uiTick();
+    },
+    [soundEffects],
+  );
   const [rect, setRect] = useState<Rect>(initial);
   const [maximized, setMaximized] = useState(false);
   const [dragging, setDragging] = useState(false);
@@ -109,7 +114,7 @@ export default function InkWindow({
             border: `1px solid ${isFocused ? "var(--ink-line-strong)" : "var(--ink-line)"}`,
             borderRadius: "var(--r-window)",
             overflow: "hidden",
-            boxShadow: "0 30px 80px #000",
+            boxShadow: "var(--ink-shadow)",
             transition: dragging
               ? "none"
               : "left .22s cubic-bezier(.25,0,.25,1), top .22s cubic-bezier(.25,0,.25,1), width .22s cubic-bezier(.25,0,.25,1), height .22s cubic-bezier(.25,0,.25,1)",
@@ -144,7 +149,7 @@ export default function InkWindow({
                   type="button"
                   aria-label={b.label}
                   title={b.label}
-                  onClick={() => { click(); b.act(); }}
+                  onClick={() => { click(b.red ? "close" : "tick"); b.act(); }}
                   style={{
                     width: 13,
                     height: 13,

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { profile } from "@/data/content";
 import KrosMark from "@/components/ink/KrosMark";
+import InkModePicker from "@/components/ink/InkModePicker";
 
 /* ──────────────────────────────────────────────────────────
    Server-rendered, indexable pages (/about, /work, /work/[slug]).
@@ -16,7 +17,7 @@ import KrosMark from "@/components/ink/KrosMark";
 
 export default function ReadLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="ink reader-mode fixed inset-0 flex flex-col" style={{ background: "#000" }}>
+    <div className="ink reader-mode fixed inset-0 flex flex-col" style={{ background: "var(--ink-bg)" }}>
       <header
         className="reader-mode-chrome flex items-center justify-between flex-shrink-0 gap-4"
         style={{ padding: "14px clamp(16px, 4vw, 28px)", borderBottom: "1px solid var(--ink-line)" }}
@@ -29,9 +30,12 @@ export default function ReadLayout({ children }: { children: React.ReactNode }) 
           <Link href="/work" className="ink-label" style={{ color: "var(--ink-fg)", textDecoration: "none" }}>Work</Link>
           <Link href="/about" className="ink-label" style={{ color: "var(--ink-fg)", textDecoration: "none" }}>About</Link>
         </nav>
-        <Link href="/" className="ink-pill solid">
-          Enter the OS →
-        </Link>
+        <div className="flex items-center gap-3">
+          <span className="hidden sm:block"><InkModePicker compact /></span>
+          <Link href="/" className="ink-pill solid">
+            Enter the OS →
+          </Link>
+        </div>
       </header>
 
       <div className="reader-mode-body flex-1 overflow-auto" style={{ padding: "48px clamp(16px, 4vw, 28px) 80px" }}>

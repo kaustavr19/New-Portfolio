@@ -18,11 +18,11 @@ const BootScreen = dynamic(() => import("@/components/os/BootScreen"), { ssr: fa
 const Desktop = dynamic(() => import("@/components/os/Desktop"), { ssr: false });
 const MobileOS = dynamic(() => import("@/components/os/MobileOS"), { ssr: false });
 const DeviantOverlay = dynamic(() => import("@/components/os/DeviantOverlay"), { ssr: false });
-const AmbientAudio = dynamic(() => import("@/components/os/AmbientAudio"), { ssr: false });
 const ReaderMode = dynamic(() => import("@/components/os/ReaderMode"), { ssr: false });
 const InkBoot = dynamic(() => import("@/components/ink/InkBoot"), { ssr: false });
 const InkDesktop = dynamic(() => import("@/components/ink/InkDesktop"), { ssr: false });
 const InkMobile = dynamic(() => import("@/components/ink/InkMobile"), { ssr: false });
+const InkAmbientAudio = dynamic(() => import("@/components/ink/InkAmbientAudio"), { ssr: false });
 
 const BOOT_KEY = "kros_booted";
 
@@ -93,8 +93,8 @@ export default function OSRoot() {
               <Shell booted={booted} onBootComplete={handleBootComplete} />
               {/* Deviant wash + WebGL experiments — classic themes only */}
               <ClassicOnlyLayers />
-              {/* Galactic ambient hum (gesture-gated, gain follows the a11y pref) */}
-              <AmbientAudio />
+              {/* Ambience: calm room tone + weather (gesture-gated, follows the a11y pref) */}
+              <InkAmbientAudio />
               {/* Site-wide plain-text reading view — About/Experience/Projects as one document */}
               <ReaderMode />
             </div>

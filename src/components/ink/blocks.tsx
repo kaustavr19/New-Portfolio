@@ -27,11 +27,11 @@ export function InkFigure({ fig, sizes }: { fig: Figure; sizes: string }) {
           height={fig.height}
           loading="lazy"
           decoding="async"
-          style={wire ? { filter: "grayscale(1) invert(1) contrast(1.05)" } : undefined}
+          className={wire ? "wire" : undefined}
         />
       </picture>
       {fig.peek && (
-        <span aria-hidden className="ink-label" style={{ position: "absolute", insetInline: 0, bottom: 0, height: 120, display: "flex", alignItems: "flex-end", justifyContent: "center", paddingBottom: 14, color: "var(--ink-fg)", background: "linear-gradient(to bottom, transparent, #000)" }}>
+        <span aria-hidden className="ink-label" style={{ position: "absolute", insetInline: 0, bottom: 0, height: 120, display: "flex", alignItems: "flex-end", justifyContent: "center", paddingBottom: 14, color: "var(--ink-fg)", background: "linear-gradient(to bottom, transparent, var(--ink-bg))" }}>
           Open full length ↗
         </span>
       )}
@@ -51,7 +51,7 @@ export function InkBlock({ block }: { block: ProjectBlock }) {
       return (
         <blockquote style={{ borderLeft: "2px solid var(--ink-fg)", padding: "2px 0 2px 16px", maxWidth: 720 }}>
           <span className="ink-label">{block.label}</span>
-          <p style={{ fontSize: 15, lineHeight: 1.65, color: "#e6e6e6", marginTop: 6 }}>{block.text}</p>
+          <p style={{ fontSize: 15, lineHeight: 1.65, color: "var(--ink-strong)", marginTop: 6 }}>{block.text}</p>
         </blockquote>
       );
     case "stats":
@@ -79,7 +79,7 @@ export function InkBlock({ block }: { block: ProjectBlock }) {
           {block.items.map((it, i) => (
             <li key={i} style={{ display: "flex", gap: 12, fontSize: 15, lineHeight: 1.6, color: "var(--ink-soft)" }}>
               <span aria-hidden style={{ width: 5, height: 5, borderRadius: "50%", background: "var(--ink-fg)", marginTop: 10, flexShrink: 0 }} />
-              <span><ListItemText item={it} /></span>
+              <span><ListItemText item={it} leadColor="var(--ink-fg)" /></span>
             </li>
           ))}
         </ul>

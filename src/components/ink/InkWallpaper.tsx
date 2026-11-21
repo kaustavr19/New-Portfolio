@@ -2,8 +2,10 @@
 
 import { useEffect, useRef } from "react";
 import { useA11y } from "@/lib/a11y";
+import { useInkScheme } from "@/lib/theme";
 import { KROS_MARK_BOX, KROS_MARK_PATH } from "./KrosMark";
 import { useWeather, type Weather } from "./useWeather";
+import { birdChirp, starTwinkle, thunder, uiThock } from "@/lib/ink-sound";
 
 /* ──────────────────────────────────────────────────────────
    InkOS wallpaper — a dot grid that behaves like an LED matrix.
@@ -23,7 +25,11 @@ import { useWeather, type Weather } from "./useWeather";
 
 const PITCH = 18;
 const BASE_R = 1;
-const BASE_A = 0.11;
+/* Dark: light dots on black. Light: ink dots on paper ("lit" = bigger + darker). */
+const SCHEME = {
+  dark: { rgb: "255,255,255", base: 0.11, gain: 0.85 },
+  light: { rgb: "17,17,17", base: 0.13, gain: 0.8 },
+} as const;
 
 export type LogoBox = { cx: number; cy: number; size: number } | null;
 
@@ -52,20 +58,25 @@ function kolkataIsDay(d = new Date()) {
 
 export default function InkWallpaper({ logo = null, dim = 0 }: { logo?: LogoBox; dim?: number }) {
   const ref = useRef<HTMLCanvasElement>(null);
+  const scheme = useInkScheme();
   const { motionReduced } = useA11y();
   const weather = useWeather();
   const dimRef = useRef(dim);
+  const { soundEffects } = useA11y();
+  const soundRef = useRef(soundEffects);
   const weatherRef = useRef<Weather | null>(weather);
   useEffect(() => {
     dimRef.current = dim;
     weatherRef.current = weather;
-  }, [dim, weather]);
+    soundRef.current = soundEffects;
+  }, [dim, weather, soundEffects]);
 
   useEffect(() => {
     const cvs = ref.current;
     const ctx = cvs?.getContext("2d");
     if (!cvs || !ctx) return;
 
+    const { rgb, base: BASE_A, gain: GAIN } = SCHEME[scheme];
     let W = 0, H = 0, cols = 0, rows = 0, dpr = 1;
     let logoMask = new Float32Array(0);
     let stars = new Float32Array(0); // per-dot twinkle phase, 0 = not a star
@@ -78,6 +89,9 @@ export default function InkWallpaper({ logo = null, dim = 0 }: { logo?: LogoBox;
     let nextBird = performance.now() + rand(8_000, 20_000);
     let nextShoot = performance.now() + rand(12_000, 30_000);
     let flashUntil = 0;
+    let sparkle: { i: number; t0: number } | null = null;
+    let nextSparkle = performance.now() + rand(4_000, 9_000);
+    let nextChirp = 0;
     let nextFlash = performance.now() + rand(15_000, 40_000);
     const pointer = { x: -9999, y: -9999, on: false };
     let raf = 0;
@@ -102,7 +116,7 @@ export default function InkWallpaper({ logo = null, dim = 0 }: { logo?: LogoBox;
       base.height = cvs.height;
       const b = base.getContext("2d")!;
       b.setTransform(dpr, 0, 0, dpr, 0, 0);
-      b.fillStyle = `rgba(255,255,255,${BASE_A})`;
+      b.fillStyle = `rgba(${rgb},${BASE_A})`;
       for (let r = 0; r < rows; r++)
         for (let c = 0; c < cols; c++) {
           b.beginPath();
@@ -202,6 +216,21 @@ export default function InkWallpaper({ logo = null, dim = 0 }: { logo?: LogoBox;
             const tw = still ? 0.5 : Math.sin(t * (0.6 + stars[i] * 0.35) + stars[i] * 7) * 0.5 + 0.5;
             I[i] += tw * tw * 0.45 * starGain;
           }
+        // Now and then one star flares — and you hear it.
+        if (!still && starGain === 1 && now > nextSparkle) {
+          const lit: number[] = [];
+          for (let i = 0; i < stars.length; i++) if (stars[i]) lit.push(i);
+          if (lit.length) {
+            sparkle = { i: lit[Math.floor(Math.random() * lit.length)], t0: now };
+            starTwinkle();
+          }
+          nextSparkle = now + rand(3_500, 9_000) / Math.max(0.3, quiet);
+        }
+        if (sparkle) {
+          const age = (now - sparkle.t0) / 900;
+          if (age >= 1) sparkle = null;
+          else I[sparkle.i] = Math.min(1, I[sparkle.i] + (1 - age) * 0.9);
+        }
       }
 
       // Slow breathing across the field.
@@ -248,6 +277,7 @@ export default function InkWallpaper({ logo = null, dim = 0 }: { logo?: LogoBox;
           rain = rain.filter((s) => s.y - s.len < H);
           if (kind === "storm" && now > nextFlash) {
             flashUntil = now + 110;
+            thunder();
             nextFlash = now + rand(15_000, 40_000);
           }
         } else rain = [];
@@ -260,6 +290,11 @@ export default function InkWallpaper({ logo = null, dim = 0 }: { logo?: LogoBox;
           for (let k = 0; k < n; k++)
             birds.push({ x: fromLeft ? -60 - k * 70 : W + 60 + k * 70, y: y + k * rand(18, 36), vx: (fromLeft ? 1 : -1) * rand(70, 95), phase: rand(0, 6), scale: rand(0.8, 1.1) });
           nextBird = now + rand(45_000, 90_000);
+          nextChirp = now + rand(300, 900);
+        }
+        if (birds.length && now > nextChirp) {
+          birdChirp();
+          nextChirp = now + rand(1_400, 3_200);
         }
         for (const b of birds) {
           b.x += b.vx * dt;
@@ -324,7 +359,7 @@ export default function InkWallpaper({ logo = null, dim = 0 }: { logo?: LogoBox;
         for (let c = 0; c < cols; c++) {
           const v = Math.min(1, I[r * cols + c] + flash);
           if (v < 0.015) continue;
-          ctx.fillStyle = `rgba(255,255,255,${Math.min(1, BASE_A + v * 0.85)})`;
+          ctx.fillStyle = `rgba(${rgb},${Math.min(1, BASE_A + v * GAIN)})`;
           ctx.beginPath();
           ctx.arc(c * PITCH + PITCH / 2, r * PITCH + PITCH / 2, BASE_R + v * 2.6, 0, Math.PI * 2);
           ctx.fill();
@@ -347,7 +382,12 @@ export default function InkWallpaper({ logo = null, dim = 0 }: { logo?: LogoBox;
     const onLeave = () => {
       pointer.on = false;
     };
-    const onDown = (e: PointerEvent) => ripples.push({ x: e.clientX, y: e.clientY, t0: performance.now() });
+    const onDown = (e: PointerEvent) => {
+      ripples.push({ x: e.clientX, y: e.clientY, t0: performance.now() });
+      // A click on the bare desktop (not a window, widget or button) gets a soft thock.
+      const el = e.target as HTMLElement | null;
+      if (soundRef.current && el && !el.closest("button, a, input, textarea, [role=dialog], .ink-card, nav, aside")) uiThock();
+    };
     const onRipple = (e: Event) => {
       const d = (e as CustomEvent<{ x: number; y: number }>).detail;
       if (d) ripples.push({ x: d.x, y: d.y, t0: performance.now() });
@@ -377,7 +417,7 @@ export default function InkWallpaper({ logo = null, dim = 0 }: { logo?: LogoBox;
       window.removeEventListener("ink:ripple", onRipple);
     };
     // logo geometry and motion preference rebuild the scene; weather/dim are read live via refs
-  }, [logo?.cx, logo?.cy, logo?.size, motionReduced]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [logo?.cx, logo?.cy, logo?.size, motionReduced, scheme]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Reduced motion: repaint the static frame once the weather arrives (sun vs moon).
   useEffect(() => {

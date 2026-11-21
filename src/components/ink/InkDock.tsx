@@ -9,6 +9,7 @@ import { INK_APPS, cityTime } from "./data";
 import { useClock } from "./useClock";
 import { SwitchRow } from "./ui";
 import KrosMark from "./KrosMark";
+import InkModePicker from "./InkModePicker";
 
 /* Theme switch — a segmented control; used in the dock menu and Settings. */
 export function ThemePicker() {
@@ -50,7 +51,7 @@ function SystemMenu({ onClose, onOpenApp }: { onClose: () => void; onOpenApp: (i
       role="dialog"
       aria-label="System menu"
       className="ink-card"
-      style={{ position: "absolute", bottom: "calc(100% + 12px)", left: 0, width: 340, padding: 20, display: "flex", flexDirection: "column", gap: 18, boxShadow: "0 20px 60px #000", animation: "ink-in .16s ease-out" }}
+      style={{ position: "absolute", bottom: "calc(100% + 12px)", left: 0, width: 340, padding: 20, display: "flex", flexDirection: "column", gap: 18, boxShadow: "var(--ink-shadow)", animation: "ink-in .16s ease-out" }}
     >
       <div>
         <div className="ink-dot-900" style={{ fontSize: 26, display: "flex", alignItems: "center", gap: 10 }}><KrosMark size={24} />KR//OS</div>
@@ -59,6 +60,10 @@ function SystemMenu({ onClose, onOpenApp }: { onClose: () => void; onOpenApp: (i
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         <span className="ink-label">Theme</span>
         <ThemePicker />
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        <span className="ink-label">Appearance</span>
+        <InkModePicker />
       </div>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
         <button type="button" className="ink-pill" onClick={() => { openReader(true); onClose(); }}>Reading view</button>
@@ -105,7 +110,7 @@ export default function InkDock({
         gap: 4,
         padding: 7,
         borderRadius: "var(--r-pill)",
-        background: "#0b0b0bee",
+        background: "var(--ink-dock)",
         border: "1px solid var(--ink-line-strong)",
         backdropFilter: "blur(10px)",
         maxWidth: "calc(100vw - 24px)",
@@ -145,7 +150,7 @@ export default function InkDock({
               padding: "9px 14px",
               borderRadius: "var(--r-pill)",
               background: active ? "var(--ink-fg)" : "transparent",
-              color: active ? "#000" : minimized ? "var(--ink-dim)" : "var(--ink-fg)",
+              color: active ? "var(--ink-on-fg)" : minimized ? "var(--ink-dim)" : "var(--ink-fg)",
               fontSize: 11,
               letterSpacing: ".08em",
             }}

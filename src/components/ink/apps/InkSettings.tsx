@@ -6,6 +6,8 @@ import { requestPersonnelBrief } from "@/lib/personnel-brief";
 import { useReaderMode } from "@/lib/reader-mode";
 import { THEMES, useTheme, type ThemeId } from "@/lib/theme";
 import { SectionHead, SwitchRow } from "../ui";
+import SoundLab from "../SoundLab";
+import InkModePicker from "../InkModePicker";
 
 /* A tiny swatch per theme so the choice is visual, not just a label. */
 const SWATCH: Record<ThemeId, string[]> = {
@@ -47,7 +49,7 @@ export default function InkSettings() {
                   style={{ textAlign: "left", padding: 16, borderRadius: 18, border: `1px solid ${on ? "var(--ink-fg)" : "var(--ink-line)"}`, background: on ? "var(--ink-raised)" : "transparent", display: "flex", flexDirection: "column", gap: 12 }}
                 >
                   <span aria-hidden style={{ display: "flex", gap: 4 }}>
-                    {SWATCH[t.id].map((c) => <span key={c} style={{ width: 22, height: 22, borderRadius: "50%", background: c, border: "1px solid #ffffff22" }} />)}
+                    {SWATCH[t.id].map((c) => <span key={c} style={{ width: 22, height: 22, borderRadius: "50%", background: c, border: "1px solid var(--ink-line-strong)" }} />)}
                   </span>
                   <span>
                     <span className="ink-dot-900" style={{ display: "block", fontSize: 20 }}>{t.label.toUpperCase()}</span>
@@ -62,14 +64,22 @@ export default function InkSettings() {
         </section>
 
         <section>
+          <SectionHead as="h3">Appearance</SectionHead>
+          <InkModePicker />
+          <p className="ink-meta" style={{ marginTop: 10 }}>Auto follows your device&apos;s light or dark setting. Applies to InkOS and the reading pages.</p>
+        </section>
+
+        <section>
           <SectionHead as="h3">Accessibility</SectionHead>
           <div style={{ display: "flex", flexDirection: "column" }}>
             <SwitchRow label="Reduce motion" hint="Stops the boot sweep, light-bar pulses and blinking dots" checked={a11y.motionReduced} onChange={() => a11y.toggle("motionReduced")} />
-            <SwitchRow label="Sound effects" hint="Clicks and the open-window chime" checked={a11y.soundEffects} onChange={() => a11y.toggle("soundEffects")} />
-            <SwitchRow label="Ambience" hint="A quiet background hum" checked={a11y.ambience} onChange={() => a11y.toggle("ambience")} />
+            <SwitchRow label="Sound effects" hint="Window blips, relay ticks on toggles, a soft thock on the desktop" checked={a11y.soundEffects} onChange={() => a11y.toggle("soundEffects")} />
+            <SwitchRow label="Ambience" hint="Calm room tone and pad, plus stars, birds and rain from the wallpaper" checked={a11y.ambience} onChange={() => a11y.toggle("ambience")} />
             <SwitchRow label="High contrast" hint="Brighter secondary text in the classic theme" checked={a11y.highContrast} onChange={() => a11y.toggle("highContrast")} />
           </div>
         </section>
+
+        <SoundLab />
 
         <section>
           <SectionHead as="h3">System</SectionHead>

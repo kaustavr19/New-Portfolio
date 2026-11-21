@@ -89,7 +89,7 @@ function Brief({ p }: { p: Project }) {
           <div className="ink-redact" aria-hidden>
             {[100, 84, 100, 62, 92, 74].map((w, i) => <i key={i} style={{ width: `${w}%` }} />)}
           </div>
-          <div className="ink-card" role="note" style={{ position: "absolute", right: 0, top: 30, maxWidth: 400, display: "flex", gap: 14, background: "#000", borderColor: "var(--ink-line-strong)" }}>
+          <div className="ink-card" role="note" style={{ position: "absolute", right: 0, top: 30, maxWidth: 400, display: "flex", gap: 14, background: "var(--ink-bg)", borderColor: "var(--ink-line-strong)" }}>
             <span aria-hidden style={{ width: 28, height: 28, flexShrink: 0, borderRadius: "50%", border: "1.5px solid var(--ink-red)", display: "grid", placeItems: "center" }}>
               <span style={{ width: 8, height: 8, borderRadius: 2, background: "var(--ink-red)" }} />
             </span>
@@ -203,7 +203,7 @@ export default function InkProjects() {
                   >
                     <span className="ink-dot" style={{ fontSize: 17, color: on ? "var(--ink-fg)" : "var(--ink-dim)" }}>{String(i + 1).padStart(2, "0")}</span>
                     <span style={{ minWidth: 0, textAlign: "left" }}>
-                      <span style={{ display: "block", fontSize: 14, lineHeight: 1.3, color: on ? "var(--ink-fg)" : "#bdbdbd" }}>{p.name}</span>
+                      <span style={{ display: "block", fontSize: 14, lineHeight: 1.3, color: on ? "var(--ink-fg)" : "var(--ink-soft)" }}>{p.name}</span>
                       <span className="ink-label" style={{ display: "block", fontSize: 9.5, marginTop: 3 }}>
                         {p.status}{p.featured ? " · Featured" : ""}
                       </span>

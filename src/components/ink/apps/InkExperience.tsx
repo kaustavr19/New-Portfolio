@@ -18,7 +18,7 @@ export default function InkExperience() {
           <span aria-hidden style={{ position: "absolute", left: 7, top: 8, bottom: 8, width: 1, background: "repeating-linear-gradient(to bottom, var(--ink-line-strong) 0 3px, transparent 3px 7px)" }} />
           {ordered.map((c) => (
             <li key={c.id} style={{ position: "relative", paddingLeft: 36, paddingBottom: 30 }}>
-              <span aria-hidden className={`ink-status ${c.status === "in_progress" ? "live" : ""}`} style={{ position: "absolute", left: 1, top: 10, width: 13, height: 13, background: c.status === "in_progress" ? undefined : "#000" }} />
+              <span aria-hidden className={`ink-status ${c.status === "in_progress" ? "live" : ""}`} style={{ position: "absolute", left: 1, top: 10, width: 13, height: 13, background: c.status === "in_progress" ? undefined : "var(--ink-bg)" }} />
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 14, flexWrap: "wrap" }}>
                 <h4 className="ink-dot-900" style={{ fontSize: 30, lineHeight: 1 }}>{c.title}</h4>
                 <span className="ink-meta">{c.period} · {c.duration}</span>
@@ -60,7 +60,7 @@ export default function InkExperience() {
             </li>
           ))}
           <li style={{ position: "relative", paddingLeft: 36 }}>
-            <span aria-hidden className="ink-status" style={{ position: "absolute", left: 1, top: 6, width: 13, height: 13, background: "#000" }} />
+            <span aria-hidden className="ink-status" style={{ position: "absolute", left: 1, top: 6, width: 13, height: 13, background: "var(--ink-bg)" }} />
             <span className="ink-label">Education · {education.period}</span>
             <div style={{ fontSize: 16, fontWeight: 600, marginTop: 6 }}>{education.degree}</div>
             <div className="ink-meta">{education.institution} · CGPA {education.cgpa}</div>

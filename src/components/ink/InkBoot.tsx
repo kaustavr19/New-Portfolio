@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useA11y } from "@/lib/a11y";
-import { playCodecBeep } from "@/lib/sound";
+import { useInkScheme } from "@/lib/theme";
+import { uiReady } from "@/lib/ink-sound";
 import { KROS_MARK_BOX, KROS_MARK_PATH } from "./KrosMark";
 
 /* ──────────────────────────────────────────────────────────
@@ -57,6 +58,7 @@ function sampleMark(): Dot[] {
 export default function InkBoot({ onComplete }: { onComplete: () => void }) {
   const { motionReduced, soundEffects } = useA11y();
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const scheme = useInkScheme();
   const [t, setT] = useState(motionReduced ? 1 : 0);
   const ready = t >= 1;
   const enterRef = useRef<HTMLButtonElement>(null);
@@ -65,6 +67,9 @@ export default function InkBoot({ onComplete }: { onComplete: () => void }) {
     const cvs = canvasRef.current;
     const ctx = cvs?.getContext("2d");
     if (!cvs || !ctx) return;
+    const C = scheme === "light"
+      ? { lit: "#111111", red: "#d92a1c", off: "#00000024" }
+      : { lit: "#f2f2f2", red: "#ff3b30", off: "#ffffff1c" };
     let raf = 0;
     let dots: Dot[] = [];
     let start = 0;
@@ -75,7 +80,7 @@ export default function InkBoot({ onComplete }: { onComplete: () => void }) {
         const lit = d.on && p >= d.at;
         ctx.beginPath();
         ctx.arc(d.x * PITCH + PITCH / 2, d.y * PITCH + PITCH / 2, lit ? 3.3 : 1, 0, Math.PI * 2);
-        ctx.fillStyle = lit ? (pulse ? "#ff3b30" : "#f2f2f2") : "#ffffff1c";
+        ctx.fillStyle = lit ? (pulse ? C.red : C.lit) : C.off;
         ctx.fill();
       }
     };
@@ -99,14 +104,14 @@ export default function InkBoot({ onComplete }: { onComplete: () => void }) {
       }
     });
     return () => cancelAnimationFrame(raf);
-  }, [motionReduced]);
+  }, [motionReduced, scheme]);
 
   useEffect(() => {
     if (ready) enterRef.current?.focus();
   }, [ready]);
 
   const enter = () => {
-    if (soundEffects) playCodecBeep();
+    if (soundEffects) uiReady();
     onComplete();
   };
 
@@ -117,7 +122,7 @@ export default function InkBoot({ onComplete }: { onComplete: () => void }) {
   return (
     <div
       className="ink fixed inset-0 flex flex-col items-center justify-center"
-      style={{ background: "#000", gap: 34, zIndex: 50 }}
+      style={{ background: "var(--ink-bg)", gap: 34, zIndex: 50 }}
       onKeyDown={(e) => {
         if (e.key === "Enter" && ready) enter();
       }}
@@ -128,14 +133,14 @@ export default function InkBoot({ onComplete }: { onComplete: () => void }) {
         style={{ WebkitMaskImage: "radial-gradient(ellipse at center, #000 20%, transparent 70%)", maskImage: "radial-gradient(ellipse at center, #000 20%, transparent 70%)", opacity: 0.7 }}
       />
       {!motionReduced && (
-        <div aria-hidden className="absolute" style={{ width: 560, height: 560, maxWidth: "90vw", maxHeight: "90vw", borderRadius: "50%", border: "1px solid #ffffff10" }}>
+        <div aria-hidden className="absolute" style={{ width: 560, height: 560, maxWidth: "90vw", maxHeight: "90vw", borderRadius: "50%", border: "1px solid var(--ink-line)" }}>
           <div
             style={{
               position: "absolute",
               inset: -1,
               borderRadius: "50%",
               border: "2px solid transparent",
-              borderTopColor: "#f2f2f2",
+              borderTopColor: "var(--ink-fg)",
               filter: "drop-shadow(0 0 8px #fff8)",
               animation: "ink-spin 2.4s linear infinite",
               opacity: ready ? 0.35 : 1,

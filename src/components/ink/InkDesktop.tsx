@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { desktopIcons, profile } from "@/data/content";
 import { useA11y } from "@/lib/a11y";
 import { parseHash, setAppHash } from "@/lib/deep-link";
-import { playCodecBeep } from "@/lib/sound";
+import { uiOpen } from "@/lib/ink-sound";
 import InkWindow, { type Rect } from "./InkWindow";
 import InkDock from "./InkDock";
 import InkBrief from "./InkBrief";
@@ -84,7 +84,7 @@ export default function InkDesktop() {
         [id]: { open: true, minimized: false, z: nextZ(prev), order: prev[id]?.open ? prev[id].order : nextOrder(prev) },
       }));
       setAppHash(id);
-      if (soundEffects) playCodecBeep();
+      if (soundEffects) uiOpen();
     },
     [soundEffects],
   );
@@ -158,9 +158,9 @@ export default function InkDesktop() {
   };
 
   return (
-    <div className={`ink fixed inset-0 select-none ${motionReduced ? "ink-motion-off" : ""}`} style={{ background: "#000" }}>
+    <div className={`ink fixed inset-0 select-none ${motionReduced ? "ink-motion-off" : ""}`} style={{ background: "var(--ink-bg)" }}>
       <InkWallpaper logo={logoBox} dim={visible.length ? 0.6 : 0} />
-      <div aria-hidden className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 45% 40%, transparent 55%, #000000cc 100%)" }} />
+      <div aria-hidden className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 45% 40%, transparent 55%, var(--ink-veil) 100%)" }} />
       <h1 className="sr-only">KR//OS — {profile.name}, {profile.designation}</h1>
 
       {showWidgets && (
@@ -174,7 +174,7 @@ export default function InkDesktop() {
           const on = wins[app.id]?.open && !wins[app.id]?.minimized;
           return (
             <button key={app.id} type="button" onClick={() => openApp(app.id)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }} aria-label={`Open ${app.name}`}>
-              <span style={{ width: 58, height: 58, borderRadius: 18, display: "grid", placeItems: "center", background: on ? "var(--ink-fg)" : "var(--ink-raised)", border: "1px solid var(--ink-line)", color: on ? "#000" : "var(--ink-fg)", transition: "background .15s" }}>
+              <span style={{ width: 58, height: 58, borderRadius: 18, display: "grid", placeItems: "center", background: on ? "var(--ink-fg)" : "var(--ink-raised)", border: "1px solid var(--ink-line)", color: on ? "var(--ink-on-fg)" : "var(--ink-fg)", transition: "background .15s" }}>
                 <Icon name={app.id} size={25} />
               </span>
               <span className="ink-meta" style={{ color: "var(--ink-fg)", fontSize: 10.5 }}>{app.name}</span>
@@ -182,7 +182,7 @@ export default function InkDesktop() {
           );
         })}
         <a href="/Kaustav_Roy_CV.pdf" target="_blank" rel="noopener noreferrer" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, textDecoration: "none" }} aria-label="Resume (PDF)">
-          <span style={{ width: 58, height: 58, borderRadius: 18, display: "grid", placeItems: "center", border: "1px solid #7ab2ff66", color: "var(--ink-blue)" }}>
+          <span style={{ width: 58, height: 58, borderRadius: 18, display: "grid", placeItems: "center", border: "1px solid var(--ink-blue-soft)", color: "var(--ink-blue)" }}>
             <Icon name="resume" size={25} />
           </span>
           <span className="ink-meta ink-blue" style={{ fontSize: 10.5 }}>Resume</span>

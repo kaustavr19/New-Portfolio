@@ -1,5 +1,7 @@
 "use client";
 
+import { registerAudio } from "@/lib/ink-sound";
+
 /* ──────────────────────────────────────────────────────────
    Shared Web Audio synth for short UI sound effects — CODEC
    beep on window open, soft clicks on window actions.
@@ -27,6 +29,7 @@ function getCtx(): AudioContext | null {
       window.AudioContext ||
       (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
     ctx = new AC();
+    registerAudio("Classic UI sounds", ctx);
     return ctx;
   } catch {
     return null;

@@ -49,7 +49,7 @@ export default function AboutPage() {
         <p style={{ fontSize: 19 }}>
           {profile.designation} at Fractal Analytics · {profile.location}
         </p>
-        <p style={{ fontSize: 18, lineHeight: 1.75, color: "#dcdcdc" }}>{profile.bio}</p>
+        <p style={{ fontSize: 18, lineHeight: 1.75, color: "var(--ink-strong)" }}>{profile.bio}</p>
         <p className="ink-body">
           Start with the <Link href="/work" className="ink-blue">case studies</Link>, or{" "}
           <Link href="/" className="ink-blue">enter KR//OS</Link> for the interactive version.

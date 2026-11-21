@@ -3,22 +3,37 @@
    Monochrome scale + two signal colours with strict roles:
      red  = state   (live, active, current, alerts, close)
      blue = action  (links, focus, selection, progress edge)
-   White fill means "selected". Everything else is outline on black.
+   Fill in the ink colour means "selected". Everything else is outline.
    No gradients or glow, except the light bars.
+
+   Two schemes: dark (ink on black) and light (ink on paper). The
+   visitor's OS setting picks one; <html data-ink-mode="light|dark">
+   overrides it (set before first paint by the script in app/layout).
    ══════════════════════════════════════════════════════════ */
 
-.ink {
+html[data-theme="ink"], .ink {
   --ink-bg: #000000;
   --ink-surface: #0b0b0b;
   --ink-raised: #141414;
+  --ink-sunken: #1d1d1d;  /* redaction bars, tracks */
   --ink-line: #262626;
   --ink-line-strong: #3a3a3a;
   --ink-dim: #555555;   /* decoration only — fails AA as text */
   --ink-mute: #8c8c8c;  /* secondary text, 6.4:1 on black */
   --ink-soft: #cfcfcf;  /* body copy */
+  --ink-strong: #e6e6e6; /* emphasised body copy */
   --ink-fg: #f2f2f2;
+  --ink-on-fg: #000000; /* text on an ink-filled pill */
   --ink-red: #ff3b30;
   --ink-blue: #7ab2ff;
+  --ink-blue-soft: #7ab2ff66;
+  --ink-dock: #0b0b0bee;
+  --ink-veil: #000000cc; /* scrims, vignettes, peek fades */
+  --ink-shadow: 0 30px 80px #000;
+  --ink-glow: 0 0 14px #ffffffaa;
+  --ink-dot: #ffffff1c;  /* static dot grid */
+  --ink-scroll: #2a2a2a;
+  color-scheme: dark;
 
   --font-dot: "Doto", "Space Mono", monospace;
   --font-mono: "Space Mono", ui-monospace, monospace;
@@ -33,13 +48,35 @@
   -webkit-font-smoothing: antialiased;
 }
 
+/* Light — ink on paper. Signal colours deepen so they keep AA contrast on white. */
+@media (prefers-color-scheme: light) {
+  html:not([data-ink-mode="dark"])[data-theme="ink"], html:not([data-ink-mode="dark"]) .ink {
+    --ink-bg: #f4f3ef; --ink-surface: #ffffff; --ink-raised: #ecebe6; --ink-sunken: #dedcd6;
+    --ink-line: #dedcd6; --ink-line-strong: #c4c2bb; --ink-dim: #a3a19a; --ink-mute: #5e5c57;
+    --ink-soft: #2e2d2a; --ink-strong: #1a1a18; --ink-fg: #111111; --ink-on-fg: #ffffff;
+    --ink-red: #d92a1c; --ink-blue: #1f5fd6; --ink-blue-soft: #1f5fd666;
+    --ink-dock: #ffffffee; --ink-veil: #f4f3efcc; --ink-shadow: 0 24px 60px #0000001f;
+    --ink-glow: 0 0 10px #00000040; --ink-dot: #00000024; --ink-scroll: #c4c2bb;
+    color-scheme: light;
+  }
+}
+html[data-ink-mode="light"][data-theme="ink"], html[data-ink-mode="light"] .ink {
+  --ink-bg: #f4f3ef; --ink-surface: #ffffff; --ink-raised: #ecebe6; --ink-sunken: #dedcd6;
+  --ink-line: #dedcd6; --ink-line-strong: #c4c2bb; --ink-dim: #a3a19a; --ink-mute: #5e5c57;
+  --ink-soft: #2e2d2a; --ink-strong: #1a1a18; --ink-fg: #111111; --ink-on-fg: #ffffff;
+  --ink-red: #d92a1c; --ink-blue: #1f5fd6; --ink-blue-soft: #1f5fd666;
+  --ink-dock: #ffffffee; --ink-veil: #f4f3efcc; --ink-shadow: 0 24px 60px #0000001f;
+  --ink-glow: 0 0 10px #00000040; --ink-dot: #00000024; --ink-scroll: #c4c2bb;
+  color-scheme: light;
+}
+
 /* Ink drops the classic scanline overlay */
 html[data-theme="ink"] .scanlines::after { display: none; }
-html[data-theme="ink"], html[data-theme="ink"] body { background: #000; }
-html[data-theme="ink"] ::-webkit-scrollbar-thumb { background: #2a2a2a; }
+html[data-theme="ink"], html[data-theme="ink"] body { background: var(--ink-bg); }
+html[data-theme="ink"] ::-webkit-scrollbar-thumb { background: var(--ink-scroll); }
 
 .ink *:focus-visible { outline: 2px solid var(--ink-blue); outline-offset: 2px; }
-.ink ::selection { background: var(--ink-blue); color: #000; }
+.ink ::selection { background: var(--ink-blue); color: var(--ink-on-fg); }
 :where(.ink) button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
 :where(.ink) a { color: inherit; }
 
@@ -69,7 +106,7 @@ html[data-theme="ink"] ::-webkit-scrollbar-thumb { background: #2a2a2a; }
 .ink-card { background: var(--ink-surface); border: 1px solid var(--ink-line); border-radius: var(--r-card); padding: 18px 20px; }
 .ink-raised { background: var(--ink-raised); border-radius: 18px; padding: 16px 18px; }
 .ink-tile { border: 1px solid var(--ink-line); border-radius: 16px; padding: 12px 14px; }
-.ink-dotgrid { background-image: radial-gradient(circle, #ffffff1c 1px, transparent 1.2px); background-size: 18px 18px; }
+.ink-dotgrid { background-image: radial-gradient(circle, var(--ink-dot) 1px, transparent 1.2px); background-size: 18px 18px; }
 
 /* Section heading: label + hairline */
 .ink-h { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
@@ -84,9 +121,9 @@ html[data-theme="ink"] ::-webkit-scrollbar-thumb { background: #2a2a2a; }
   color: var(--ink-fg); text-decoration: none; transition: background .15s, color .15s, border-color .15s;
 }
 .ink-pill:hover { border-color: var(--ink-fg); }
-.ink-pill.solid { background: var(--ink-fg); color: #000; border-color: var(--ink-fg); }
-.ink-pill.solid:hover { background: #fff; }
-.ink-pill.action { color: var(--ink-blue); border-color: #7ab2ff66; }
+.ink-pill.solid { background: var(--ink-fg); color: var(--ink-on-fg); border-color: var(--ink-fg); }
+.ink-pill.solid:hover { opacity: .88; }
+.ink-pill.action { color: var(--ink-blue); border-color: var(--ink-blue-soft); }
 .ink-pill.action:hover { border-color: var(--ink-blue); }
 .ink-pill[disabled] { opacity: .4; cursor: not-allowed; }
 
@@ -96,13 +133,13 @@ html[data-theme="ink"] ::-webkit-scrollbar-thumb { background: #2a2a2a; }
   padding: 8px 16px; border-radius: var(--r-pill); color: var(--ink-mute); display: flex; gap: 8px; align-items: center;
 }
 .ink-seg > button:hover { color: var(--ink-fg); }
-.ink-seg > button[aria-pressed="true"], .ink-seg > button[aria-selected="true"] { background: var(--ink-fg); color: #000; }
+.ink-seg > button[aria-pressed="true"], .ink-seg > button[aria-selected="true"] { background: var(--ink-fg); color: var(--ink-on-fg); }
 .ink-seg > button b { font-family: var(--font-dot); font-weight: 700; font-size: 14px; }
 
 .ink-switch { width: 40px; height: 22px; border-radius: var(--r-pill); border: 1px solid var(--ink-line-strong); position: relative; flex-shrink: 0; transition: background .15s, border-color .15s; }
 .ink-switch::after { content: ""; position: absolute; left: 3px; top: 3px; width: 14px; height: 14px; border-radius: 50%; background: var(--ink-mute); transition: left .15s, background .15s; }
 [aria-checked="true"] > .ink-switch, .ink-switch.on { background: var(--ink-fg); border-color: var(--ink-fg); }
-[aria-checked="true"] > .ink-switch::after, .ink-switch.on::after { left: 21px; background: #000; }
+[aria-checked="true"] > .ink-switch::after, .ink-switch.on::after { left: 21px; background: var(--ink-bg); }
 
 /* Segmented progress bar */
 .ink-bar { display: grid; gap: 3px; }
@@ -116,7 +153,7 @@ html[data-theme="ink"] ::-webkit-scrollbar-thumb { background: #2a2a2a; }
 .ink-status.live { border: 0; background: var(--ink-red); }
 
 /* Light bar — the focus/notification "glyph" */
-.ink-glyph { position: absolute; top: 0; left: 50%; height: 3px; width: 120px; transform: translateX(-50%); border-radius: 0 0 3px 3px; background: var(--ink-fg); box-shadow: 0 0 14px #ffffffaa; transition: opacity .3s, width .3s; }
+.ink-glyph { position: absolute; top: 0; left: 50%; height: 3px; width: 120px; transform: translateX(-50%); border-radius: 0 0 3px 3px; background: var(--ink-fg); box-shadow: var(--ink-glow); transition: opacity .3s, width .3s; }
 .ink-glyph.pulse { animation: ink-glyph 1.4s ease-in-out 1; }
 .ink-glyph.idle { width: 40px; opacity: .25; box-shadow: none; }
 
@@ -133,13 +170,13 @@ html[data-theme="ink"] ::-webkit-scrollbar-thumb { background: #2a2a2a; }
 /* Scroll areas inside windows */
 .ink-scroll { overflow-y: auto; overscroll-behavior: contain; }
 .ink-scroll::-webkit-scrollbar { width: 6px; }
-.ink-scroll::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 3px; }
+.ink-scroll::-webkit-scrollbar-thumb { background: var(--ink-scroll); border-radius: 3px; }
 
 /* Apps resize with their window, not the viewport */
 .ink-app { container-type: inline-size; height: 100%; }
 
 /* Halftone figures */
-.ink-halftone { position: relative; overflow: hidden; border-radius: 14px; border: 1px solid var(--ink-line); background: #000; }
+.ink-halftone { position: relative; overflow: hidden; border-radius: 14px; border: 1px solid var(--ink-line); background: var(--ink-bg); }
 .ink-halftone img { display: block; width: 100%; height: auto; filter: grayscale(1) contrast(1.15) brightness(.88); transition: filter .25s; }
 .ink-halftone.dots img {
   -webkit-mask: radial-gradient(circle, #000 1px, transparent 1.5px) 0 0/4px 4px;
@@ -149,14 +186,14 @@ html[data-theme="ink"] ::-webkit-scrollbar-thumb { background: #2a2a2a; }
 
 /* Redacted (NDA) block */
 .ink-redact { display: flex; flex-direction: column; gap: 10px; }
-.ink-redact i { height: 13px; border-radius: 3px; background: #1d1d1d; }
+.ink-redact i { height: 13px; border-radius: 3px; background: var(--ink-sunken); }
 
 /* ── Projects app ── */
 .ink-projects-body { display: grid; grid-template-columns: 290px minmax(0, 1fr); }
 .ink-projects-rail { border-right: 1px solid var(--ink-line); padding: 20px 12px; display: flex; flex-direction: column; gap: 4px; min-height: 0; }
 .ink-projects-railhead { padding: 0 10px 14px; }
 .ink-projects-item { display: grid; grid-template-columns: 30px minmax(0, 1fr) 10px; align-items: center; gap: 10px; padding: 12px 10px; border-radius: 16px; width: 100%; }
-.ink-projects-item:hover { background: #101010; }
+.ink-projects-item:hover { background: var(--ink-raised); }
 @container (max-width: 720px) {
   .ink-projects-body { grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr); }
   .ink-projects-rail { flex-direction: row; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; border-right: 0; border-bottom: 1px solid var(--ink-line); padding: 10px 12px; gap: 6px; }
@@ -179,3 +216,8 @@ html[data-theme="ink"] ::-webkit-scrollbar-thumb { background: #2a2a2a; }
 .ink-workdot:hover, .ink-workdot:focus-visible { transform: scale(1.35); }
 .ink-workdot.live { animation: ink-blink 1.6s steps(2) infinite; }
 .ink-motion-off .ink-workdot.live { animation: none; }
+
+/* Wireframes: inverted to white-on-black in dark, shown as-is (light greys) on paper. */
+.ink-halftone img.wire { filter: grayscale(1) invert(1) contrast(1.05); }
+@media (prefers-color-scheme: light) { html:not([data-ink-mode="dark"]) .ink-halftone img.wire { filter: grayscale(1); } }
+html[data-ink-mode="light"] .ink-halftone img.wire { filter: grayscale(1); }

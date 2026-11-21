@@ -9,12 +9,13 @@ import { useTheme } from "@/lib/theme";
 /* Same engine as the classic terminal; its §-colour codes are mapped onto
    the Ink palette: greens/whites → ink, golds → bright, aquas/blues → blue,
    reds → red, greys → muted. */
+const FG = "var(--ink-fg)", SOFT = "var(--ink-soft)", MUTE = "var(--ink-mute)", DIM = "var(--ink-dim)", RED = "var(--ink-red)", BLUE = "var(--ink-blue)", STRONG = "var(--ink-strong)";
 const INK_CODES: Record<string, string> = {
-  "0": "#555555", "1": "#7ab2ff", "2": "#f2f2f2", "3": "#7ab2ff", "4": "#ff3b30",
-  "5": "#cfcfcf", "6": "#ffffff", "7": "#cfcfcf", "8": "#8c8c8c", "9": "#7ab2ff",
-  a: "#f2f2f2", b: "#7ab2ff", c: "#ff3b30", d: "#cfcfcf", e: "#ffffff", f: "#f2f2f2",
+  "0": DIM, "1": BLUE, "2": FG, "3": BLUE, "4": RED,
+  "5": SOFT, "6": STRONG, "7": SOFT, "8": MUTE, "9": BLUE,
+  a: FG, b: BLUE, c: RED, d: SOFT, e: STRONG, f: FG,
 };
-const BASE: Record<TermLine["type"], string> = { input: "#f2f2f2", output: "#cfcfcf", error: "#ff3b30", system: "#8c8c8c" };
+const BASE: Record<TermLine["type"], string> = { input: FG, output: SOFT, error: RED, system: MUTE };
 
 function Segments({ text, base }: { text: string; base: string }) {
   const parts: { t: string; c: string }[] = [];
@@ -107,7 +108,7 @@ export default function InkTerminal() {
   };
 
   return (
-    <div className="ink-app" style={{ display: "flex", flexDirection: "column", position: "relative", background: "#000" }} onClick={() => inputRef.current?.focus()}>
+    <div className="ink-app" style={{ display: "flex", flexDirection: "column", position: "relative", background: "var(--ink-bg)" }} onClick={() => inputRef.current?.focus()}>
       {toast && (
         <div role="status" className="ink-card" style={{ position: "absolute", top: 14, right: 14, zIndex: 2, maxWidth: 300, display: "flex", gap: 12, animation: "ink-in .2s ease-out" }}>
           <span aria-hidden style={{ width: 3, borderRadius: 3, background: "var(--ink-red)", boxShadow: "0 0 10px var(--ink-red)" }} />
