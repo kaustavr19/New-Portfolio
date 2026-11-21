@@ -132,24 +132,6 @@ export default function InkBoot({ onComplete }: { onComplete: () => void }) {
         className="ink-dotgrid absolute inset-0"
         style={{ WebkitMaskImage: "radial-gradient(ellipse at center, #000 20%, transparent 70%)", maskImage: "radial-gradient(ellipse at center, #000 20%, transparent 70%)", opacity: 0.7 }}
       />
-      {!motionReduced && (
-        <div aria-hidden className="absolute" style={{ width: 560, height: 560, maxWidth: "90vw", maxHeight: "90vw", borderRadius: "50%", border: "1px solid var(--ink-line)" }}>
-          <div
-            style={{
-              position: "absolute",
-              inset: -1,
-              borderRadius: "50%",
-              border: "2px solid transparent",
-              borderTopColor: "var(--ink-fg)",
-              filter: "drop-shadow(0 0 8px #fff8)",
-              animation: "ink-spin 2.4s linear infinite",
-              opacity: ready ? 0.35 : 1,
-              transition: "opacity .6s",
-            }}
-          />
-        </div>
-      )}
-
       {["KR-19 · INKOS", "BUILD 2.077", "PORTFOLIO · INK EDITION", ready ? "PRESS ENTER" : "BOOTING"].map((txt, i) => (
         <span
           key={txt}
@@ -162,9 +144,41 @@ export default function InkBoot({ onComplete }: { onComplete: () => void }) {
       ))}
 
       <h1 className="sr-only">KR//OS — Kaustav Roy&apos;s portfolio</h1>
-      <div style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", gap: 18 }}>
-        <canvas ref={canvasRef} width={COLS * PITCH} height={ROWS * PITCH} aria-hidden style={{ width: "min(340px, 62vw)", height: "auto" }} />
-        <span aria-hidden className="ink-dot-900" style={{ fontSize: 34, letterSpacing: ".06em", opacity: ready ? 1 : 0.35, transition: "opacity .6s" }}>KR//OS</span>
+      {/* The ring and the mark share one square box, so the ring always
+          goes all the way around the monogram and its label. */}
+      <div
+        style={{
+          position: "relative",
+          width: "min(480px, 82vw, 56vh)",
+          aspectRatio: "1",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "3.5%",
+          containerType: "inline-size",
+          color: "var(--ink-fg)",
+        }}
+      >
+        <span aria-hidden style={{ position: "absolute", inset: 0, borderRadius: "50%", border: "1px solid var(--ink-line)" }} />
+        {!motionReduced && (
+          <span
+            aria-hidden
+            style={{
+              position: "absolute",
+              inset: -1,
+              borderRadius: "50%",
+              border: "2px solid transparent",
+              borderTopColor: "currentColor",
+              filter: "drop-shadow(0 0 6px currentColor)",
+              animation: "ink-spin 2.4s linear infinite",
+              opacity: ready ? 0.35 : 1,
+              transition: "opacity .6s",
+            }}
+          />
+        )}
+        <canvas ref={canvasRef} width={COLS * PITCH} height={ROWS * PITCH} aria-hidden style={{ position: "relative", width: "56%", height: "auto" }} />
+        <span aria-hidden className="ink-dot-900" style={{ position: "relative", fontSize: "clamp(20px, 6.5cqi, 32px)", letterSpacing: ".06em", opacity: ready ? 1 : 0.35, transition: "opacity .6s" }}>KR//OS</span>
       </div>
 
       <div style={{ position: "relative", width: "min(420px, 80vw)", display: "flex", flexDirection: "column", gap: 10 }}>
