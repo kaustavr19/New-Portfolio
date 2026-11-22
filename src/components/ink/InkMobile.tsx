@@ -15,6 +15,7 @@ import { useWeather } from "./useWeather";
 import WeatherGlyph from "./WeatherGlyph";
 import { INK_APP_COMPONENTS } from "./apps";
 import AskBar from "./AskBar";
+import InkPet from "./pet/InkPet";
 
 /* InkOS phone shell: lock → home → app. Shares the kros_booted session
    key with the classic shell, and keeps deep links across the unlock. */
@@ -190,7 +191,9 @@ function HomeScreen({ onOpen, onLogoArea }: { onOpen: (id: string) => void; onLo
       </nav>
 
       {/* Extra air between the app grid and the Ask bar, so it reads as its own control. */}
-      <div className="ink-home-ask">
+      {/* position: relative so the dock pet can sit on top of the Ask bar */}
+      <div className="ink-home-ask" style={{ position: "relative" }}>
+        <InkPet scale={1.5} />
         <AskBar variant="mobile" />
       </div>
     </div>

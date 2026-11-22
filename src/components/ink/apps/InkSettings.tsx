@@ -100,6 +100,7 @@ export default function InkSettings() {
             <SwitchRow label="Sound effects" hint="Window blips, relay ticks on toggles, a soft thock on the desktop" checked={a11y.soundEffects} onChange={() => a11y.toggle("soundEffects")} />
             <SwitchRow label="Ambience" hint="Calm room tone and pad, plus stars, birds and rain from the wallpaper" checked={a11y.ambience} onChange={() => a11y.toggle("ambience")} />
             <SwitchRow label="High contrast" hint="Brighter secondary text in the classic theme" checked={a11y.highContrast} onChange={() => a11y.toggle("highContrast")} />
+            <SwitchRow label="Dock pet" hint="A pixel wolf-husky that trots, naps and watches your cursor on the dock" checked={a11y.dockPet} onChange={() => a11y.toggle("dockPet")} />
           </div>
         </section>
 

@@ -510,3 +510,15 @@ export function uiReady() {
   if (!layerOn.ui || !graph()) return;
   [440, 554.37, 659.25, 880].forEach((f, i) => blip(f, { at: i * 0.035, dur: 1.8, peak: 0.03, space: 0.5 }));
 }
+
+/* Dock pet — a soft rising boop when petted, and a little two-part howl. */
+export function petBoop() {
+  if (!layerOn.ui || !graph()) return;
+  blip(720, { dur: 0.07, peak: 0.035, to: 1080, space: 0.25 });
+}
+
+export function petHowl() {
+  if (!layerOn.ui || !graph()) return;
+  blip(392, { dur: 0.32, peak: 0.03, to: 587, space: 0.45 });
+  blip(587, { at: 0.3, dur: 0.9, peak: 0.028, to: 440, space: 0.55 });
+}
