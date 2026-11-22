@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { InkDossier } from "@/components/ink/blocks";
-import { SectionHead, StatTile } from "@/components/ink/ui";
+import { DotTitle, SectionHead, StatTile } from "@/components/ink/ui";
+import ProjectCover from "@/components/ink/ProjectCover";
 import { caseStudyJsonLd, getCaseStudy, isGated, jsonLd, longformProjects, nextCaseStudy, osLink } from "@/lib/site";
 
 /* Only real case studies get a URL; anything else is a 404. */
@@ -61,7 +62,7 @@ export default async function CaseStudyPage({ params }: PageProps<"/work/[slug]"
           <span className={`ink-label ${live ? "ink-live" : ""}`} style={{ color: "var(--ink-fg)" }}>
             {consulting ? "Consulting" : "Case study"} · {p.status}
           </span>
-          <h1 className="ink-dot-900" style={{ fontSize: "clamp(38px, 8vw, 64px)", lineHeight: 0.95, textTransform: "uppercase", overflowWrap: "anywhere" }}>{p.name}</h1>
+          <DotTitle as="h1" tier="page" text={p.name} />
           <p style={{ fontSize: 20 }}>{p.tagline}</p>
           {p.role && <p className="ink-meta" style={{ letterSpacing: ".03em" }}>{p.role}</p>}
           <Link href={osLink(p)} className="ink-pill" style={{ alignSelf: "flex-start", marginTop: 6 }}>
@@ -69,13 +70,15 @@ export default async function CaseStudyPage({ params }: PageProps<"/work/[slug]"
           </Link>
         </header>
 
+        <ProjectCover project={p} radius={20} />
+
         <p style={{ fontSize: 18, lineHeight: 1.75, color: "var(--ink-strong)" }}>{p.summary ?? p.description}</p>
 
         {p.intel && p.intel.length > 0 && (
           <ul className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", listStyle: "none" }}>
             {p.intel.map((s) => (
               <li key={s.label}>
-                <StatTile value={s.value} label={s.label} size={34} />
+                <StatTile value={s.value} label={s.label} size="l" />
               </li>
             ))}
           </ul>
@@ -86,7 +89,7 @@ export default async function CaseStudyPage({ params }: PageProps<"/work/[slug]"
             <span aria-hidden className="ink-glyph" />
             <span>
               <span className="ink-label ink-live" style={{ display: "block", marginBottom: 6 }}>Live</span>
-              <span className="ink-dot-900" style={{ fontSize: 26 }}>{p.live.label.toUpperCase()}</span>
+              <span className="ink-dot-900" style={{ fontSize: "var(--dot-m)" }}>{p.live.label.toUpperCase()}</span>
               <span className="sr-only"> (opens in a new tab)</span>
             </span>
             <span aria-hidden className="ink-pill solid">Visit ↗</span>
@@ -151,7 +154,7 @@ export default async function CaseStudyPage({ params }: PageProps<"/work/[slug]"
         {next && next.id !== p.id && (
           <Link href={`/work/${next.id}`} className="ink-card" style={{ display: "block", textDecoration: "none" }}>
             <span className="ink-label">Next case study →</span>
-            <span className="ink-dot-900" style={{ display: "block", fontSize: 26, marginTop: 8, textTransform: "uppercase" }}>{next.name}</span>
+            <span style={{ display: "block", marginTop: 8 }}><DotTitle as="span" tier="card" text={next.name} /></span>
             <span style={{ display: "block", fontSize: 15, color: "var(--ink-mute)", marginTop: 4 }}>{next.tagline}</span>
           </Link>
         )}

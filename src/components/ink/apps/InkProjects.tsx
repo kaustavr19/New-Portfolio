@@ -5,7 +5,8 @@ import { projects, type Project, type ProjectType } from "@/data/content";
 import { parseHash, setHash } from "@/lib/deep-link";
 import { isGated } from "@/lib/site";
 import { InkDossier } from "../blocks";
-import { SectionHead, SegBar, StatTile } from "../ui";
+import { DotTitle, SectionHead, SegBar, StatTile } from "../ui";
+import ProjectCover from "../ProjectCover";
 
 const TABS: { type: ProjectType; label: string; kicker: string }[] = [
   { type: "main", label: "Main", kicker: "Story" },
@@ -31,7 +32,7 @@ function Brief({ p }: { p: Project }) {
     <article style={{ display: "flex", flexDirection: "column", gap: 26 }}>
       <header style={{ display: "flex", justifyContent: "space-between", gap: 20, flexWrap: "wrap" }}>
         <div style={{ minWidth: 0, flex: "1 1 320px" }}>
-          <h3 className="ink-dot-900" style={{ fontSize: "clamp(30px, 6cqi, 48px)", lineHeight: 0.95, textTransform: "uppercase", overflowWrap: "anywhere" }}>{p.name}</h3>
+          <DotTitle as="h3" tier="window" text={p.name} />
           <p style={{ fontSize: 17, marginTop: 12 }}>{p.tagline}</p>
           {p.role && <p className="ink-meta" style={{ marginTop: 8, letterSpacing: ".03em" }}>{p.role}</p>}
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 14 }} aria-label={`Difficulty ${p.stars} of 5`}>
@@ -42,7 +43,8 @@ function Brief({ p }: { p: Project }) {
             <span className="ink-meta" style={{ marginLeft: 10 }}>{p.year}</span>
           </div>
         </div>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-start" }}>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-start", alignContent: "flex-start", flex: "0 1 280px" }}>
+          <ProjectCover project={p} radius={14} style={{ marginBottom: 4 }} />
           {p.featured && <span className="ink-pill">★ Featured</span>}
           {p.live && <a className="ink-pill solid" href={p.live.href} target="_blank" rel="noopener noreferrer">● Live ↗</a>}
           {hasPage && <a className="ink-pill action" href={`/work/${p.id}`}>Read case study →</a>}
@@ -53,7 +55,7 @@ function Brief({ p }: { p: Project }) {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14 }}>
         <div className="ink-raised" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", gap: 16 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
-            <span className="ink-dot-900" style={{ fontSize: 26 }}>{passed ? "MISSION PASSED" : "MISSION ACTIVE"}</span>
+            <span className="ink-dot-900" style={{ fontSize: "var(--dot-m)" }}>{passed ? "MISSION PASSED" : "MISSION ACTIVE"}</span>
             {p.medal ? (
               <span className="ink-label" style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <span aria-hidden style={{ width: 16, height: 16, borderRadius: "50%", border: "1.5px solid var(--ink-fg)", display: "grid", placeItems: "center" }}>
@@ -68,7 +70,7 @@ function Brief({ p }: { p: Project }) {
           <SegBar value={p.completion} segments={40} live={!passed} height={12} label="Completion" />
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <span className="ink-label">Completion</span>
-            <span className="ink-dot" style={{ fontSize: 20 }}>{p.completion}%</span>
+            <span className="ink-dot" style={{ fontSize: "var(--dot-s)" }}>{p.completion}%</span>
           </div>
         </div>
         {p.intel && p.intel.length > 0 && (
@@ -185,7 +187,7 @@ export default function InkProjects() {
         <nav aria-label={`${meta.label} missions`} className="ink-projects-rail ink-scroll">
           <div className="ink-projects-railhead">
             <span className="ink-label">{meta.kicker}</span>
-            <div className="ink-dot-900" style={{ fontSize: 28, marginTop: 4 }}>
+            <div className="ink-dot-900" style={{ fontSize: "var(--dot-m)", marginTop: 4 }}>
               {String(visible.length).padStart(2, "0")} MISSION{visible.length === 1 ? "" : "S"}
             </div>
           </div>
@@ -201,10 +203,10 @@ export default function InkProjects() {
                     className="ink-projects-item"
                     style={{ background: on ? "var(--ink-raised)" : "transparent", outline: on ? "1px solid var(--ink-line-strong)" : "none" }}
                   >
-                    <span className="ink-dot" style={{ fontSize: 17, color: on ? "var(--ink-fg)" : "var(--ink-dim)" }}>{String(i + 1).padStart(2, "0")}</span>
+                    <span className="ink-dot" style={{ fontSize: "var(--dot-s)", color: on ? "var(--ink-fg)" : "var(--ink-dim)" }}>{String(i + 1).padStart(2, "0")}</span>
                     <span style={{ minWidth: 0, textAlign: "left" }}>
                       <span style={{ display: "block", fontSize: 14, lineHeight: 1.3, color: on ? "var(--ink-fg)" : "var(--ink-soft)" }}>{p.name}</span>
-                      <span className="ink-label" style={{ display: "block", fontSize: 9.5, marginTop: 3 }}>
+                      <span className="ink-label" style={{ display: "block", fontSize: 11, marginTop: 3 }}>
                         {p.status}{p.featured ? " · Featured" : ""}
                       </span>
                     </span>

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import type { Project } from "@/data/content";
-import { SectionHead } from "@/components/ink/ui";
+import { DotTitle, SectionHead } from "@/components/ink/ui";
+import ProjectCover from "@/components/ink/ProjectCover";
 import { SITE_URL, caseStudies, consultingProjects, jsonLd, longformProjects, sideProjects } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -37,11 +38,14 @@ const LONGFORM_SECTIONS: { id: string; title: string; intro?: string; items: Pro
 function WorkCard({ p, n }: { p: Project; n: number }) {
   const live = p.status === "IN PROGRESS";
   return (
-    <Link href={`/work/${p.id}`} className="ink-card" style={{ display: "grid", gridTemplateColumns: "40px minmax(0, 1fr)", gap: 14, textDecoration: "none" }}>
-      <span className="ink-dot" style={{ fontSize: 20, color: "var(--ink-dim)" }}>{String(n).padStart(2, "0")}</span>
-      <span>
+    <Link href={`/work/${p.id}`} className="ink-card ink-workcard" style={{ textDecoration: "none" }}>
+      <span className="ink-dot ink-workcard-n" style={{ fontSize: "var(--dot-s)", color: "var(--ink-dim)" }}>{String(n).padStart(2, "0")}</span>
+      <span className="ink-workcard-cover">
+        <ProjectCover project={p} radius={12} />
+      </span>
+      <span className="ink-workcard-body">
         <span className={`ink-label ${live ? "ink-live" : ""}`}>{p.status} · {p.year}</span>
-        <span className="ink-dot-900" style={{ display: "block", fontSize: 26, lineHeight: 1.05, marginTop: 8, textTransform: "uppercase" }}>{p.name}</span>
+        <span style={{ display: "block", marginTop: 8 }}><DotTitle as="span" tier="card" text={p.name} /></span>
         <span style={{ display: "block", fontSize: 16, marginTop: 6 }}>{p.tagline}</span>
         <span className="ink-body" style={{ display: "block", fontSize: 15, marginTop: 8, color: "var(--ink-mute)" }}>{p.description}</span>
         <span className="ink-label ink-blue" style={{ display: "block", marginTop: 12 }}>Read case study →</span>
@@ -56,7 +60,7 @@ export default function WorkIndex() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(collectionJsonLd) }} />
       <header className="flex flex-col gap-3">
         <span className="ink-label">Kaustav Roy · Work</span>
-        <h1 className="ink-dot-900" style={{ fontSize: "clamp(34px, 7vw, 54px)", lineHeight: 1 }}>
+        <h1 className="ink-dot-900" style={{ fontSize: "clamp(var(--dot-m), 7vw, var(--dot-xl))", lineHeight: 1 }}>
           DESIGNING AI PRODUCTS PEOPLE CAN UNDERSTAND, QUESTION, AND TRUST.
         </h1>
         <p className="ink-body" style={{ fontSize: 17 }}>
@@ -86,7 +90,9 @@ export default function WorkIndex() {
         </div>
         <ul style={{ listStyle: "none" }}>
           {sideProjects.map((p) => (
-            <li key={p.id} style={{ padding: "16px 0", borderBottom: "1px solid var(--ink-line)" }}>
+            <li key={p.id} className="ink-sidecard" style={{ padding: "16px 0", borderBottom: "1px solid var(--ink-line)" }}>
+              <ProjectCover project={p} radius={10} />
+              <div style={{ minWidth: 0 }}>
               <h3 style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", gap: "4px 12px", fontSize: 18, fontWeight: 600 }}>
                 {p.github ? (
                   <a href={p.github} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
@@ -98,6 +104,7 @@ export default function WorkIndex() {
                 <span className={`ink-label ${p.status === "IN PROGRESS" ? "ink-live" : ""}`}>{p.status} · {p.year}</span>
               </h3>
               <p className="ink-body" style={{ fontSize: 15, marginTop: 4, color: "var(--ink-mute)" }}>{p.description}</p>
+              </div>
             </li>
           ))}
         </ul>
