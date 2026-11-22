@@ -5,7 +5,7 @@ import { useA11y } from "@/lib/a11y";
 import { useInkScheme } from "@/lib/theme";
 import { KROS_MARK_BOX, KROS_MARK_PATH } from "./KrosMark";
 import { useWeather, type Weather } from "./useWeather";
-import { birdChirp, starTwinkle, thunder, uiThock } from "@/lib/ink-sound";
+import { birdChirp, rainDrop, starTwinkle, thunder, uiThock } from "@/lib/ink-sound";
 
 /* ──────────────────────────────────────────────────────────
    InkOS wallpaper — a dot grid that behaves like an LED matrix.
@@ -15,7 +15,8 @@ import { birdChirp, starTwinkle, thunder, uiThock } from "@/lib/ink-sound";
 
    The scene follows the real Kolkata weather from /api/weather:
    clear days get a dot sun, clouds thicken with cloud cover, rain
-   falls in streaks, nights bring a moon, twinkling stars and the
+   falls in streaks that splash on the glass (each one a drop you
+   hear, panned to where it lands), nights bring a moon, stars and the
    odd shooting star. Birds cross on dry days.
 
    Budget: ~30fps, paused while the tab is hidden, slowed when
@@ -36,7 +37,9 @@ export type LogoBox = { cx: number; cy: number; size: number } | null;
 type Cloud = { x: number; y: number; vx: number; blobs: { dx: number; dy: number; r: number }[]; a: number };
 type Ripple = { x: number; y: number; t0: number };
 type Bird = { x: number; y: number; vx: number; phase: number; scale: number };
-type Streak = { x: number; y: number; vx: number; vy: number; len: number };
+/* Rain streaks carry `end`: the height where the drop meets the glass. */
+type Streak = { x: number; y: number; vx: number; vy: number; len: number; end?: number; landed?: boolean };
+type Splash = { x: number; y: number; t0: number };
 
 const rand = (a: number, b: number) => a + Math.random() * (b - a);
 
@@ -85,6 +88,8 @@ export default function InkWallpaper({ logo = null, dim = 0 }: { logo?: LogoBox;
     let ripples: Ripple[] = [];
     let birds: Bird[] = [];
     let rain: Streak[] = [];
+    let splashes: Splash[] = [];
+    let lastDropSound = 0;
     let shooting: Streak | null = null;
     let nextBird = performance.now() + rand(8_000, 20_000);
     let nextShoot = performance.now() + rand(12_000, 30_000);
@@ -157,6 +162,9 @@ export default function InkWallpaper({ logo = null, dim = 0 }: { logo?: LogoBox;
     let I = new Float32Array(0);
 
     const frame = (now: number, still = false) => {
+      // Zero-size canvas (hidden or not laid out yet): nothing to paint, and
+      // rain must not make sound from a wallpaper nobody can see.
+      if (!W || !H) return;
       const dt = last ? Math.min(0.1, (now - last) / 1000) : 0.033;
       last = now;
       const t = now / 1000;
@@ -267,20 +275,54 @@ export default function InkWallpaper({ logo = null, dim = 0 }: { logo?: LogoBox;
           const want = Math.round((kind === "storm" ? 70 : 45) * quiet);
           // When rain starts, scatter it over the whole sky; after that, new drops enter from the top.
           const seeding = rain.length === 0;
-          while (rain.length < want) rain.push({ x: rand(-100, W + 100), y: seeding ? rand(-H * 0.3, H) : rand(-H * 0.3, 0), vx: -70, vy: rand(380, 460), len: rand(40, 70) });
+          while (rain.length < want) {
+            const y = seeding ? rand(-H * 0.3, H) : rand(-H * 0.3, 0);
+            // Each drop meets the glass somewhere below where it starts.
+            rain.push({ x: rand(-100, W + 100), y, vx: -70, vy: rand(380, 460), len: rand(40, 70), end: rand(Math.max(y + 40, H * 0.3), H * 1.02) });
+          }
           for (const s of rain) {
-            s.x += s.vx * dt;
-            s.y += s.vy * dt;
             const sp = Math.hypot(s.vx, s.vy);
+            if (s.landed) {
+              // Head stays put on the glass; the tail runs into it.
+              s.len -= sp * dt;
+            } else {
+              s.x += s.vx * dt;
+              s.y += s.vy * dt;
+              if (s.end !== undefined && s.y >= s.end) {
+                s.landed = true;
+                s.y = s.end;
+                if (s.x > -10 && s.x < W + 10) {
+                  splashes.push({ x: s.x, y: s.y, t0: now });
+                  // Sound it — but not a machine-gun when a lot land at once.
+                  if (now - lastDropSound > 28) {
+                    lastDropSound = now;
+                    rainDrop(s.x / W, s.y > H * 0.86, rand(0.45, 1) * quiet);
+                  }
+                }
+              }
+            }
             for (let k = 0; k <= s.len; k += PITCH / 2) splat(s.x - (s.vx / sp) * k, s.y - (s.vy / sp) * k, 0.75 * (1 - k / s.len));
           }
-          rain = rain.filter((s) => s.y - s.len < H);
+          rain = rain.filter((s) => (s.landed ? s.len > 0 : s.y - s.len < H));
+          // Splashes: a lit point that spreads sideways and fades (~0.35 s).
+          for (const p of splashes) {
+            const age = (now - p.t0) / 350;
+            const v = (1 - age) * 0.55;
+            const r = 4 + age * 16;
+            splat(p.x, p.y, v);
+            splat(p.x - r, p.y - age * 4, v * 0.45);
+            splat(p.x + r, p.y - age * 4, v * 0.45);
+          }
+          splashes = splashes.filter((p) => now - p.t0 < 350);
           if (kind === "storm" && now > nextFlash) {
             flashUntil = now + 110;
             thunder();
             nextFlash = now + rand(15_000, 40_000);
           }
-        } else rain = [];
+        } else {
+          rain = [];
+          splashes = [];
+        }
 
         // Birds — daytime, dry, every so often; a two-frame flap.
         if (day && !wet && now > nextBird && quiet > 0.4) {
