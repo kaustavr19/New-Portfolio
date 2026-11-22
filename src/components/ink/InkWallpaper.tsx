@@ -142,11 +142,30 @@ export default function InkWallpaper({ logo = null, dim = 0 }: { logo?: LogoBox;
         o.fillStyle = "#fff";
         o.fill(new Path2D(KROS_MARK_PATH));
         const data = o.getImageData(0, 0, W, H).data;
+        const alpha = (x: number, y: number) => {
+          const xi = Math.max(0, Math.min(W - 1, x)) | 0, yi = Math.max(0, Math.min(H - 1, y)) | 0;
+          return data[(yi * W + xi) * 4 + 3] / 255;
+        };
+        // Big mark (desktop): a dot is on if the mark covers its centre.
+        // Small mark (phone): strokes are about as thin as the dot pitch, so
+        // on/off sampling either drops them or fattens them into blobs. Instead
+        // each dot glows by how much of its cell the mark covers (4×4 samples)
+        // — a halftone, so thin strokes stay thin and edges taper.
+        const small = logo.size < 260;
+        const N = 4;
         for (let r = 0; r < rows; r++)
           for (let c = 0; c < cols; c++) {
-            const x = Math.min(W - 1, c * PITCH + PITCH / 2) | 0;
-            const y = Math.min(H - 1, r * PITCH + PITCH / 2) | 0;
-            logoMask[r * cols + c] = data[(y * W + x) * 4 + 3] > 120 ? 1 : 0;
+            const cx = c * PITCH + PITCH / 2, cy = r * PITCH + PITCH / 2;
+            if (!small) {
+              logoMask[r * cols + c] = alpha(cx, cy) > 0.47 ? 1 : 0;
+              continue;
+            }
+            if (Math.abs(cx - logo.cx) > logo.size / 2 + PITCH || Math.abs(cy - logo.cy) > logo.size / 2 + PITCH) continue;
+            let cov = 0;
+            for (let i = 0; i < N; i++)
+              for (let j = 0; j < N; j++) cov += alpha(cx - PITCH / 2 + ((i + 0.5) * PITCH) / N, cy - PITCH / 2 + ((j + 0.5) * PITCH) / N);
+            cov /= N * N;
+            logoMask[r * cols + c] = cov < 0.15 ? 0 : Math.min(1, 0.3 + cov);
           }
       }
 
@@ -192,8 +211,9 @@ export default function InkWallpaper({ logo = null, dim = 0 }: { logo?: LogoBox;
       };
 
       // Logo, breathing gently.
-      const logoV = 0.42 + (still ? 0 : Math.sin(t * 0.8) * 0.06);
-      for (let i = 0; i < logoMask.length; i++) if (logoMask[i]) I[i] += logoV;
+      // A small mark (phone) has few dots to work with, so it sits brighter to read through clouds.
+      const logoV = (logo && logo.size < 260 ? 0.62 : 0.42) + (still ? 0 : Math.sin(t * 0.8) * 0.06);
+      for (let i = 0; i < logoMask.length; i++) if (logoMask[i]) I[i] += logoV * logoMask[i];
 
       // Sun / moon, upper right of the open area.
       const skyX = logo ? Math.min(W - 260, logo.cx + logo.size * 0.75) : W - Math.min(120, W * 0.18);

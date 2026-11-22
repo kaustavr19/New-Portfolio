@@ -221,3 +221,22 @@ html[data-theme="ink"] ::-webkit-scrollbar-thumb { background: var(--ink-scroll)
 .ink-halftone img.wire { filter: grayscale(1) invert(1) contrast(1.05); }
 @media (prefers-color-scheme: light) { html:not([data-ink-mode="dark"]) .ink-halftone img.wire { filter: grayscale(1); } }
 html[data-ink-mode="light"] .ink-halftone img.wire { filter: grayscale(1); }
+
+/* ── Phone home: fits one screen, no scroll. Steps down on short viewports
+      (a phone with browser bars can leave as little as ~550px). ── */
+.ink-home { gap: 12px; }
+.ink-home-apps { gap: 14px 0; }
+.ink-home-icon { width: 58px; height: 58px; }
+@media (max-height: 720px) {
+  .ink-home { gap: 10px; }
+  .ink-home-apps { gap: 10px 0; }
+  .ink-home-icon { width: 50px; height: 50px; }
+}
+@media (max-height: 600px) {
+  .ink-home { gap: 8px; }
+  .ink-home-apps { gap: 8px 0; }
+  .ink-home-icon { width: 44px; height: 44px; }
+}
+.ink-home-ask { margin-top: 22px; }
+@media (max-height: 720px) { .ink-home-ask { margin-top: 18px; } }
+@media (max-height: 600px) { .ink-home-ask { margin-top: 12px; } }
