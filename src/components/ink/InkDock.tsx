@@ -10,6 +10,7 @@ import { useClock } from "./useClock";
 import { SwitchRow } from "./ui";
 import KrosMark from "./KrosMark";
 import InkModePicker from "./InkModePicker";
+import AskBar from "./AskBar";
 
 /* Theme switch — a segmented control; used in the dock menu and Settings. */
 export function ThemePicker() {
@@ -133,8 +134,10 @@ export default function InkDock({
         {menu && <SystemMenu onClose={() => setMenu(false)} onOpenApp={onOpenApp} />}
       </div>
       <span aria-hidden style={{ width: 1, height: 20, background: "var(--ink-line-strong)", margin: "0 4px" }} />
+      <AskBar variant="dock" />
+      <span aria-hidden style={{ width: 1, height: 20, background: "var(--ink-line-strong)", margin: "0 4px" }} />
 
-      {openApps.length === 0 && <span className="ink-meta" style={{ padding: "0 10px" }}>No windows open</span>}
+      {openApps.length === 0 && <span className="ink-meta" style={{ padding: "0 10px", whiteSpace: "nowrap" }}>No windows open</span>}
       {openApps.map(({ id, minimized }) => {
         const app = INK_APPS.find((a) => a.id === id);
         const active = id === focusedApp && !minimized;
@@ -183,7 +186,7 @@ export default function InkDock({
           />
         ))}
       </button>
-      <a href="/Kaustav_Roy_CV.pdf" target="_blank" rel="noopener noreferrer" className="ink-label ink-blue" style={{ padding: "9px 12px", fontSize: 11, textDecoration: "none" }}>
+      <a href="/Kaustav_Roy_CV.pdf" target="_blank" rel="noopener noreferrer" className="ink-label ink-blue" style={{ padding: "9px 12px", fontSize: 11, textDecoration: "none", whiteSpace: "nowrap" }}>
         Resume ↗
       </a>
       <span className="ink-dot" style={{ fontSize: 19, padding: "0 12px 0 6px", minWidth: 70 }} aria-label={t ? `Kolkata time ${t.h}:${t.m}` : undefined}>
