@@ -9,8 +9,8 @@ import { INK_APPS, CITY, CURRENT, cityDate, cityTime } from "./data";
 import { useClock } from "./useClock";
 import { Icon, SegBar } from "./ui";
 import KrosMark from "./KrosMark";
-import InkWallpaper from "./InkWallpaper";
-import { ExperienceTile, WorkMap } from "./widgets";
+import InkWallpaper, { type LogoBox } from "./InkWallpaper";
+import { NowStrip, ProfileHeader } from "./widgets";
 import { useWeather } from "./useWeather";
 import WeatherGlyph from "./WeatherGlyph";
 import { INK_APP_COMPONENTS } from "./apps";
@@ -23,9 +23,25 @@ type View = "lock" | "home" | "app";
 const BOOT_KEY = "kros_booted";
 const isApp = (id?: string) => !!id && desktopIcons.some((ic) => ic.id === id);
 
+/* Installed to the home screen (no browser chrome)? Only then does a fake
+   status bar make sense — in a browser the phone's real one sits right above. */
+function useStandalone() {
+  const [standalone, setStandalone] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(display-mode: standalone)");
+    const update = () => setStandalone(mq.matches || (navigator as Navigator & { standalone?: boolean }).standalone === true);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+  return standalone;
+}
+
 function StatusBar() {
   const now = useClock();
+  const standalone = useStandalone();
   const t = now ? cityTime(now) : null;
+  if (!standalone) return null;
   return (
     <div aria-hidden style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "calc(env(safe-area-inset-top, 0px) + 14px) 24px 6px", flexShrink: 0 }}>
       <span className="ink-dot" style={{ fontSize: 16 }}>{t ? `${t.h}:${t.m}` : ""}</span>
@@ -118,50 +134,65 @@ function LockScreen({ onUnlock }: { onUnlock: () => void }) {
   );
 }
 
-function HomeScreen({ onOpen }: { onOpen: (id: string) => void }) {
+function HomeScreen({ onOpen, onLogoArea }: { onOpen: (id: string) => void; onLogoArea: (box: LogoBox) => void }) {
   const openAt = (id: string, sub?: string) => {
     if (sub) window.history.replaceState(null, "", `#${id}/${sub}`);
     onOpen(id);
   };
-  return (
-    <div className="ink-scroll" style={{ flex: 1, padding: "10px 18px calc(env(safe-area-inset-bottom, 0px) + 26px)", display: "flex", flexDirection: "column", gap: 14 }}>
-      <h1 className="sr-only">KR//OS home</h1>
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)", gap: 12, alignItems: "start" }}>
-        <button type="button" onClick={() => onOpen("about")} className="ink-card" style={{ gridColumn: "span 2", display: "flex", justifyContent: "space-between", alignItems: "flex-end", textAlign: "left", borderRadius: 26 }}>
-          <span>
-            <span className="ink-label">{profile.name}</span>
-            <span style={{ display: "block", fontSize: 15, marginTop: 8, lineHeight: 1.4 }}>
-              {profile.designation}
-              <br />
-              <span style={{ color: "var(--ink-mute)" }}>AI · Enterprise UX</span>
-            </span>
-          </span>
-          <span style={{ color: "var(--ink-fg)" }}><KrosMark size={52} /></span>
-        </button>
-        <div style={{ minWidth: 0 }}>
-          <WorkMap onOpenApp={openAt} compact />
-        </div>
-        <ExperienceTile onOpenApp={openAt} round />
-      </div>
+  const gapRef = useRef<HTMLDivElement>(null);
 
-      <nav aria-label="Apps" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "16px 0", marginTop: 4 }}>
+  // The open middle of the screen is where the wallpaper draws a small KR
+  // monogram — measured, so it stays centred in whatever room the phone leaves.
+  useEffect(() => {
+    const el = gapRef.current;
+    if (!el) return;
+    const measure = () => {
+      const r = el.getBoundingClientRect();
+      const size = Math.round(Math.min(r.height * 0.84, r.width * 0.52, 190));
+      onLogoArea(size > 40 ? { cx: Math.round(r.left + r.width / 2), cy: Math.round(r.top + r.height / 2), size } : null);
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => {
+      ro.disconnect();
+      onLogoArea(null);
+    };
+  }, [onLogoArea]);
+
+  /* One screen, no scroll: widgets up top, the wallpaper (and its monogram)
+     shows through the middle, apps + the Ask bar sit low where the thumb is.
+     Sizes step down on short screens (ink.css · .ink-home). Overflow stays
+     scrollable only as a last resort (landscape, huge text). */
+  return (
+    <div className="ink-home ink-scroll" style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", padding: "12px 16px calc(env(safe-area-inset-bottom, 0px) + 16px)" }}>
+      <h1 className="sr-only">KR//OS home</h1>
+      <ProfileHeader onOpenApp={openAt} />
+      <NowStrip onOpenApp={openAt} />
+
+      <div ref={gapRef} aria-hidden style={{ flex: 1, minHeight: 0 }} />
+
+      <nav aria-label="Apps" className="ink-home-apps" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)" }}>
         {INK_APPS.map((a) => (
-          <button key={a.id} type="button" onClick={() => onOpen(a.id)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 7 }}>
-            <span style={{ width: 58, height: 58, borderRadius: "50%", background: "var(--ink-raised)", border: "1px solid var(--ink-line)", display: "grid", placeItems: "center", position: "relative" }}>
-              <Icon name={a.id} size={24} />
+          <button key={a.id} type="button" onClick={() => onOpen(a.id)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+            <span className="ink-home-icon" style={{ borderRadius: "50%", background: "var(--ink-raised)", border: "1px solid var(--ink-line)", display: "grid", placeItems: "center" }}>
+              <Icon name={a.id} size={22} />
             </span>
             <span style={{ fontSize: 11, color: "var(--ink-soft)" }}>{a.name}</span>
           </button>
         ))}
-        <a href="/Kaustav_Roy_CV.pdf" target="_blank" rel="noopener noreferrer" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 7, textDecoration: "none" }}>
-          <span style={{ width: 58, height: 58, borderRadius: "50%", border: "1px solid var(--ink-blue-soft)", display: "grid", placeItems: "center", color: "var(--ink-blue)" }}>
-            <Icon name="resume" size={24} />
+        <a href="/Kaustav_Roy_CV.pdf" target="_blank" rel="noopener noreferrer" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, textDecoration: "none" }}>
+          <span className="ink-home-icon" style={{ borderRadius: "50%", border: "1px solid var(--ink-blue-soft)", display: "grid", placeItems: "center", color: "var(--ink-blue)" }}>
+            <Icon name="resume" size={22} />
           </span>
           <span className="ink-blue" style={{ fontSize: 11 }}>Resume</span>
         </a>
       </nav>
 
-      <AskBar variant="mobile" />
+      {/* Extra air between the app grid and the Ask bar, so it reads as its own control. */}
+      <div className="ink-home-ask">
+        <AskBar variant="mobile" />
+      </div>
     </div>
   );
 }
@@ -169,6 +200,7 @@ function HomeScreen({ onOpen }: { onOpen: (id: string) => void }) {
 export default function InkMobile() {
   const [view, setView] = useState<View>("lock");
   const [app, setApp] = useState<string | null>(null);
+  const [logo, setLogo] = useState<LogoBox>(null);
   const { motionReduced } = useA11y();
   const target = useRef(parseHash());
 
@@ -214,11 +246,11 @@ export default function InkMobile() {
 
   return (
     <div className={`ink fixed inset-0 flex flex-col ${motionReduced ? "ink-motion-off" : ""}`} style={{ background: "var(--ink-bg)" }}>
-      {view !== "app" && <InkWallpaper dim={view === "home" ? 0.5 : 0} />}
+      {view !== "app" && <InkWallpaper logo={view === "home" ? logo : null} dim={view === "home" ? 0.5 : 0} />}
       <div style={{ position: "relative", flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
         <StatusBar />
         {view === "lock" && <LockScreen onUnlock={unlock} />}
-        {view === "home" && <HomeScreen onOpen={open} />}
+        {view === "home" && <HomeScreen onOpen={open} onLogoArea={setLogo} />}
         {view === "app" && meta && Comp && (
           <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", animation: motionReduced ? undefined : "ink-in .18s ease-out" }}>
             <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 16px 12px", borderBottom: "1px solid var(--ink-line)" }}>

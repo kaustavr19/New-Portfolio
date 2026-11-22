@@ -33,6 +33,10 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
+  /* Tells browsers the site has its own light AND dark designs, so
+     Samsung Internet / Chrome "dark mode for websites" leave it alone
+     instead of auto-darkening the light theme into muddy greys. */
+  colorScheme: "light dark",
 };
 
 export default function RootLayout({

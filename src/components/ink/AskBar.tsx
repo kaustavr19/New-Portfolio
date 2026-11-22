@@ -198,7 +198,7 @@ export default function AskBar({ variant }: { variant: "dock" | "mobile" }) {
   }
 
   return (
-    <div ref={rootRef} style={{ position: "relative", marginTop: "auto" }}>
+    <div ref={rootRef} style={{ position: "relative" }}>
       {card}
       <form
         onSubmit={(e) => {

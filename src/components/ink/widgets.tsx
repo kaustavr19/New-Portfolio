@@ -58,24 +58,18 @@ export function StatusTile() {
 }
 
 /* Years of experience, computed from CAREER_START (internship included). */
-export function ExperienceTile({ onOpenApp, round = false }: { onOpenApp: OpenApp; round?: boolean }) {
+export function ExperienceTile({ onOpenApp }: { onOpenApp: OpenApp }) {
   const yrs = yearsSince(CAREER_START);
   return (
-    <button
-      type="button"
-      className="ink-card"
-      onClick={() => onOpenApp("experience")}
-      aria-label={`${yrs} years of experience — open Experience`}
-      style={round ? { aspectRatio: "1", borderRadius: "50%", display: "grid", placeItems: "center", textAlign: "center" } : { textAlign: "left" }}
-    >
+    <button type="button" className="ink-card" onClick={() => onOpenApp("experience")} aria-label={`${yrs} years of experience — open Experience`} style={{ textAlign: "left" }}>
       <span>
-        {!round && <span className="ink-label" style={{ display: "block" }}>Experience</span>}
-        <span className="ink-dot-900" style={{ display: "block", fontSize: round ? 38 : 36, lineHeight: 1, marginTop: round ? 0 : 10, whiteSpace: "nowrap" }}>
+        <span className="ink-label" style={{ display: "block" }}>Experience</span>
+        <span className="ink-dot-900" style={{ display: "block", fontSize: 36, lineHeight: 1, marginTop: 10, whiteSpace: "nowrap" }}>
           {yrs}
           <span style={{ fontSize: 14 }}> YRS</span>
         </span>
         <span className="ink-meta" style={{ display: "block", marginTop: 6 }}>
-          {round ? "experience" : `since ${MONTHS[CAREER_START.month - 1]} ${CAREER_START.year} · ${chapters.length} companies`}
+          {`since ${MONTHS[CAREER_START.month - 1]} ${CAREER_START.year} · ${chapters.length} companies`}
         </span>
       </span>
     </button>
@@ -90,11 +84,11 @@ const TYPES: { type: Project["type"]; label: string }[] = [
 
 /* Every project as one dot: filled = main mission, ring = contract,
    small = side project, blinking red = in progress. */
-export function WorkMap({ onOpenApp, compact = false }: { onOpenApp: OpenApp; compact?: boolean }) {
+export function WorkMap({ onOpenApp }: { onOpenApp: OpenApp }) {
   const ordered = TYPES.flatMap((t) => projects.filter((p) => p.type === t.type));
-  const size = compact ? 18 : 22;
+  const size = 22;
   return (
-    <div className="ink-card" style={{ display: "flex", flexDirection: "column", gap: compact ? 10 : 14, padding: compact ? "14px 14px" : undefined, borderRadius: compact ? 26 : undefined }}>
+    <div className="ink-card" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <span className="ink-label">Work map</span>
         <button type="button" className="ink-meta ink-blue" onClick={() => onOpenApp("projects")}>all →</button>
@@ -124,9 +118,9 @@ export function WorkMap({ onOpenApp, compact = false }: { onOpenApp: OpenApp; co
           );
         })}
       </ul>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: compact ? "2px 8px" : 8, flexWrap: "wrap" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
         {TYPES.map((t) => (
-          <span key={t.type} className="ink-meta" style={{ whiteSpace: "nowrap", fontSize: compact ? 10 : undefined }}>
+          <span key={t.type} className="ink-meta" style={{ whiteSpace: "nowrap" }}>
             <b className="ink-dot" style={{ fontSize: 15, color: "var(--ink-fg)" }}>{projects.filter((p) => p.type === t.type).length}</b> {t.label}
           </span>
         ))}
@@ -153,5 +147,72 @@ export function CurrentlyCard({ onOpenApp }: { onOpenApp: OpenApp }) {
         <span className="ink-meta">{p.completion}%</span>
       </span>
     </button>
+  );
+}
+
+/* ── Phone home: compact widgets, sized so the home screen fits one screen ── */
+
+/* Name, role and years in one row. Left half → About, right half → Experience. */
+export function ProfileHeader({ onOpenApp }: { onOpenApp: OpenApp }) {
+  const yrs = yearsSince(CAREER_START);
+  return (
+    <div className="ink-card" style={{ display: "flex", alignItems: "stretch", padding: 0, borderRadius: 24, overflow: "hidden" }}>
+      <button type="button" onClick={() => onOpenApp("about")} style={{ flex: 1, minWidth: 0, textAlign: "left", padding: "14px 16px 14px 18px" }} aria-label={`${profile.name}, ${profile.designation} — open About`}>
+        <span className="ink-label" style={{ display: "block" }}>{profile.name}</span>
+        <span style={{ display: "block", fontSize: 15, marginTop: 6, lineHeight: 1.3 }}>{profile.designation}</span>
+        <span className="ink-meta" style={{ display: "block", fontSize: 12, marginTop: 2 }}>AI · Enterprise UX</span>
+      </button>
+      <span aria-hidden style={{ width: 1, background: "var(--ink-line)", margin: "12px 0" }} />
+      <button type="button" onClick={() => onOpenApp("experience")} style={{ padding: "12px 18px", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }} aria-label={`${yrs} years of experience — open Experience`}>
+        <span className="ink-dot-900" style={{ fontSize: 30, lineHeight: 1, whiteSpace: "nowrap" }}>
+          {yrs}
+          <span style={{ fontSize: 12 }}> YRS</span>
+        </span>
+        <span className="ink-meta" style={{ fontSize: 10, marginTop: 4 }}>experience</span>
+      </button>
+    </div>
+  );
+}
+
+/* What he's on right now, plus every project as one dot on a single line
+   (filled = main, ring = contract, small = side, blinking red = live). */
+export function NowStrip({ onOpenApp }: { onOpenApp: OpenApp }) {
+  const p = CURRENT.project;
+  const ordered = TYPES.flatMap((t) => projects.filter((x) => x.type === t.type));
+  const counts = TYPES.map((t) => `${projects.filter((x) => x.type === t.type).length} ${t.label.toLowerCase()}`).join(", ");
+  return (
+    <div className="ink-card" style={{ padding: "12px 16px 12px 18px", borderRadius: 24, display: "flex", flexDirection: "column", gap: 10 }}>
+      {p && (
+        <button type="button" onClick={() => onOpenApp("projects", p.id)} style={{ display: "flex", alignItems: "center", gap: 10, textAlign: "left" }} aria-label={`Now: ${p.name}, ${p.completion}% — open project`}>
+          <span className="ink-label ink-live" style={{ flexShrink: 0 }}>Now</span>
+          <span style={{ flex: 1, minWidth: 0, fontSize: 14, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</span>
+          <span className="ink-meta" style={{ flexShrink: 0 }}>{p.completion}%</span>
+        </button>
+      )}
+      <button type="button" onClick={() => onOpenApp("projects")} style={{ display: "flex", alignItems: "center", gap: 12 }} aria-label={`All ${projects.length} projects: ${counts} — open Projects`}>
+        <span aria-hidden style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 4 }}>
+          {ordered.map((x) => {
+            const live = x.status === "IN PROGRESS";
+            const d = x.type === "side" ? 6 : 11;
+            return (
+              <i
+                key={x.id}
+                className={live ? "ink-workdot live" : undefined}
+                style={{
+                  width: d,
+                  height: d,
+                  flexShrink: 0,
+                  borderRadius: "50%",
+                  background: live ? "var(--ink-red)" : x.type === "consulting" ? "transparent" : "var(--ink-fg)",
+                  border: x.type === "consulting" && !live ? "1.5px solid var(--ink-fg)" : 0,
+                  opacity: x.type === "side" && !live ? 0.75 : 1,
+                }}
+              />
+            );
+          })}
+        </span>
+        <span className="ink-meta ink-blue" style={{ flexShrink: 0, whiteSpace: "nowrap" }}>{projects.length} projects →</span>
+      </button>
+    </div>
   );
 }
