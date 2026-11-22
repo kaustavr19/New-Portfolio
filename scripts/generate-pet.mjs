@@ -329,6 +329,59 @@ function rollPose(o = {}) {
   };
 }
 
+/* Moving between perches (dock ↔ windows). All are variations on the stand pose. */
+const shift = (pt, dx, dy) => [pt[0] + dx, pt[1] + dy];
+
+/* Crouched to spring, or absorbing a landing: everything low, knees bent. */
+function crouchPose() {
+  const p = standPose(0);
+  p.body = { ...p.body, cy: p.body.cy + 2.2, rot: 0.06 };
+  p.chest = { ...p.chest, cy: p.chest.cy + 2.4 };
+  const cy = p.body.cy;
+  p.belly = (x) => cy + 1.6 - (x - 15) * 0.04;
+  p.neck = [20.4, 14.6, 22.6, 12.0, 3.2];
+  p.head = { ...p.head, y: p.head.y + 2.8, flipEar: -0.5 };
+  p.legs = p.legs.map((l) => ({ ...l, hip: shift(l.hip, 0, 2.2), knee: [l.knee[0] + (l.front ? -1.6 : 1.6), 20.4] }));
+  p.tail = { ...p.tail, p0: shift(p.tail.p0, 0, 2.2), p1: shift(p.tail.p1, 1, 4.4), p2: shift(p.tail.p2, -1, 5.4) };
+  return p;
+}
+
+/* Mid-air: stretched out, front paws reaching, back legs trailing, tail streaming. */
+function leapPose() {
+  const p = standPose(0);
+  p.body = { cx: 15.8, cy: 11.6, rx: 8.2, ry: 3.5, rot: -0.16 };
+  p.chest = { cx: 22.4, cy: 11.4, rx: 2.8, ry: 3.0 };
+  p.belly = (x) => 12.8 - (x - 15) * 0.16;
+  p.neck = [20.8, 10.0, 23.2, 7.2, 3.0];
+  p.head = { ...p.head, x: 25.0, y: 6.0, tilt: -0.12, flipEar: -0.8 };
+  p.legs = [
+    { hip: [9.6, 13.0], knee: [6.4, 15.6], paw: [3.2, 17.4], near: false, front: false },
+    { hip: [19.6, 13.0], knee: [23.0, 14.8], paw: [26.4, 15.2], near: false, front: true },
+    { hip: [11.2, 13.4], knee: [8.0, 16.4], paw: [4.8, 18.4], near: true, front: false },
+    { hip: [20.8, 13.4], knee: [24.2, 15.6], paw: [27.6, 16.2], near: true, front: true },
+  ];
+  p.tail = { p0: [8.8, 10.4], p1: [4.0, 8.6], p2: [0.6, 8.0], r: 2.2, under: "down" };
+  return p;
+}
+
+/* Riding a window that's being dragged: low, legs braced wide, ears back. */
+function holdPose() {
+  const p = crouchPose();
+  p.legs = p.legs.map((l) => ({ ...l, paw: [l.paw[0] + (l.front ? 2.2 : -2.2), l.paw[1]], knee: [l.knee[0] + (l.front ? 1.2 : -1.2), l.knee[1]] }));
+  p.head = { ...p.head, flipEar: -1.1, eyes: "closed" };
+  p.tail = { ...p.tail, p1: shift(p.tail.p1, 2, 2), p2: shift(p.tail.p2, 1, 4) };
+  return p;
+}
+
+/* Shaking it off after the ride: head and tail whip side to side. */
+function shakePose(side) {
+  const p = standPose(0);
+  p.body = { ...p.body, cx: p.body.cx + side * 0.5 };
+  p.head = { ...p.head, tilt: side * 0.35, y: p.head.y + 0.4, eyes: "closed", flipEar: side * 0.8 };
+  p.tail = { ...p.tail, p1: shift(p.tail.p1, side * 1.8, 0), p2: shift(p.tail.p2, side * 2.4, -side * 0.6) };
+  return p;
+}
+
 /* Sit-down frames tween the stand and sit poses. The stand pose has a
    belly function and the sit pose doesn't, so tweens use the stand's. */
 const tween = (t) => ({ ...lerpObj(standPose(0), { ...sitPose(), belly: null }, t), belly: null });
@@ -357,6 +410,12 @@ function buildFrames() {
   f.howl1 = render(sitPose({ eyes: "closed", tilt: -0.6, dy: -1.0, dx: -0.6, mouth: 1 }));
   f.roll0 = render(rollPose({ kick: 0 }));
   f.roll1 = render(rollPose({ kick: 1, mouth: 1 }));
+  // moving between perches
+  f.crouch = render(crouchPose());
+  f.leap = render(leapPose());
+  f.hold = render(holdPose());
+  f.shakeL = render(shakePose(-1));
+  f.shakeR = render(shakePose(1));
   f.sleep0 = render(sleepPose({ breath: 0 }));
   f.sleep1 = render(sleepPose({ breath: 1 }));
   return f;

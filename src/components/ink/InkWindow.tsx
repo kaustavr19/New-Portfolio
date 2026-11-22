@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useA11y } from "@/lib/a11y";
 import { uiClose, uiTick } from "@/lib/ink-sound";
 import { WindowFocusContext } from "@/components/os/Window";
+import { usePerch } from "./pet/perches";
 
 /* InkOS window — rounded black panel, hairline border, three outline
    controls (close is the red one), and a light bar on the top edge
@@ -55,6 +56,8 @@ export default function InkWindow({
   const [maximized, setMaximized] = useState(false);
   const [dragging, setDragging] = useState(false);
   const offset = useRef({ x: 0, y: 0 });
+  const sectionRef = useRef<HTMLElement>(null);
+  usePerch(`window:${id}`, "window", sectionRef, { active: isOpen && !isMinimized, focused: isFocused, maximized });
 
   // Opening a window sends a ripple through the wallpaper from its centre.
   useEffect(() => {
@@ -100,6 +103,7 @@ export default function InkWindow({
     <AnimatePresence>
       {isOpen && !isMinimized && (
         <motion.section
+          ref={sectionRef}
           key={id}
           role="dialog"
           aria-label={title}
