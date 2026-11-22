@@ -44,7 +44,7 @@ function StatusBar() {
   if (!standalone) return null;
   return (
     <div aria-hidden style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "calc(env(safe-area-inset-top, 0px) + 14px) 24px 6px", flexShrink: 0 }}>
-      <span className="ink-dot" style={{ fontSize: 16 }}>{t ? `${t.h}:${t.m}` : ""}</span>
+      <span className="ink-dot" style={{ fontSize: "var(--dot-xs)" }}>{t ? `${t.h}:${t.m}` : ""}</span>
       <span style={{ display: "flex", gap: 8, alignItems: "center" }}>
         <span style={{ display: "flex", gap: 3, alignItems: "flex-end" }}>
           {[5, 8, 11, 11].map((h, i) => <i key={i} style={{ width: 3, height: h, borderRadius: 1, background: i === 3 ? "var(--ink-dim)" : "var(--ink-fg)" }} />)}
@@ -77,7 +77,7 @@ function LockScreen({ onUnlock }: { onUnlock: () => void }) {
       <h1 className="sr-only">KR//OS — {profile.name}</h1>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 18 }}>
         <KrosMark size={18} />
-        <span className="ink-dot-900" style={{ fontSize: 16 }}>KR//OS</span>
+        <span className="ink-dot-900" style={{ fontSize: "var(--dot-xs)" }}>KR//OS</span>
       </div>
       <div className="ink-dot-900" style={{ fontSize: "min(38vw, 160px)", lineHeight: 0.82, letterSpacing: "-.02em" }} aria-label={t ? `${CITY} time ${t.h}:${t.m}` : undefined}>
         {t ? t.h : "--"}
@@ -265,7 +265,7 @@ export default function InkMobile() {
               >
                 <Icon name="back" size={16} />
               </button>
-              <h2 className="ink-dot-900" style={{ fontSize: 24, textTransform: "uppercase" }}>{meta.name}</h2>
+              <h2 className="ink-dot-900" style={{ fontSize: "var(--dot-m)", textTransform: "uppercase" }}>{meta.name}</h2>
               <span className="ink-label" aria-hidden>{meta.index}</span>
             </header>
             <main style={{ flex: 1, minHeight: 0 }}>

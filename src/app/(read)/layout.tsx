@@ -23,7 +23,7 @@ export default function ReadLayout({ children }: { children: React.ReactNode }) 
         style={{ padding: "14px clamp(16px, 4vw, 28px)", borderBottom: "1px solid var(--ink-line)" }}
       >
         <nav aria-label="Primary" className="flex items-center gap-5">
-          <Link href="/" className="ink-dot-900" style={{ fontSize: 18, textDecoration: "none", display: "flex", alignItems: "center", gap: 8 }}>
+          <Link href="/" className="ink-dot-900" style={{ fontSize: "var(--dot-s)", textDecoration: "none", display: "flex", alignItems: "center", gap: 8 }}>
             <KrosMark size={18} />
             KR//OS
           </Link>
@@ -45,7 +45,7 @@ export default function ReadLayout({ children }: { children: React.ReactNode }) 
           <footer className="ink-card" style={{ padding: 28, position: "relative", overflow: "hidden" }}>
             <span aria-hidden className="ink-glyph" />
             <span className="ink-label ink-live">Next step</span>
-            <h2 className="ink-dot-900" style={{ fontSize: 30, lineHeight: 1.05, margin: "12px 0 8px" }}>
+            <h2 className="ink-dot-900" style={{ fontSize: "var(--dot-m)", lineHeight: 1.05, margin: "12px 0 8px" }}>
               SEEN ENOUGH TO START A CONVERSATION?
             </h2>
             <p className="ink-body">Send a role, product brief, or difficult workflow. A little context is enough.</p>

@@ -58,7 +58,7 @@ export function InkBlock({ block }: { block: ProjectBlock }) {
       return (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 10 }}>
           {block.items.map((s) => (
-            <StatTile key={s.label} value={s.value} label={s.sub ? `${s.label} · ${s.sub}` : s.label} size={28} />
+            <StatTile key={s.label} value={s.value} label={s.sub ? `${s.label} · ${s.sub}` : s.label} size="m" />
           ))}
         </div>
       );
@@ -67,7 +67,7 @@ export function InkBlock({ block }: { block: ProjectBlock }) {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
           {block.items.map((p) => (
             <div key={p.title} className="ink-raised">
-              <div className="ink-dot-900" style={{ fontSize: 20 }}>{p.title}</div>
+              <div className="ink-dot-900" style={{ fontSize: "var(--dot-s)" }}>{p.title}</div>
               <div style={{ fontSize: 13.5, lineHeight: 1.55, color: "var(--ink-soft)", marginTop: 6 }}>{p.sub}</div>
             </div>
           ))}

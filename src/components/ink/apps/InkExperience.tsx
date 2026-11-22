@@ -11,7 +11,7 @@ export default function InkExperience() {
       <div style={{ padding: "clamp(20px, 3cqi, 36px)", display: "flex", flexDirection: "column", gap: 10 }}>
         <header style={{ marginBottom: 18 }}>
           <span className="ink-label">Timeline · {chapters.reduce((n, c) => n + c.missions.length, 0)} roles across {chapters.length} companies</span>
-          <h3 className="ink-dot-900" style={{ fontSize: "clamp(30px, 5cqi, 44px)", lineHeight: 1, marginTop: 8 }}>EXPERIENCE</h3>
+          <h3 className="ink-dot-900" style={{ fontSize: "clamp(var(--dot-m), 5cqi, var(--dot-l))", lineHeight: 1, marginTop: 8 }}>EXPERIENCE</h3>
         </header>
 
         <ol style={{ listStyle: "none", position: "relative" }}>
@@ -20,7 +20,7 @@ export default function InkExperience() {
             <li key={c.id} style={{ position: "relative", paddingLeft: 36, paddingBottom: 30 }}>
               <span aria-hidden className={`ink-status ${c.status === "in_progress" ? "live" : ""}`} style={{ position: "absolute", left: 1, top: 10, width: 13, height: 13, background: c.status === "in_progress" ? undefined : "var(--ink-bg)" }} />
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 14, flexWrap: "wrap" }}>
-                <h4 className="ink-dot-900" style={{ fontSize: 30, lineHeight: 1 }}>{c.title}</h4>
+                <h4 className="ink-dot-900" style={{ fontSize: "var(--dot-m)", lineHeight: 1 }}>{c.title}</h4>
                 <span className="ink-meta">{c.period} · {c.duration}</span>
               </div>
 

@@ -24,7 +24,7 @@ export function ClockCard() {
         <span className="ink-label">{CITY}</span>
         <span className="ink-label">{now ? cityDate(now) : ""}</span>
       </div>
-      <div className="ink-dot-900" style={{ fontSize: 58, lineHeight: 0.9, textAlign: "center", padding: "10px 0 6px" }} aria-label={t ? `${CITY} time ${t.h}:${t.m}` : undefined}>
+      <div className="ink-dot-900" style={{ fontSize: "var(--dot-xl)", lineHeight: 0.9, textAlign: "center", padding: "10px 0 6px" }} aria-label={t ? `${CITY} time ${t.h}:${t.m}` : undefined}>
         {t ? t.h : "--"}
         <span className={`ink-red ${motionReduced ? "" : "ink-blinker"}`}>:</span>
         {t ? t.m : "--"}
@@ -34,7 +34,7 @@ export function ClockCard() {
           <>
             <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <WeatherGlyph kind={w.kind} isDay={w.isDay} size={22} />
-              <span className="ink-dot" style={{ fontSize: 22 }}>{w.temp}°</span>
+              <span className="ink-dot" style={{ fontSize: "var(--dot-s)" }}>{w.temp}°</span>
               <span className="ink-label" style={{ color: "var(--ink-fg)" }}>{w.label}</span>
             </span>
             <span className="ink-meta">H{w.high} · L{w.low}</span>
@@ -51,7 +51,7 @@ export function StatusTile() {
   return (
     <div className="ink-card">
       <span className="ink-label">Status</span>
-      <div className="ink-dot-900" style={{ fontSize: 24, marginTop: 14 }}>{profile.status}</div>
+      <div className="ink-dot-900" style={{ fontSize: "var(--dot-m)", marginTop: 14 }}>{profile.status}</div>
       <div className="ink-meta" style={{ marginTop: 6 }}>{profile.unit} · online</div>
     </div>
   );
@@ -64,7 +64,7 @@ export function ExperienceTile({ onOpenApp }: { onOpenApp: OpenApp }) {
     <button type="button" className="ink-card" onClick={() => onOpenApp("experience")} aria-label={`${yrs} years of experience — open Experience`} style={{ textAlign: "left" }}>
       <span>
         <span className="ink-label" style={{ display: "block" }}>Experience</span>
-        <span className="ink-dot-900" style={{ display: "block", fontSize: 36, lineHeight: 1, marginTop: 10, whiteSpace: "nowrap" }}>
+        <span className="ink-dot-900" style={{ display: "block", fontSize: "var(--dot-l)", lineHeight: 1, marginTop: 10, whiteSpace: "nowrap" }}>
           {yrs}
           <span style={{ fontSize: 14 }}> YRS</span>
         </span>
@@ -121,7 +121,7 @@ export function WorkMap({ onOpenApp }: { onOpenApp: OpenApp }) {
       <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
         {TYPES.map((t) => (
           <span key={t.type} className="ink-meta" style={{ whiteSpace: "nowrap" }}>
-            <b className="ink-dot" style={{ fontSize: 15, color: "var(--ink-fg)" }}>{projects.filter((p) => p.type === t.type).length}</b> {t.label}
+            <b className="ink-dot" style={{ fontSize: "var(--dot-xs)", color: "var(--ink-fg)" }}>{projects.filter((p) => p.type === t.type).length}</b> {t.label}
           </span>
         ))}
       </div>
@@ -164,11 +164,11 @@ export function ProfileHeader({ onOpenApp }: { onOpenApp: OpenApp }) {
       </button>
       <span aria-hidden style={{ width: 1, background: "var(--ink-line)", margin: "12px 0" }} />
       <button type="button" onClick={() => onOpenApp("experience")} style={{ padding: "12px 18px", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }} aria-label={`${yrs} years of experience — open Experience`}>
-        <span className="ink-dot-900" style={{ fontSize: 30, lineHeight: 1, whiteSpace: "nowrap" }}>
+        <span className="ink-dot-900" style={{ fontSize: "var(--dot-m)", lineHeight: 1, whiteSpace: "nowrap" }}>
           {yrs}
           <span style={{ fontSize: 12 }}> YRS</span>
         </span>
-        <span className="ink-meta" style={{ fontSize: 10, marginTop: 4 }}>experience</span>
+        <span className="ink-meta" style={{ fontSize: 11, marginTop: 4 }}>experience</span>
       </button>
     </div>
   );

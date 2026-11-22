@@ -55,7 +55,7 @@ function SystemMenu({ onClose, onOpenApp }: { onClose: () => void; onOpenApp: (i
       style={{ position: "absolute", bottom: "calc(100% + 12px)", left: 0, width: 340, padding: 20, display: "flex", flexDirection: "column", gap: 18, boxShadow: "var(--ink-shadow)", animation: "ink-in .16s ease-out" }}
     >
       <div>
-        <div className="ink-dot-900" style={{ fontSize: 26, display: "flex", alignItems: "center", gap: 10 }}><KrosMark size={24} />KR//OS</div>
+        <div className="ink-dot-900" style={{ fontSize: "var(--dot-m)", display: "flex", alignItems: "center", gap: 10 }}><KrosMark size={24} />KR//OS</div>
         <div className="ink-meta">Kaustav Roy · portfolio system</div>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -189,7 +189,7 @@ export default function InkDock({
       <a href="/Kaustav_Roy_CV.pdf" target="_blank" rel="noopener noreferrer" className="ink-label ink-blue" style={{ padding: "9px 12px", fontSize: 11, textDecoration: "none", whiteSpace: "nowrap" }}>
         Resume ↗
       </a>
-      <span className="ink-dot" style={{ fontSize: 19, padding: "0 12px 0 6px", minWidth: 70 }} aria-label={t ? `Kolkata time ${t.h}:${t.m}` : undefined}>
+      <span className="ink-dot" style={{ fontSize: "var(--dot-s)", padding: "0 12px 0 6px", minWidth: 70 }} aria-label={t ? `Kolkata time ${t.h}:${t.m}` : undefined}>
         {t ? (
           <>
             {t.h}

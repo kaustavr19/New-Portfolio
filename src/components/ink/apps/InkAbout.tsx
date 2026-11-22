@@ -49,7 +49,7 @@ export default function InkAbout() {
         <aside className="ink-split-side">
           <Avatar />
           <div style={{ textAlign: "center" }}>
-            <h3 className="ink-dot-900" style={{ fontSize: 30, lineHeight: 1 }}>{profile.name.toUpperCase()}</h3>
+            <h3 className="ink-dot-900" style={{ fontSize: "var(--dot-m)", lineHeight: 1 }}>{profile.name.toUpperCase()}</h3>
             <div className="ink-meta" style={{ marginTop: 6 }}>{profile.unit} · {profile.tagline}</div>
           </div>
           <span className="ink-label" style={{ alignSelf: "center", border: "1px solid var(--ink-line-strong)", borderRadius: 999, padding: "6px 12px", color: "var(--ink-fg)", whiteSpace: "nowrap" }}>
@@ -93,7 +93,7 @@ export default function InkAbout() {
                 <li key={c.label} style={{ display: "grid", gridTemplateColumns: "minmax(150px, 220px) minmax(0, 1fr) 38px", alignItems: "center", gap: 14, padding: "7px 0" }}>
                   <span style={{ fontSize: 14 }}>{c.label}</span>
                   <SegBar value={c.value} label={c.label} />
-                  <span className="ink-dot" style={{ fontSize: 17, textAlign: "right" }}>{c.value}</span>
+                  <span className="ink-dot" style={{ fontSize: "var(--dot-s)", textAlign: "right" }}>{c.value}</span>
                 </li>
               ))}
             </ul>
@@ -107,7 +107,7 @@ export default function InkAbout() {
                 <div className="ink-meta" style={{ marginTop: 4 }}>{education.institution} · {education.period}</div>
               </div>
               <div style={{ textAlign: "right" }}>
-                <div className="ink-dot-900" style={{ fontSize: 26 }}>{education.cgpa.split(" ")[0]}</div>
+                <div className="ink-dot-900" style={{ fontSize: "var(--dot-m)" }}>{education.cgpa.split(" ")[0]}</div>
                 <div className="ink-label">CGPA / 10</div>
               </div>
             </div>
@@ -122,7 +122,7 @@ export default function InkAbout() {
                     <span style={{ display: "block", fontSize: 14 }}>{a.title}</span>
                     <span className="ink-label" style={{ display: "block", marginTop: 4 }}>{a.org}</span>
                   </span>
-                  <span className="ink-dot" style={{ fontSize: 15, whiteSpace: "nowrap" }}>{a.year}</span>
+                  <span className="ink-dot" style={{ fontSize: "var(--dot-xs)", whiteSpace: "nowrap" }}>{a.year}</span>
                 </li>
               ))}
             </ul>

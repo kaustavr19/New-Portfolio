@@ -67,7 +67,7 @@ export default function InkContact() {
       <div className="ink-split">
         <aside className="ink-split-side">
           <span className="ink-label ink-live">Channel open</span>
-          <h3 className="ink-dot-900" style={{ fontSize: 34, lineHeight: 1 }}>SAY<br />HELLO.</h3>
+          <h3 className="ink-dot-900" style={{ fontSize: "var(--dot-l)", lineHeight: 1 }}>SAY<br />HELLO.</h3>
           <p style={{ fontSize: 14, lineHeight: 1.6, color: "var(--ink-soft)" }}>
             Send a role, product brief, or difficult workflow. A little context is enough — not a polished brief.
           </p>
@@ -90,7 +90,7 @@ export default function InkContact() {
           {status === "sent" ? (
             <div role="status" style={{ display: "flex", flexDirection: "column", gap: 16, alignItems: "flex-start", paddingTop: 20 }}>
               <span className="ink-label">Transmission sent</span>
-              <div className="ink-dot-900" style={{ fontSize: 44, lineHeight: 1 }}>RECEIVED<span className="ink-red">.</span></div>
+              <div className="ink-dot-900" style={{ fontSize: "var(--dot-l)", lineHeight: 1 }}>RECEIVED<span className="ink-red">.</span></div>
               <p className="ink-body">Thanks{name.trim() ? `, ${name.trim()}` : ""}. A reply goes to {email.trim()} — usually within a couple of days.</p>
               <button type="button" className="ink-pill" onClick={reset}>Send another</button>
             </div>
