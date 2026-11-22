@@ -240,3 +240,11 @@ html[data-ink-mode="light"] .ink-halftone img.wire { filter: grayscale(1); }
 .ink-home-ask { margin-top: 22px; }
 @media (max-height: 720px) { .ink-home-ask { margin-top: 18px; } }
 @media (max-height: 600px) { .ink-home-ask { margin-top: 12px; } }
+
+/* Visitor brief — a card above the dock (desktop) or the Ask bar (phone). */
+.ink-brief { right: 20px; bottom: 96px; width: min(340px, calc(100vw - 40px)); }
+@media (max-width: 760px) {
+  .ink-brief { left: 12px; right: 12px; width: auto; bottom: calc(env(safe-area-inset-bottom, 0px) + 88px); }
+}
+.ink-brief-option { transition: border-color .15s, background .15s; }
+.ink-brief-option:hover, .ink-brief-option:focus-visible { border-color: var(--ink-fg); background: var(--ink-raised); }

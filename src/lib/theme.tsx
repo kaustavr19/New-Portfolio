@@ -48,11 +48,30 @@ function initialTheme(): ThemeId {
   return DEFAULT_THEME;
 }
 
+/* The classic shell's typefaces (Minecraft terminal, Detroit, Cyberpunk,
+   GTA, RDR2, The Last of Us, OS shell mono) — one stylesheet, added on
+   demand so InkOS visitors never download them. */
+const CLASSIC_FONTS_HREF =
+  "https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Press+Start+2P&family=VT323" +
+  "&family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@400;500;600;700&family=Bebas+Neue" +
+  "&family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600" +
+  "&family=Special+Elite&display=swap";
+
+function ensureClassicFonts() {
+  if (document.getElementById("kros-classic-fonts")) return;
+  const link = document.createElement("link");
+  link.id = "kros-classic-fonts";
+  link.rel = "stylesheet";
+  link.href = CLASSIC_FONTS_HREF;
+  document.head.appendChild(link);
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<ThemeId>(initialTheme);
   const ready = true;
 
   useEffect(() => {
+    if (theme !== "ink") ensureClassicFonts();
     document.documentElement.dataset.theme = theme;
     try {
       localStorage.setItem(STORAGE_KEY, theme);

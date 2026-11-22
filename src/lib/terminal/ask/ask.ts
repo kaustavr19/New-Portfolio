@@ -164,6 +164,12 @@ function smalltalk(q: Q): AskResult | null {
       "§fI'm KR-19, the terminal of Kaustav's portfolio.",
       "§7No AI here — I parse your question and match it against everything on this site, the pre-LLM way. If it isn't written down, I'll say so.",
     ], EXAMPLES.slice(0, 3), "smalltalk");
+  // About the site itself — the colophon lives in Settings.
+  if (/\b(this|the|your) (site|website|portfolio|os|terminal)\b/.test(q.low) && /\b(built|build|made|make|tech|stack|works?|code[d]?|framework|how)\b/.test(q.low))
+    return res([
+      "§fKR//OS is built as an operating system — designed and coded by Kaustav, in Next.js, React and TypeScript.",
+      "§7The wallpaper is one canvas of fixed dots that follows the real Kolkata weather; the sound is synthesised live with Web Audio; and I answer you without AI, from this site's own content.",
+    ], [{ label: "About this OS →", act: { kind: "open", app: "settings" } }], "smalltalk");
   if (/\bwhat can (i|you) (ask|do|answer)\b|\bwhat (should|do) i ask\b|\bexamples?\b/.test(q.low))
     return res(["§fAsk about his roles, projects, skills, tools, dates, awards or availability.", "§8For example:"], EXAMPLES, "smalltalk");
   return null;

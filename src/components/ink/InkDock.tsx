@@ -68,7 +68,7 @@ function SystemMenu({ onClose, onOpenApp }: { onClose: () => void; onOpenApp: (i
       </div>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
         <button type="button" className="ink-pill" onClick={() => { openReader(true); onClose(); }}>Reading view</button>
-        <button type="button" className="ink-pill" onClick={() => { onOpenApp("settings"); onClose(); }}>Settings</button>
+        <button type="button" className="ink-pill" onClick={() => { onOpenApp("settings"); onClose(); }}>About this OS</button>
         <Link className="ink-pill action" href="/work">Case studies ↗</Link>
       </div>
       <div style={{ borderTop: "1px solid var(--ink-line)" }}>

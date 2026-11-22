@@ -9,16 +9,18 @@ import { KROS_MARK_BOX, KROS_MARK_PATH } from "./KrosMark";
 /* ──────────────────────────────────────────────────────────
    InkOS boot — the KR//OS monogram is rasterised into a dot grid and
    lit in a sweep while a segmented bar fills. At 100% the mark pulses
-   red once (system ready) and the ENTER pill appears; that click is
-   also the audio-unlock gesture.
+   red once (system ready) and the desktop takes over on its own — no
+   click gate. Any click or key skips straight to the desktop (and, being
+   a gesture, also unlocks audio and plays the ready chord).
+   Only first visits see it; OSRoot remembers the boot.
    Reduced motion: the mark is drawn fully formed, no sweep or pulse.
    ────────────────────────────────────────────────────────── */
 
 const COLS = 40;
 const ROWS = 40;
 const PITCH = 9;
-const DURATION = 3400;
-const PULSE = 650;
+const DURATION = 1500; // short on purpose: visitors came for the work, not the loader
+const PULSE = 450;
 
 const STATUSES: [number, string][] = [
   [0, "Laying ink…"],
@@ -61,7 +63,21 @@ export default function InkBoot({ onComplete }: { onComplete: () => void }) {
   const scheme = useInkScheme();
   const [t, setT] = useState(motionReduced ? 1 : 0);
   const ready = t >= 1;
-  const enterRef = useRef<HTMLButtonElement>(null);
+  const doneRef = useRef(false);
+
+  /* Leave the boot exactly once. `gesture` = the visitor clicked or pressed
+     a key, which is allowed to make sound; the automatic hand-off is silent. */
+  const enter = (gesture: boolean) => {
+    if (doneRef.current) return;
+    doneRef.current = true;
+    if (gesture && soundEffects) uiReady();
+    onComplete();
+  };
+  // The animation loop and window listeners outlive renders; they call the latest `enter`.
+  const enterRef = useRef(enter);
+  useEffect(() => {
+    enterRef.current = enter;
+  });
 
   useEffect(() => {
     const cvs = canvasRef.current;
@@ -91,29 +107,43 @@ export default function InkBoot({ onComplete }: { onComplete: () => void }) {
       const p = Math.min(el / DURATION, 1);
       draw(p, p >= 1 && el < DURATION + PULSE);
       setT(p);
-      if (el < DURATION + PULSE + 50) raf = requestAnimationFrame(frame);
+      if (el < DURATION + PULSE) raf = requestAnimationFrame(frame);
+      else enterRef.current(false); // ready pulse done → hand over to the desktop
     };
 
+    let handoff = 0;
     document.fonts.ready.then(() => {
       dots = sampleMark();
       if (motionReduced) {
         draw(1);
         setT(1);
+        handoff = window.setTimeout(() => enterRef.current(false), 700);
       } else {
         raf = requestAnimationFrame(frame);
+        // Animation frames pause in background tabs (a visitor middle-clicking
+        // in from a gallery); a timer makes sure the boot never hangs there.
+        handoff = window.setTimeout(() => enterRef.current(false), DURATION + PULSE + 400);
       }
     });
-    return () => cancelAnimationFrame(raf);
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(handoff);
+    };
   }, [motionReduced, scheme]);
 
+  // Any click, tap or key skips the boot.
   useEffect(() => {
-    if (ready) enterRef.current?.focus();
-  }, [ready]);
-
-  const enter = () => {
-    if (soundEffects) uiReady();
-    onComplete();
-  };
+    const skip = (e: Event) => {
+      if (e instanceof KeyboardEvent && (e.metaKey || e.ctrlKey || e.altKey || e.key === "Tab")) return;
+      enterRef.current(true);
+    };
+    window.addEventListener("pointerdown", skip);
+    window.addEventListener("keydown", skip);
+    return () => {
+      window.removeEventListener("pointerdown", skip);
+      window.removeEventListener("keydown", skip);
+    };
+  }, []);
 
   const segments = 48;
   const n = Math.round(t * segments);
@@ -122,17 +152,14 @@ export default function InkBoot({ onComplete }: { onComplete: () => void }) {
   return (
     <div
       className="ink fixed inset-0 flex flex-col items-center justify-center"
-      style={{ background: "var(--ink-bg)", gap: 34, zIndex: 50 }}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" && ready) enter();
-      }}
+      style={{ background: "var(--ink-bg)", gap: 34, zIndex: 50, cursor: "pointer" }}
     >
       <div
         aria-hidden
         className="ink-dotgrid absolute inset-0"
         style={{ WebkitMaskImage: "radial-gradient(ellipse at center, #000 20%, transparent 70%)", maskImage: "radial-gradient(ellipse at center, #000 20%, transparent 70%)", opacity: 0.7 }}
       />
-      {["KR-19 · INKOS", "BUILD 2.077", "PORTFOLIO · INK EDITION", ready ? "PRESS ENTER" : "BOOTING"].map((txt, i) => (
+      {["KR-19 · INKOS", "BUILD 2.077", "PORTFOLIO · INK EDITION", ready ? "READY" : "CLICK OR PRESS ANY KEY TO SKIP"].map((txt, i) => (
         <span
           key={txt}
           aria-hidden
@@ -193,16 +220,9 @@ export default function InkBoot({ onComplete }: { onComplete: () => void }) {
         </div>
       </div>
 
-      <button
-        ref={enterRef}
-        type="button"
-        onClick={enter}
-        className="ink-pill"
-        style={{ position: "relative", padding: "14px 28px", fontSize: 12, borderColor: "var(--ink-fg)", letterSpacing: ".2em", opacity: ready ? 1 : 0, pointerEvents: ready ? "auto" : "none", transition: "opacity .4s" }}
-        tabIndex={ready ? 0 : -1}
-        aria-hidden={!ready}
-      >
-        ENTER KR//OS
+      {/* Keyboard / screen-reader way out, same as clicking anywhere. */}
+      <button type="button" className="sr-only" onClick={() => enter(true)}>
+        Skip intro
       </button>
     </div>
   );

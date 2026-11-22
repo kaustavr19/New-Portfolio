@@ -1,29 +1,27 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { profile } from "@/data/content";
+import { useCallback, useEffect, useState } from "react";
 import { audienceProfiles, saveAudience, type AudienceId } from "@/lib/audience";
 import { setHash } from "@/lib/deep-link";
 import { PERSONNEL_BRIEF_EVENT } from "@/lib/personnel-brief";
 import { useReaderMode } from "@/lib/reader-mode";
-import { StatTile } from "./ui";
 
-/* First-visit orientation, Ink edition. Same storage key and reopen event
-   as the classic PersonnelBrief, so a visitor is briefed once across themes
-   and About's "Open brief" button reopens whichever is mounted. */
+/* First-visit orientation, Ink edition — a small card, not a modal.
+
+   It slides in a few seconds after the desktop appears, sits above the
+   dock (above the Ask bar on phones), never dims the screen or takes
+   focus, and one click on a choice acts immediately. The first impression
+   stays the desktop itself.
+
+   Same storage key and reopen event as the classic PersonnelBrief, so a
+   visitor is briefed once across themes and About's "Open brief" button
+   reopens whichever is mounted. */
 
 const BRIEFED_KEY = "kros_personnel_brief_v2";
-
-const PROOF = [
-  { value: "~40%", label: "Faster review · AI underwriting" },
-  { value: "50+", label: "Designers on one system" },
-  { value: "I/O 24", label: "Featured at Google I/O" },
-];
+const DELAY_MS = 4000;
 
 export default function InkBrief() {
   const [open, setOpen] = useState(false);
-  const [choice, setChoice] = useState<AudienceId | null>(null);
-  const ref = useRef<HTMLDivElement>(null);
   const { setOpen: openReader } = useReaderMode();
 
   const dismiss = useCallback(() => {
@@ -41,22 +39,18 @@ export default function InkBrief() {
     } catch {
       // show anyway
     }
-    const t = setTimeout(() => setOpen(true), 700);
+    const t = setTimeout(() => setOpen(true), DELAY_MS);
     return () => clearTimeout(t);
   }, []);
 
   useEffect(() => {
-    const reopen = () => {
-      setChoice(null);
-      setOpen(true);
-    };
+    const reopen = () => setOpen(true);
     window.addEventListener(PERSONNEL_BRIEF_EVENT, reopen);
     return () => window.removeEventListener(PERSONNEL_BRIEF_EVENT, reopen);
   }, []);
 
   useEffect(() => {
     if (!open) return;
-    ref.current?.focus();
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && dismiss();
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -64,8 +58,8 @@ export default function InkBrief() {
 
   if (!open) return null;
 
-  const go = () => {
-    if (choice) saveAudience(choice);
+  const go = (choice: AudienceId) => {
+    saveAudience(choice);
     if (choice === "recruiter") openReader(true);
     if (choice === "collaborator") {
       setHash("projects", "underwriting");
@@ -75,59 +69,32 @@ export default function InkBrief() {
   };
 
   return (
-    <div className="ink fixed inset-0 flex items-center justify-center" style={{ zIndex: 9500, background: "var(--ink-veil)", padding: 20 }} onMouseDown={(e) => e.target === e.currentTarget && dismiss()}>
-      <div
-        ref={ref}
-        tabIndex={-1}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="ink-brief-title"
-        className="ink-card ink-scroll"
-        style={{ width: "min(640px, 100%)", maxHeight: "calc(100vh - 40px)", padding: 28, display: "flex", flexDirection: "column", gap: 22, position: "relative", animation: "ink-in .2s ease-out", outline: "none" }}
-      >
-        <span aria-hidden className="ink-glyph pulse" />
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16 }}>
-          <div>
-            <span className="ink-label ink-live">Incoming · personnel brief</span>
-            <h2 id="ink-brief-title" className="ink-dot-900" style={{ fontSize: 40, lineHeight: 1, marginTop: 12 }}>{profile.name.toUpperCase()}</h2>
-            <p className="ink-body" style={{ marginTop: 10 }}>{profile.bioShort}</p>
-          </div>
-          <button type="button" className="ink-pill" onClick={dismiss} aria-label="Close brief">✕</button>
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 10 }}>
-          {PROOF.map((p) => <StatTile key={p.label} value={p.value} label={p.label} size={26} />)}
-        </div>
-        <div>
-          <span className="ink-label">Who&apos;s visiting?</span>
-          <div role="radiogroup" aria-label="Who's visiting" style={{ display: "grid", gap: 8, marginTop: 10 }}>
-            {audienceProfiles.map((a) => {
-              const on = choice === a.id;
-              return (
-                <button
-                  key={a.id}
-                  type="button"
-                  role="radio"
-                  aria-checked={on}
-                  onClick={() => setChoice(a.id)}
-                  style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 14, textAlign: "left", padding: "14px 16px", borderRadius: 16, border: `1px solid ${on ? "var(--ink-fg)" : "var(--ink-line)"}`, background: on ? "var(--ink-raised)" : "transparent" }}
-                >
-                  <span>
-                    <span className="ink-label" style={{ color: on ? "var(--ink-fg)" : undefined }}>{a.eyebrow}</span>
-                    <span style={{ display: "block", fontSize: 14, color: "var(--ink-soft)", marginTop: 4 }}>{a.description}</span>
-                  </span>
-                  <span className={`ink-status ${on ? "live" : ""}`} aria-hidden />
-                </button>
-              );
-            })}
-          </div>
-        </div>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-          <button type="button" className="ink-label" onClick={dismiss} style={{ padding: "8px 0" }}>Skip — explore freely</button>
-          <button type="button" className="ink-pill solid" onClick={go} disabled={!choice}>
-            {audienceProfiles.find((a) => a.id === choice)?.action ?? "Choose one"} →
-          </button>
-        </div>
+    <aside className="ink ink-brief ink-card" aria-labelledby="ink-brief-title" style={{ position: "fixed", zIndex: 9500, padding: "16px 16px 14px", boxShadow: "var(--ink-shadow)", animation: "ink-in .24s ease-out", display: "flex", flexDirection: "column", gap: 12 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+        <span className="ink-label ink-live">Incoming · personnel brief</span>
+        <button type="button" onClick={dismiss} aria-label="Close brief" style={{ width: 26, height: 26, borderRadius: "50%", display: "grid", placeItems: "center", color: "var(--ink-mute)" }}>
+          ✕
+        </button>
       </div>
-    </div>
+      <h2 id="ink-brief-title" style={{ fontSize: 15, fontWeight: 600 }}>Who&apos;s visiting? I&apos;ll point you to the right place.</h2>
+      <div style={{ display: "grid", gap: 6 }}>
+        {audienceProfiles.map((a) => (
+          <button
+            key={a.id}
+            type="button"
+            data-tick
+            onClick={() => go(a.id)}
+            className="ink-brief-option"
+            style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, textAlign: "left", padding: "10px 12px", borderRadius: 14, border: "1px solid var(--ink-line)" }}
+          >
+            <span style={{ minWidth: 0 }}>
+              <span className="ink-label" style={{ color: "var(--ink-fg)" }}>{a.eyebrow}</span>
+              <span className="ink-meta" style={{ display: "block", fontSize: 12, marginTop: 2, color: "var(--ink-soft)" }}>{a.actionDetail}</span>
+            </span>
+            <span aria-hidden style={{ color: "var(--ink-blue)" }}>→</span>
+          </button>
+        ))}
+      </div>
+    </aside>
   );
 }
