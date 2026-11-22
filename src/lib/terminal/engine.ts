@@ -8,9 +8,9 @@
 
    Two layers:
      1. Commands — slash-or-plain verbs (/help, open, resume, …).
-     2. Answer engine — free text is matched against intents +
-        the site content (content.ts) so the terminal can answer
-        questions about Kaustav, not just a fixed menu.
+     2. Ask KR-19 — anything else is a question, answered by the
+        no-AI engine in ./ask (templates over content.ts, the FAQ,
+        and search), with follow-up chips.
 
    Text supports Minecraft §-colour codes (parsed in the component):
      §7 gray  §a green  §6 gold  §e yellow  §b aqua  §c red  §f white
@@ -20,6 +20,15 @@ import {
   profile, experience, projects, skills,
   education, certifications, awardsFractal, awardsExternal, publications,
 } from "@/data/content";
+import { askKR, resetAsk, type Chip } from "./ask/ask";
+
+export type { Chip, ChipAct } from "./ask/ask";
+
+/* Free text → the answer engine. */
+function ask(input: string): TermResult {
+  const r = askKR(input);
+  return { lines: r.lines.map(out), chips: r.chips };
+}
 
 export type TermLineType = "input" | "output" | "error" | "system";
 export type TermLine = { type: TermLineType; text: string };
@@ -33,7 +42,9 @@ export type TermAction =
   | { kind: "toggleWallpaper" }
   | { kind: "advancement"; title: string; desc: string };
 
-export type TermResult = { lines: TermLine[]; action?: TermAction };
+/* `chips` are follow-up buttons from the answer engine (Ask KR-19); shells that
+   don't render them can ignore them. */
+export type TermResult = { lines: TermLine[]; action?: TermAction; chips?: Chip[] };
 
 const out = (text: string): TermLine => ({ type: "output", text });
 const err = (text: string): TermLine => ({ type: "error", text });
@@ -46,9 +57,6 @@ function bar(level: number): string {
 
 const FLAT_SKILLS = Object.values(skills).flat();
 
-// `experience` is chronological (oldest first) — the current role is the
-// last entry, not the first.
-const CURRENT_ROLE = experience[experience.length - 1];
 
 /* App aliases for `open <app>` / `/tp <app>`. */
 const APP_ALIASES: Record<string, string> = {
@@ -181,139 +189,6 @@ function cmdContact(): TermResult {
   };
 }
 
-/* ── The free-text answer engine ── */
-type Intent = { keys: string[]; weight?: number; run: (q: string) => TermResult };
-
-const INTENTS: Intent[] = [
-  {
-    keys: ["hi", "hello", "hey", "yo", "sup", "greetings"],
-    run: () => ({ lines: ["§aHey there! §7I'm KR//OS, Kaustav's terminal.", "§8Ask me about his work, skills, or projects — or type §e/help§8."].map(out) }),
-  },
-  {
-    keys: ["who", "about", "yourself", "introduce", "kaustav"],
-    run: () => ({ lines: cmdAbout() }),
-  },
-  {
-    keys: ["where", "work", "job", "company", "fractal", "currently", "now", "based", "location", "live"],
-    run: (q) => {
-      if (/where.*(live|based|from)|location|city/.test(q)) {
-        return { lines: [`§7Kaustav is based in §f${profile.location}§7.`].map(out) };
-      }
-      const cur = CURRENT_ROLE;
-      return {
-        lines: [
-          `§7Right now he's a §f${cur.role}§7`,
-          `§7at §f${cur.company}§7 §8(${cur.period})§7.`,
-          `§8${cur.description}`,
-        ].map(out),
-      };
-    },
-  },
-  {
-    keys: ["experience", "history", "career", "past", "before", "previous", "roles"],
-    run: () => ({ lines: cmdExperience() }),
-  },
-  {
-    keys: ["skill", "skills", "good", "strength", "strengths", "expert", "best"],
-    run: () => ({ lines: cmdSkills() }),
-  },
-  {
-    keys: ["project", "projects", "built", "build", "side", "made"],
-    run: () => ({ lines: cmdProjects() }),
-  },
-  {
-    keys: ["study", "studied", "education", "degree", "college", "university", "cgpa", "uem"],
-    run: () => ({ lines: cmdEducation() }),
-  },
-  {
-    keys: ["award", "awards", "recognition", "honour", "honor", "google", "io"],
-    run: () => ({ lines: cmdAwards() }),
-  },
-  {
-    keys: ["write", "writing", "article", "articles", "blog", "medium", "publication", "talks"],
-    run: () => ({ lines: cmdWriting() }),
-  },
-  {
-    keys: ["contact", "hire", "hiring", "available", "reach", "email", "connect", "opportunity"],
-    run: () => cmdContact(),
-  },
-  {
-    keys: ["ai", "ml", "xai", "explainable", "underwriting", "enterprise", "human-in-the-loop", "hitl"],
-    run: () => ({
-      lines: [
-        "§7Kaustav specializes in §fAI-powered enterprise UX§7 —",
-        "§7human-in-the-loop decisioning, explainable AI, and",
-        "§7workflows complex domains can actually trust.",
-        `§8Currently: ${CURRENT_ROLE.role} @ ${CURRENT_ROLE.company}.`,
-      ].map(out),
-    }),
-  },
-  {
-    keys: ["resume", "cv", "download"],
-    run: () => ({ lines: ["§aOpening résumé… §8(/Kaustav_Roy_CV.pdf)"].map(out), action: { kind: "link", url: "/Kaustav_Roy_CV.pdf" } }),
-  },
-  {
-    keys: ["thanks", "thank", "cool", "nice", "awesome", "great"],
-    run: () => ({ lines: ["§aGG. §7Anything else? Try §e/projects§7 or §e/contact§7."].map(out) }),
-  },
-];
-
-/* Score = keyword hits, lightly normalised. */
-function answer(query: string): TermResult {
-  const q = query.toLowerCase();
-  const tokens = q.split(/[^a-z0-9+]+/).filter(Boolean);
-  const tokenSet = new Set(tokens);
-
-  // 1) Specific skill lookup — "do you know X" / "<tool>?"
-  const skillHit = FLAT_SKILLS.find((s) => {
-    const name = s.name.toLowerCase();
-    return tokens.some((t) => t.length > 2 && (name.includes(t)));
-  });
-
-  // 2) Specific project lookup by name
-  const projHit = projects.find((p) => q.includes(p.name.toLowerCase().replace("project ", "")));
-
-  // 3) Best intent by keyword overlap
-  let best: { intent: Intent; score: number } | null = null;
-  for (const intent of INTENTS) {
-    let score = 0;
-    for (const k of intent.keys) if (tokenSet.has(k) || q.includes(k)) score += 1;
-    if (score > 0 && (!best || score > best.score)) best = { intent, score };
-  }
-
-  // Decide: a confident intent wins; otherwise prefer a specific entity hit.
-  if (best && best.score >= 2) return best.intent.run(q);
-  if (projHit) {
-    return {
-      lines: [
-        `§a▸ ${projHit.name} §8— §7${projHit.tagline} §8[${projHit.status}]`,
-        `§7${projHit.description}`,
-        `§8Stack: ${projHit.tags.join(", ")} · ${projHit.year}`,
-      ].map(out),
-    };
-  }
-  if (skillHit && (/know|can|able|good|familiar|use|experience|skill|\?/.test(q))) {
-    const verdict = skillHit.level >= 85 ? "§aVery much so." : skillHit.level >= 70 ? "§aYes." : "§eSomewhat.";
-    return { lines: [`${verdict} §f${skillHit.name} §7${bar(skillHit.level)} §f${skillHit.level}§8/100`].map(out) };
-  }
-  if (best) return best.intent.run(q);
-
-  // 4) Fallback — light content search across experience descriptions
-  const docHit = experience.find((e) =>
-    tokens.some((t) => t.length > 3 && (e.description.toLowerCase().includes(t) || e.tags.join(" ").toLowerCase().includes(t)))
-  );
-  if (docHit) {
-    return { lines: [`§e${docHit.period} §8· §f${docHit.role}`, `§8${docHit.description}`].map(out) };
-  }
-
-  return {
-    lines: [
-      `§7Hmm, I don't have a clean answer for §f"${query}"§7.`,
-      "§8Try §e/help§8, or ask about his §eskills§8, §eprojects§8, §eexperience§8, or how to §ehire§8 him.",
-    ].map(out),
-  };
-}
-
 /* ── Top-level dispatch ── */
 export function runTerminal(raw: string): TermResult {
   const input = raw.trim();
@@ -344,6 +219,7 @@ export function runTerminal(raw: string): TermResult {
     case "medium":
       return { lines: ["§aOpening Medium…"].map(out), action: { kind: "link", url: profile.social.medium } };
     case "clear": case "cls":
+      resetAsk();
       return { lines: [], action: { kind: "clear" } };
     case "ls": case "dir": case "apps": {
       const target = arg.trim().replace(/\/+$/, "").toLowerCase();
@@ -466,7 +342,7 @@ export function runTerminal(raw: string): TermResult {
       return { lines: ["§6The Answer to the Ultimate Question of Life, the Universe, and Everything."].map(out) };
     default:
       // Not a command → answer engine.
-      return answer(input);
+      return ask(input);
   }
 }
 

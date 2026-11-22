@@ -118,7 +118,12 @@ export default function TerminalApp() {
     if (a?.kind === "toggleWallpaper") setFlag("starfieldWebgl", !starfieldWebgl);
     if (a?.kind === "advancement") setToast({ title: a.title, desc: a.desc });
 
-    setLines((prev) => [...prev, echo, ...result.lines, { type: "system", text: "" }]);
+    // The answer engine's follow-up chips, as typeable hints (this shell has no buttons).
+    const hints = (result.chips ?? []).flatMap((c) =>
+      c.act.kind === "ask" ? [`§e"${c.act.q}"`] : c.act.kind === "open" && c.act.app === "contact" ? ["§e/contact"] : [],
+    );
+    const hintLine: TermLine[] = hints.length ? [{ type: "system", text: `§8→ ${hints.join("§8 · ")}` }] : [];
+    setLines((prev) => [...prev, echo, ...result.lines, ...hintLine, { type: "system", text: "" }]);
     if (raw.trim()) setHistory((h) => [raw, ...h.filter((x) => x !== raw)].slice(0, 40));
     setHistIdx(-1);
     setInput("");

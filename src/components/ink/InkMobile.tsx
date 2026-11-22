@@ -14,6 +14,7 @@ import { ExperienceTile, WorkMap } from "./widgets";
 import { useWeather } from "./useWeather";
 import WeatherGlyph from "./WeatherGlyph";
 import { INK_APP_COMPONENTS } from "./apps";
+import AskBar from "./AskBar";
 
 /* InkOS phone shell: lock → home → app. Shares the kros_booted session
    key with the classic shell, and keeps deep links across the unlock. */
@@ -160,11 +161,7 @@ function HomeScreen({ onOpen }: { onOpen: (id: string) => void }) {
         </a>
       </nav>
 
-      <button type="button" onClick={() => onOpen("terminal")} style={{ marginTop: "auto", display: "flex", alignItems: "center", gap: 10, padding: "14px 18px", borderRadius: 999, background: "var(--ink-raised)", border: "1px solid var(--ink-line)" }}>
-        <Icon name="search" size={16} color="var(--ink-mute)" />
-        <span className="ink-meta" style={{ fontSize: 12 }}>Ask KR-19 anything…</span>
-        <span className="ink-label ink-blue" style={{ marginLeft: "auto" }}>Terminal →</span>
-      </button>
+      <AskBar variant="mobile" />
     </div>
   );
 }
