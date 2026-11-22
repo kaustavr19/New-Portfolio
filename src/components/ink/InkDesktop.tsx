@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { desktopIcons, profile } from "@/data/content";
 import { useA11y } from "@/lib/a11y";
 import { parseHash, setAppHash } from "@/lib/deep-link";
@@ -35,18 +35,66 @@ function useViewport() {
 }
 
 /* ── Widgets ── */
+/* Short screens: shrink the column to fit instead of scrolling. Scale it
+   down a little first; if that would get too small, drop the lowest-priority
+   card (Currently) and fit the rest. */
+const MIN_SCALE = 0.84;
+const GAP = 14;
+
 function Widgets({ onOpenApp }: { onOpenApp: OpenApp }) {
+  const asideRef = useRef<HTMLElement>(null);
+  const curRef = useRef<HTMLDivElement>(null);
+  const curH = useRef(0); // last measured Currently height + gap, remembered while it's hidden
+  const [fit, setFit] = useState({ scale: 1, showCurrently: true, h: 0 });
+
+  useLayoutEffect(() => {
+    const aside = asideRef.current;
+    const box = aside?.parentElement?.parentElement; // the absolutely-positioned column
+    if (!aside || !box) return;
+    const measure = () => {
+      const room = box.clientHeight;
+      if (curRef.current) curH.current = curRef.current.offsetHeight + GAP;
+      const h = aside.offsetHeight; // layout height, unaffected by the transform
+      const full = curRef.current ? h : h + curH.current;
+      let next: { scale: number; showCurrently: boolean; h: number };
+      if (full <= room) next = { scale: 1, showCurrently: true, h: full };
+      else if (room / full >= MIN_SCALE) next = { scale: room / full, showCurrently: true, h: full };
+      else {
+        const rest = full - curH.current;
+        next = { scale: Math.min(1, room / rest), showCurrently: false, h: rest };
+      }
+      setFit((p) => (p.scale === next.scale && p.showCurrently === next.showCurrently && p.h === next.h ? p : next));
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(aside);
+    ro.observe(box);
+    document.fonts?.ready.then(measure);
+    return () => ro.disconnect();
+  }, []);
+
   return (
-    <aside aria-label="Widgets" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-      <ClockCard />
-      {/* minmax(0, …): a wide tile (e.g. "4.3 YRS") must not push the row past the 300px column */}
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)", gap: 14 }}>
-        <StatusTile />
-        <ExperienceTile onOpenApp={onOpenApp} />
-      </div>
-      <WorkMap onOpenApp={onOpenApp} />
-      <CurrentlyCard onOpenApp={onOpenApp} />
-    </aside>
+    /* Wrapper carries the scaled height so the column never reserves unscaled space. */
+    <div style={{ height: fit.h ? fit.h * fit.scale : undefined }}>
+      <aside
+        ref={asideRef}
+        aria-label="Widgets"
+        style={{ display: "flex", flexDirection: "column", gap: GAP, width: 300, transform: fit.scale < 1 ? `scale(${fit.scale})` : undefined, transformOrigin: "top left" }}
+      >
+        <ClockCard />
+        {/* minmax(0, …): a wide tile (e.g. "4.3 YRS") must not push the row past the 300px column */}
+        <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)", gap: GAP }}>
+          <StatusTile />
+          <ExperienceTile onOpenApp={onOpenApp} />
+        </div>
+        <WorkMap onOpenApp={onOpenApp} />
+        {fit.showCurrently && (
+          <div ref={curRef}>
+            <CurrentlyCard onOpenApp={onOpenApp} />
+          </div>
+        )}
+      </aside>
+    </div>
   );
 }
 
