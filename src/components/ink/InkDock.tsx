@@ -11,6 +11,7 @@ import { SwitchRow } from "./ui";
 import KrosMark from "./KrosMark";
 import InkModePicker from "./InkModePicker";
 import AskBar from "./AskBar";
+import InkPet from "./pet/InkPet";
 
 /* Theme switch — a segmented control; used in the dock menu and Settings. */
 export function ThemePicker() {
@@ -75,6 +76,7 @@ function SystemMenu({ onClose, onOpenApp }: { onClose: () => void; onOpenApp: (i
         <SwitchRow label="Sound effects" checked={a11y.soundEffects} onChange={() => a11y.toggle("soundEffects")} />
         <SwitchRow label="Ambience" checked={a11y.ambience} onChange={() => a11y.toggle("ambience")} />
         <SwitchRow label="Reduce motion" checked={a11y.motionReduced} onChange={() => a11y.toggle("motionReduced")} />
+        <SwitchRow label="Dock pet" checked={a11y.dockPet} onChange={() => a11y.toggle("dockPet")} />
       </div>
     </div>
   );
@@ -117,6 +119,7 @@ export default function InkDock({
         maxWidth: "calc(100vw - 24px)",
       }}
     >
+      <InkPet />
       <div style={{ position: "relative" }}>
         <button
           type="button"

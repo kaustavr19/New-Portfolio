@@ -38,7 +38,8 @@ function Widgets({ onOpenApp }: { onOpenApp: OpenApp }) {
   return (
     <aside aria-label="Widgets" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       <ClockCard />
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+      {/* minmax(0, …): a wide tile (e.g. "4.3 YRS") must not push the row past the 300px column */}
+      <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)", gap: 14 }}>
         <StatusTile />
         <ExperienceTile onOpenApp={onOpenApp} />
       </div>

@@ -246,9 +246,9 @@ html[data-ink-mode="light"] .ink-halftone img.wire { filter: grayscale(1); }
   .ink-home-apps { gap: 8px 0; }
   .ink-home-icon { width: 44px; height: 44px; }
 }
-.ink-home-ask { margin-top: 22px; }
-@media (max-height: 720px) { .ink-home-ask { margin-top: 18px; } }
-@media (max-height: 600px) { .ink-home-ask { margin-top: 12px; } }
+.ink-home-ask { margin-top: 40px; } /* room for the dock pet (36px tall) */
+@media (max-height: 720px) { .ink-home-ask { margin-top: 38px; } }
+@media (max-height: 600px) { .ink-home-ask { margin-top: 36px; } }
 
 /* Visitor brief — a card above the dock (desktop) or the Ask bar (phone). */
 .ink-brief { right: 20px; bottom: 96px; width: min(340px, calc(100vw - 40px)); }
@@ -271,3 +271,16 @@ html[data-ink-mode="light"] .ink-halftone img.wire { filter: grayscale(1); }
 
 /* Headings break into even lines instead of leaving one word hanging. */
 .ink h1, .ink h2, .ink h3, .ink h4, html[data-theme="ink"] h1, html[data-theme="ink"] h2, html[data-theme="ink"] h3 { text-wrap: balance; }
+
+/* Dock pet effects — pixel hearts and the "awoo" label float up from the husky's head. */
+.ink-pet-heart, .ink-pet-awoo { position: absolute; top: 0; transform: translateX(-50%); animation: ink-pet-float 1.1s ease-out both; pointer-events: none; }
+.ink-pet-heart {
+  width: calc(var(--pet-px, 2px) * 7); height: calc(var(--pet-px, 2px) * 6); background: var(--ink-red);
+  clip-path: polygon(14.3% 0, 42.9% 0, 42.9% 16.7%, 57.1% 16.7%, 57.1% 0, 85.7% 0, 85.7% 16.7%, 100% 16.7%, 100% 50%, 85.7% 50%, 85.7% 66.7%, 71.4% 66.7%, 71.4% 83.3%, 57.1% 83.3%, 57.1% 100%, 42.9% 100%, 42.9% 83.3%, 28.6% 83.3%, 28.6% 66.7%, 14.3% 66.7%, 14.3% 50%, 0 50%, 0 16.7%, 14.3% 16.7%);
+}
+.ink-pet-awoo { font-size: 11px; color: var(--ink-fg); white-space: nowrap; animation-duration: 1.8s; }
+@keyframes ink-pet-float {
+  0% { opacity: 0; translate: 0 4px; }
+  15% { opacity: 1; }
+  100% { opacity: 0; translate: 0 -26px; }
+}

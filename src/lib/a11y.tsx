@@ -13,6 +13,7 @@ export type A11yPrefs = {
   soundEffects: boolean;   // pop sounds, boot chimes, UI blips
   ambience: boolean;       // calm room tone + weather sounds
   highContrast: boolean;
+  dockPet: boolean;        // the pixel husky on the InkOS dock
 };
 
 type A11yCtx = A11yPrefs & {
@@ -25,6 +26,7 @@ const DEFAULTS: A11yPrefs = {
   soundEffects: false,
   ambience: true,
   highContrast: false,
+  dockPet: true,
 };
 
 const STORAGE_KEY = "kros_a11y";
