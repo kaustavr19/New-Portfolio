@@ -11,7 +11,7 @@ import { SwitchRow } from "./ui";
 import KrosMark from "./KrosMark";
 import InkModePicker from "./InkModePicker";
 import AskBar from "./AskBar";
-import InkPet from "./pet/InkPet";
+import { usePerch } from "./pet/perches";
 
 /* Theme switch — a segmented control; used in the dock menu and Settings. */
 export function ThemePicker() {
@@ -97,9 +97,12 @@ export default function InkDock({
   const { ambience, toggle, motionReduced } = useA11y();
   const now = useClock();
   const t = now ? cityTime(now) : null;
+  const navRef = useRef<HTMLElement>(null);
+  usePerch("dock", "dock", navRef); // the dock pet's home
 
   return (
     <nav
+      ref={navRef}
       aria-label="Dock"
       className="ink"
       style={{
@@ -119,7 +122,6 @@ export default function InkDock({
         maxWidth: "calc(100vw - 24px)",
       }}
     >
-      <InkPet />
       <div style={{ position: "relative" }}>
         <button
           type="button"

@@ -7,6 +7,7 @@ import { parseHash, setAppHash } from "@/lib/deep-link";
 import { uiOpen } from "@/lib/ink-sound";
 import InkWindow, { type Rect } from "./InkWindow";
 import InkDock from "./InkDock";
+import InkPet from "./pet/InkPet";
 import InkBrief from "./InkBrief";
 import { INK_APPS } from "./data";
 import { Icon } from "./ui";
@@ -216,6 +217,7 @@ export default function InkDesktop() {
       })}
 
       <InkDock openApps={openList} focusedApp={focusedId} onAppClick={onDockApp} onOpenApp={openApp} />
+      <InkPet roam />
       <InkBrief />
     </div>
   );
