@@ -30,7 +30,7 @@ export default function InkSkills() {
         <header style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: 18, flexWrap: "wrap" }}>
           <div>
             <span className="ink-label">Capability map · evidence-linked</span>
-            <h3 className="ink-dot-900" style={{ fontSize: "clamp(30px, 5cqi, 44px)", lineHeight: 1, marginTop: 8, textTransform: "uppercase" }}>{meta.label}</h3>
+            <h3 className="ink-dot-900" style={{ fontSize: "clamp(var(--dot-m), 5cqi, var(--dot-l))", lineHeight: 1, marginTop: 8, textTransform: "uppercase" }}>{meta.label}</h3>
             <p className="ink-body" style={{ marginTop: 8, maxWidth: 560 }}>{meta.summary}</p>
           </div>
           <div className="ink-seg" role="tablist" aria-label="Capability groups" style={{ flexWrap: "wrap", borderRadius: 22 }}>
@@ -46,7 +46,7 @@ export default function InkSkills() {
           {capabilityGroups[group].map((c, i) => (
             <article key={c.name} className="ink-card" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
-                <span className="ink-dot" style={{ fontSize: 15, color: "var(--ink-dim)" }}>{String(i + 1).padStart(2, "0")}</span>
+                <span className="ink-dot" style={{ fontSize: "var(--dot-xs)", color: "var(--ink-dim)" }}>{String(i + 1).padStart(2, "0")}</span>
                 <span className="ink-label">{c.evidence.length} proof points</span>
               </div>
               <div>
@@ -64,8 +64,8 @@ export default function InkSkills() {
                   const body = (
                     <>
                       <span style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
-                        <b className="ink-dot" style={{ fontSize: 15 }}>{e.signal}</b>
-                        <span className="ink-label" style={{ fontSize: 9 }}>{e.source}</span>
+                        <b className="ink-dot" style={{ fontSize: "var(--dot-xs)" }}>{e.signal}</b>
+                        <span className="ink-label" style={{ fontSize: 11 }}>{e.source}</span>
                       </span>
                       <span style={{ display: "block", fontSize: 13, lineHeight: 1.5, color: "var(--ink-mute)", marginTop: 4 }}>{e.detail}</span>
                       {(proj || e.href) && <span className="ink-meta ink-blue" style={{ display: "block", marginTop: 6 }}>{proj ? `${proj.name} →` : "Source ↗"}</span>}
@@ -96,7 +96,7 @@ export default function InkSkills() {
               <li key={s.name} style={{ display: "grid", gridTemplateColumns: "140px minmax(0, 1fr) 30px", alignItems: "center", gap: 12, padding: "6px 0" }}>
                 <span style={{ fontSize: 13.5 }}>{s.name}</span>
                 <SegBar value={s.level} segments={20} label={s.name} />
-                <span className="ink-dot" style={{ fontSize: 14, textAlign: "right" }}>{s.level}</span>
+                <span className="ink-dot" style={{ fontSize: "var(--dot-xs)", textAlign: "right" }}>{s.level}</span>
               </li>
             ))}
           </ul>

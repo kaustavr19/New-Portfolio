@@ -39,6 +39,14 @@ html[data-theme="ink"], .ink {
   --font-mono: "Space Mono", ui-monospace, monospace;
   --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
 
+  /* Doto display scale (~1.4 ratio). Every dot-matrix size is one of these;
+     the boot logo and lock-screen clock are the only deliberate exceptions. */
+  --dot-xs: 14px;
+  --dot-s: 20px;
+  --dot-m: 28px;
+  --dot-l: 40px;
+  --dot-xl: 58px;
+
   --r-card: 22px;
   --r-window: 26px;
   --r-pill: 999px;
@@ -87,8 +95,9 @@ html[data-theme="ink"] ::-webkit-scrollbar-thumb { background: var(--ink-scroll)
 @keyframes ink-spin { to { transform: rotate(360deg) } }
 
 /* ── Type ── */
-.ink-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-mute); }
-.ink-meta { font-family: var(--font-mono); font-size: 11px; color: var(--ink-mute); line-height: 1.5; }
+/* 11px is the floor for any label — uppercase mono below that stops being readable. */
+.ink-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-mute); }
+.ink-meta { font-family: var(--font-mono); font-size: 12px; color: var(--ink-mute); line-height: 1.5; }
 .ink-dot { font-family: var(--font-dot); font-weight: 700; letter-spacing: .01em; }
 .ink-dot-900 { font-family: var(--font-dot); font-weight: 900; letter-spacing: .01em; }
 .ink-body { font-size: 15px; line-height: 1.7; color: var(--ink-soft); }
@@ -248,3 +257,17 @@ html[data-ink-mode="light"] .ink-halftone img.wire { filter: grayscale(1); }
 }
 .ink-brief-option { transition: border-color .15s, background .15s; }
 .ink-brief-option:hover, .ink-brief-option:focus-visible { border-color: var(--ink-fg); background: var(--ink-raised); }
+
+/* ── Generated project covers on the /work cards ── */
+.ink-workcard { display: grid; grid-template-columns: 40px minmax(0, 1fr) 200px; grid-template-areas: "n body cover"; gap: 14px 18px; align-items: start; }
+.ink-workcard-n { grid-area: n; }
+.ink-workcard-body { grid-area: body; min-width: 0; }
+.ink-workcard-cover { grid-area: cover; }
+@media (max-width: 640px) {
+  .ink-workcard { grid-template-columns: 32px minmax(0, 1fr); grid-template-areas: "cover cover" "n body"; }
+}
+.ink-sidecard { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 480px) { .ink-sidecard { grid-template-columns: 88px minmax(0, 1fr); gap: 12px; } }
+
+/* Headings break into even lines instead of leaving one word hanging. */
+.ink h1, .ink h2, .ink h3, .ink h4, html[data-theme="ink"] h1, html[data-theme="ink"] h2, html[data-theme="ink"] h3 { text-wrap: balance; }

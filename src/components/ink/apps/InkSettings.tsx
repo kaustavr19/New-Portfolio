@@ -76,7 +76,7 @@ export default function InkSettings() {
                     {SWATCH[t.id].map((c) => <span key={c} style={{ width: 22, height: 22, borderRadius: "50%", background: c, border: "1px solid var(--ink-line-strong)" }} />)}
                   </span>
                   <span>
-                    <span className="ink-dot-900" style={{ display: "block", fontSize: 20 }}>{t.label.toUpperCase()}</span>
+                    <span className="ink-dot-900" style={{ display: "block", fontSize: "var(--dot-s)" }}>{t.label.toUpperCase()}</span>
                     <span className="ink-meta">{t.hint}</span>
                   </span>
                   <span className={`ink-label ${on ? "ink-live" : ""}`} style={{ color: on ? "var(--ink-fg)" : undefined }}>{on ? "Active" : "Switch"}</span>

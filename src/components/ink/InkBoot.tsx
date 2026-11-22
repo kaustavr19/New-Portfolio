@@ -211,7 +211,7 @@ export default function InkBoot({ onComplete }: { onComplete: () => void }) {
       <div style={{ position: "relative", width: "min(420px, 80vw)", display: "flex", flexDirection: "column", gap: 10 }}>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <span className="ink-label" role="status" aria-live="polite">{status}</span>
-          <span className="ink-dot" style={{ fontSize: 16 }}>{String(Math.round(t * 100)).padStart(2, "0")}%</span>
+          <span className="ink-dot" style={{ fontSize: "var(--dot-xs)" }}>{String(Math.round(t * 100)).padStart(2, "0")}%</span>
         </div>
         <div className="ink-bar" style={{ gridTemplateColumns: `repeat(${segments}, 1fr)` }} aria-hidden>
           {Array.from({ length: segments }, (_, i) => (

@@ -177,7 +177,7 @@ export default function InkDesktop() {
               <span style={{ width: 58, height: 58, borderRadius: 18, display: "grid", placeItems: "center", background: on ? "var(--ink-fg)" : "var(--ink-raised)", border: "1px solid var(--ink-line)", color: on ? "var(--ink-on-fg)" : "var(--ink-fg)", transition: "background .15s" }}>
                 <Icon name={app.id} size={25} />
               </span>
-              <span className="ink-meta" style={{ color: "var(--ink-fg)", fontSize: 10.5 }}>{app.name}</span>
+              <span className="ink-meta" style={{ color: "var(--ink-fg)", fontSize: 11 }}>{app.name}</span>
             </button>
           );
         })}
@@ -185,7 +185,7 @@ export default function InkDesktop() {
           <span style={{ width: 58, height: 58, borderRadius: 18, display: "grid", placeItems: "center", border: "1px solid var(--ink-blue-soft)", color: "var(--ink-blue)" }}>
             <Icon name="resume" size={25} />
           </span>
-          <span className="ink-meta ink-blue" style={{ fontSize: 10.5 }}>Resume</span>
+          <span className="ink-meta ink-blue" style={{ fontSize: 11 }}>Resume</span>
         </a>
       </nav>
 

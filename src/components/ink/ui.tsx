@@ -6,6 +6,29 @@ export function Label({ children, live, className = "" }: { children: ReactNode;
   return <span className={`ink-label ${live ? "ink-live" : ""} ${className}`}>{children}</span>;
 }
 
+/* A project / page title in Doto, kept legible: dot-matrix type falls apart
+   past ~20 characters, so a " — subtitle" moves to Inter underneath, and a
+   long main title steps one size down the Doto scale. `tier` = where it sits. */
+const DOT_TITLE = {
+  page: { short: "clamp(var(--dot-l), 8vw, var(--dot-xl))", long: "clamp(var(--dot-m), 6vw, var(--dot-l))", sub: 22 },
+  window: { short: "clamp(var(--dot-m), 6cqi, var(--dot-l))", long: "var(--dot-m)", sub: 18 },
+  card: { short: "var(--dot-m)", long: "var(--dot-s)", sub: 16 },
+} as const;
+
+export function DotTitle({ text, as: Tag = "h3", tier }: { text: string; as?: "h1" | "h2" | "h3" | "h4" | "span"; tier: keyof typeof DOT_TITLE }) {
+  const [main, ...rest] = text.split(/\s[—–]\s/);
+  const sub = rest.join(" — ");
+  const t = DOT_TITLE[tier];
+  return (
+    <Tag style={{ display: "block", margin: 0 }}>
+      <span className="ink-dot-900" style={{ display: "block", fontSize: main.length > 22 ? t.long : t.short, lineHeight: 0.98, textTransform: "uppercase", overflowWrap: "anywhere", textWrap: "balance" }}>
+        {main}
+      </span>
+      {sub && <span style={{ display: "block", fontSize: t.sub, fontWeight: 600, marginTop: 6, color: "var(--ink-soft)" }}>— {sub}</span>}
+    </Tag>
+  );
+}
+
 /* Section heading: optional dot-matrix index, mono label, hairline to the edge. */
 export function SectionHead({ n, children, as: Tag = "h3" }: { n?: string | number; children: ReactNode; as?: "h2" | "h3" | "h4" }) {
   return (
@@ -52,11 +75,12 @@ export function SegBar({
 }
 
 /* Big dot-matrix figure with a mono caption — key numbers, intel tiles. */
-export function StatTile({ value, label, size = 32 }: { value: string; label: string; size?: number }) {
+/* Sizes are steps of the Doto scale (ink.css · --dot-*), never raw pixels. */
+export function StatTile({ value, label, size = "m" }: { value: string; label: string; size?: "m" | "l" }) {
   return (
     <div className="ink-tile">
-      <b className="ink-dot-900" style={{ display: "block", fontSize: size, lineHeight: 1 }}>{value}</b>
-      <span className="ink-label" style={{ display: "block", marginTop: 6, fontSize: 9.5, letterSpacing: ".08em", lineHeight: 1.4 }}>
+      <b className="ink-dot-900" style={{ display: "block", fontSize: `var(--dot-${size})`, lineHeight: 1 }}>{value}</b>
+      <span className="ink-label" style={{ display: "block", marginTop: 6, fontSize: 11, letterSpacing: ".06em", lineHeight: 1.4 }}>
         {label}
       </span>
     </div>

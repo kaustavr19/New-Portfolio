@@ -45,7 +45,7 @@ export default function AboutPage() {
 
       <header className="flex flex-col gap-3">
         <span className="ink-label ink-live">{profile.tagline}</span>
-        <h1 className="ink-dot-900" style={{ fontSize: "clamp(40px, 9vw, 68px)", lineHeight: 0.95 }}>{profile.name.toUpperCase()}</h1>
+        <h1 className="ink-dot-900" style={{ fontSize: "clamp(var(--dot-m), 9vw, var(--dot-xl))", lineHeight: 0.95 }}>{profile.name.toUpperCase()}</h1>
         <p style={{ fontSize: 19 }}>
           {profile.designation} at Fractal Analytics · {profile.location}
         </p>
@@ -81,7 +81,7 @@ export default function AboutPage() {
                   const href = cs ? `/work/${cs.id}` : e.href;
                   return (
                     <li key={e.signal} style={{ fontSize: 15, lineHeight: 1.6, color: "var(--ink-soft)" }}>
-                      <strong className="ink-dot" style={{ fontSize: 16, color: "var(--ink-fg)" }}>{e.signal}</strong> — {e.detail}
+                      <strong className="ink-dot" style={{ fontSize: "var(--dot-xs)", color: "var(--ink-fg)" }}>{e.signal}</strong> — {e.detail}
                       {href && (
                         <>
                           {" "}
@@ -107,7 +107,7 @@ export default function AboutPage() {
           {[...chapters].reverse().map((c) => (
             <div key={c.id} className="flex flex-col gap-4">
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12, flexWrap: "wrap" }}>
-                <h3 className={`ink-dot-900 ${c.status === "in_progress" ? "ink-live" : ""}`} style={{ fontSize: 28 }}>{c.title}</h3>
+                <h3 className={`ink-dot-900 ${c.status === "in_progress" ? "ink-live" : ""}`} style={{ fontSize: "var(--dot-m)" }}>{c.title}</h3>
                 <span className="ink-meta">{c.period} · {c.duration}</span>
               </div>
               {[...c.missions].reverse().map((m) => (
