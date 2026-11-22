@@ -55,24 +55,10 @@ export default function RootLayout({
         />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        {/* InkOS (default theme) — dot-matrix display, mono data, sans reading */}
+        {/* InkOS (default theme) — dot-matrix display, mono data, sans reading.
+            The classic game-themed shell's nine families load only when that
+            theme is switched on (lib/theme · ensureClassicFonts). */}
         <link href="https://fonts.googleapis.com/css2?family=Doto:wght@500;700;900&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-        {/* OS Shell */}
-        <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet" />
-        {/* Minecraft Terminal — Press Start 2P for titles, VT323 for readable body */}
-        <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet" />
-        {/* Detroit: Become Human — futuristic tech */}
-        <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet" />
-        {/* Cyberpunk 2077 — condensed angular */}
-        <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
-        {/* GTA V — bold block */}
-        <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet" />
-        {/* Red Dead Redemption 2 — western serif (display) + journal serif (body) */}
-        <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet" />
-        {/* The Last of Us — typewriter worn */}
-        <link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet" />
       </head>
       <body className="scanlines h-full" suppressHydrationWarning>{children}</body>
     </html>

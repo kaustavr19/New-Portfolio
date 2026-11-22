@@ -9,6 +9,15 @@ import { SectionHead, SwitchRow } from "../ui";
 import SoundLab from "../SoundLab";
 import InkModePicker from "../InkModePicker";
 
+/* The colophon — how the OS is made. Facts only; keep in step with the code. */
+const COLOPHON: { term: string; detail: string }[] = [
+  { term: "Wallpaper", detail: "One canvas of fixed dots. The logo, clouds, rain, birds and stars are drawn by brightening dots that never move — and the sky follows the real Kolkata weather (Open-Meteo, refreshed every 30 min)." },
+  { term: "Sound", detail: "Synthesised live with the Web Audio API — no audio files. The rain you hear is drops landing on the wallpaper, panned to where they fall." },
+  { term: "Ask KR-19", detail: "The terminal answers questions with no AI: it parses the question, computes the answer from this site's own content, and falls back to a BM25 search." },
+  { term: "Type", detail: "Doto for the dot-matrix display, Space Mono for data, Inter for reading. Monochrome, with red for state and blue for actions." },
+  { term: "Stack", detail: "Next.js 16, React 19 and TypeScript, deployed on Vercel. Light and dark themes, reduced-motion support and a plain reading view at /work." },
+];
+
 /* A tiny swatch per theme so the choice is visual, not just a label. */
 const SWATCH: Record<ThemeId, string[]> = {
   ink: ["#000", "#f2f2f2", "#ff3b30", "#7ab2ff"],
@@ -34,6 +43,21 @@ export default function InkSettings() {
   return (
     <div className="ink-app ink-app-scroll">
       <div style={{ padding: "clamp(20px, 3cqi, 36px)", display: "flex", flexDirection: "column", gap: 30, maxWidth: 820 }}>
+        <section id="about-os" aria-label="About this OS">
+          <SectionHead as="h3">About this OS</SectionHead>
+          <p className="ink-body" style={{ maxWidth: 620 }}>
+            KR//OS is a portfolio built as an operating system — designed and coded by Kaustav Roy. Everything below is live, not a recording.
+          </p>
+          <dl style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 10, marginTop: 14 }}>
+            {COLOPHON.map((c) => (
+              <div key={c.term} className="ink-card" style={{ padding: "14px 16px" }}>
+                <dt className="ink-label">{c.term}</dt>
+                <dd style={{ fontSize: 14, lineHeight: 1.5, marginTop: 6, color: "var(--ink-soft)" }}>{c.detail}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+
         <section>
           <SectionHead as="h3">Theme</SectionHead>
           <div role="radiogroup" aria-label="Theme" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
